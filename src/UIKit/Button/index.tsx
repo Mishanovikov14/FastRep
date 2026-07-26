@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import type { PressableStateCallbackType, StyleProp, ViewStyle } from 'react-native';
 import { Pressable, View } from 'react-native';
 
-import { Loader } from '@/UIKit/Loader/Loader';
-import { Typography } from '@/UIKit/Typography/Typography';
+import { Loader } from '@/UIKit/Loader';
+import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getStyles } from './styles';
@@ -50,13 +50,17 @@ export const Button = ({
       onPress={onPress}
       style={getContainerStyle}
     >
-      <View style={styles.content}>
-        {loading ? <Loader color={foregroundColor} /> : leftElement}
-        <Typography color={foregroundColor} variant="button">
-          {title}
-        </Typography>
-        {!loading && rightElement}
-      </View>
+      {loading ? (
+        <Loader color={foregroundColor} />
+      ) : (
+        <View style={styles.content}>
+          {leftElement}
+          <Typography color={foregroundColor} variant="button">
+            {title}
+          </Typography>
+          {rightElement}
+        </View>
+      )}
     </Pressable>
   );
 };

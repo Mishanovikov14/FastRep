@@ -3,7 +3,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ReactQueryProvider } from '@/libs/query/ReactQueryProvider';
 import { ToastHost } from '@/libs/toast';
-import { Loader } from '@/UIKit';
+import { Loader } from '@/UIKit/Loader';
 import { UIProvider } from '@/UIProvider/UIProvider';
 import { useUIContext } from '@/UIProvider/useUIContext';
 

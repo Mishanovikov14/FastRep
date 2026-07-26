@@ -1,6 +1,30 @@
 import type { TranslationResources } from './types';
 
 export const de: TranslationResources = {
+  auth: {
+    registration: {
+      alreadyHaveAccount: 'Sie haben bereits ein Konto?',
+      confirmPassword: 'Passwort bestätigen',
+      createAccount: 'Konto erstellen',
+      email: 'E-Mail',
+      fullName: 'Vollständiger Name',
+      logIn: 'Anmelden',
+      password: 'Passwort',
+      subtitle: 'Erstellen Sie Ihr FastRep-Konto, um loszulegen.',
+      title: 'Konto erstellen',
+      validation: {
+        confirmPasswordRequired: 'Bestätigen Sie Ihr Passwort.',
+        emailInvalid: 'Geben Sie eine gültige E-Mail-Adresse ein.',
+        emailRequired: 'E-Mail ist erforderlich.',
+        fullNameMax: 'Der vollständige Name darf höchstens 80 Zeichen enthalten.',
+        fullNameMin: 'Der vollständige Name muss mindestens 2 Zeichen enthalten.',
+        fullNameRequired: 'Der vollständige Name ist erforderlich.',
+        passwordMin: 'Das Passwort muss mindestens 8 Zeichen enthalten.',
+        passwordRequired: 'Das Passwort ist erforderlich.',
+        passwordsMismatch: 'Die Passwörter stimmen nicht überein.',
+      },
+    },
+  },
   common: {
     cancel: 'Abbrechen',
     close: 'Schließen',
@@ -8,10 +32,20 @@ export const de: TranslationResources = {
     error: 'Fehler',
     info: 'Information',
     loading: 'Wird geladen',
+    no: 'Nein',
     retry: 'Erneut versuchen',
     save: 'Speichern',
     somethingWentWrong: 'Etwas ist schiefgelaufen',
     success: 'Erfolg',
+    yes: 'Ja',
+  },
+  home: {
+    email: 'E-Mail',
+    fullName: 'Vollständiger Name',
+    language: 'Sprache',
+    logout: 'Abmelden',
+    premium: 'Premium',
+    title: 'Startseite',
   },
   languages: {
     english: 'Englisch',

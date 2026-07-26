@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import type { SupportedLanguage } from '@/localization/types';
-import type { TypographyWeight } from '@/UIKit';
+import type { TypographyWeight } from '@/UIKit/Typography/types';
 import type { LanguageOption } from '@/UIProvider/types';
 
 export interface IFontLanguageSample {

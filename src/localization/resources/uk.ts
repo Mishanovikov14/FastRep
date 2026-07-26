@@ -1,6 +1,30 @@
 import type { TranslationResources } from './types';
 
 export const uk: TranslationResources = {
+  auth: {
+    registration: {
+      alreadyHaveAccount: 'Уже маєте обліковий запис?',
+      confirmPassword: 'Підтвердьте пароль',
+      createAccount: 'Створити обліковий запис',
+      email: 'Електронна пошта',
+      fullName: "Повне ім'я",
+      logIn: 'Увійти',
+      password: 'Пароль',
+      subtitle: 'Створіть обліковий запис FastRep, щоб почати.',
+      title: 'Створіть обліковий запис',
+      validation: {
+        confirmPasswordRequired: 'Підтвердьте пароль.',
+        emailInvalid: 'Введіть коректну адресу електронної пошти.',
+        emailRequired: 'Електронна пошта обов’язкова.',
+        fullNameMax: "Повне ім'я не може перевищувати 80 символів.",
+        fullNameMin: "Повне ім'я має містити щонайменше 2 символи.",
+        fullNameRequired: "Повне ім'я обов’язкове.",
+        passwordMin: 'Пароль має містити щонайменше 8 символів.',
+        passwordRequired: 'Пароль обов’язковий.',
+        passwordsMismatch: 'Паролі не збігаються.',
+      },
+    },
+  },
   common: {
     cancel: 'Скасувати',
     close: 'Закрити',
@@ -8,10 +32,20 @@ export const uk: TranslationResources = {
     error: 'Помилка',
     info: 'Інформація',
     loading: 'Завантаження',
+    no: 'Ні',
     retry: 'Повторити',
     save: 'Зберегти',
     somethingWentWrong: 'Щось пішло не так',
     success: 'Успішно',
+    yes: 'Так',
+  },
+  home: {
+    email: 'Електронна пошта',
+    fullName: "Повне ім'я",
+    language: 'Мова',
+    logout: 'Вийти',
+    premium: 'Преміум',
+    title: 'Головна',
   },
   languages: {
     english: 'Англійська',

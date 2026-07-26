@@ -1,3 +1,5 @@
 export type RootStackParamList = {
-  Foundation: undefined;
+  Home: undefined;
+  Registration: undefined;
+  Splash: undefined;
 };

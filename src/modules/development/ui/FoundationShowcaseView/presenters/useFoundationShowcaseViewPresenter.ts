@@ -25,7 +25,7 @@ const fontLanguageSamples: readonly IFontLanguageSample[] = [
   { code: 'de', label: 'German', text: 'Schnelle und gut organisierte Berichte.' },
 ];
 
-export const useFoundationShowcasePresenter = ({
+export const useFoundationShowcaseViewPresenter = ({
   language,
   languages,
   setLanguage,
