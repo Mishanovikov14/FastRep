@@ -1,5 +1,51 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
+# Environment
+
+Copy `.env.example` to `.env` and keep environment-specific values out of Git:
+
+```sh
+API_URL=http://localhost:3000
+```
+
+The iOS simulator can reach a backend running on the Mac through `localhost`. The standard
+Android emulator uses `10.0.2.2` to reach the host machine, so use an Android-specific environment
+file or change `API_URL` for that run:
+
+```sh
+API_URL=http://10.0.2.2:3000
+```
+
+Application code reads the backend URL only through `react-native-config`; do not hardcode
+platform-specific URLs in requester or feature code.
+
+# Typography
+
+FastRep bundles **Google Sans Flex** locally; the application never downloads fonts at runtime.
+The four application files are official Google Fonts static 24pt optical-size TTF instances:
+
+- `GoogleSansFlex_24pt-Regular.ttf` — 400
+- `GoogleSansFlex_24pt-Medium.ttf` — 500
+- `GoogleSansFlex_24pt-SemiBold.ttf` — 600
+- `GoogleSansFlex_24pt-Bold.ttf` — 700
+
+Source: [Google Fonts — Google Sans Flex](https://fonts.google.com/specimen/Google+Sans+Flex).
+The original SIL Open Font License 1.1 is stored at
+`assets/fonts/licenses/GoogleSansFlex-OFL.txt`.
+
+Google Fonts currently publishes Google Sans Flex without Cyrillic coverage. FastRep therefore
+uses an explicit system-font fallback for Ukrainian (`uk`), including `і ї є ґ І Ї Є Ґ`, until
+Google publishes an official Cyrillic-capable Google Sans Flex file or subset.
+
+After changing files under `assets/fonts`, relink and inspect the native diff:
+
+```sh
+npx react-native-asset
+```
+
+Application UI must use `Typography` and the font tokens exposed by `UIProvider`. Do not hardcode
+font-family names in screens or feature components.
+
 # Getting Started
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.

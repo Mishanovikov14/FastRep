@@ -18,7 +18,7 @@ function isAuthTokens(value: unknown): value is AuthTokens {
   return typeof tokens.accessToken === 'string' && typeof tokens.refreshToken === 'string';
 }
 
-class KeychainStorage {
+export class KeychainStorage {
   async clearTokens(): Promise<void> {
     await Keychain.resetGenericPassword({ service: TOKEN_SERVICE });
   }
