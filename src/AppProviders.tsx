@@ -1,4 +1,5 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ReactQueryProvider } from '@/libs/query/ReactQueryProvider';
@@ -27,13 +28,15 @@ const AppContent = ({ children }: IProps) => {
 export const AppProviders = ({ children }: IProps) => {
   return (
     <GestureHandlerRootView>
-      <SafeAreaProvider>
-        <UIProvider>
-          <ReactQueryProvider>
-            <AppContent>{children}</AppContent>
-          </ReactQueryProvider>
-        </UIProvider>
-      </SafeAreaProvider>
+      <KeyboardProvider>
+        <SafeAreaProvider>
+          <UIProvider>
+            <ReactQueryProvider>
+              <AppContent>{children}</AppContent>
+            </ReactQueryProvider>
+          </UIProvider>
+        </SafeAreaProvider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 };

@@ -2,6 +2,25 @@ import type { TranslationResources } from './types';
 
 export const de: TranslationResources = {
   auth: {
+    login: {
+      createAccount: 'Konto erstellen',
+      description: 'Melden Sie sich an, um FastRep weiter zu nutzen.',
+      email: 'E-Mail',
+      forgotPassword: 'Passwort vergessen?',
+      invalidCredentials: 'Die E-Mail-Adresse oder das Passwort ist falsch.',
+      logIn: 'Anmelden',
+      password: 'Passwort',
+      passwordRecoveryComingSoon:
+        'Die Passwortwiederherstellung wird bald verfügbar sein.',
+      title: 'Willkommen zurück',
+      validation: {
+        emailInvalid: 'Geben Sie eine gültige E-Mail-Adresse ein.',
+        emailRequired: 'E-Mail ist erforderlich.',
+        passwordMax: 'Das Passwort darf höchstens 128 Zeichen enthalten.',
+        passwordMin: 'Das Passwort muss mindestens 8 Zeichen enthalten.',
+        passwordRequired: 'Das Passwort ist erforderlich.',
+      },
+    },
     registration: {
       alreadyHaveAccount: 'Sie haben bereits ein Konto?',
       confirmPassword: 'Passwort bestätigen',
@@ -24,6 +43,18 @@ export const de: TranslationResources = {
         passwordsMismatch: 'Die Passwörter stimmen nicht überein.',
       },
     },
+    session: {
+      expired: 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.',
+      genericError:
+        'Die Authentifizierung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.',
+      networkUnavailable:
+        'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      restoring: 'Ihre Sitzung wird wiederhergestellt…',
+      serverError:
+        'Der Server ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.',
+      timeout:
+        'Die Zeitüberschreitung für die Anfrage wurde erreicht. Bitte versuchen Sie es erneut.',
+    },
   },
   common: {
     cancel: 'Abbrechen',
@@ -44,7 +75,11 @@ export const de: TranslationResources = {
     fullName: 'Vollständiger Name',
     language: 'Sprache',
     logout: 'Abmelden',
+    logoutError:
+      'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
     premium: 'Premium',
+    premiumActive: 'Aktiv',
+    premiumInactive: 'Inaktiv',
     title: 'Startseite',
   },
   languages: {

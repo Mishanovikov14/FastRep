@@ -4,19 +4,19 @@ import { useCallback, useRef, useState } from 'react';
 
 import { keychainStorage } from '@/libs/storage/KeychainStorage';
 import { toastService } from '@/libs/toast/toastService';
-import { register } from '@/modules/auth/API/register';
+import { register } from '@/modules/auth/API/authApi';
 import type {
   IPresenterInput,
   RegistrationFormErrors,
 } from '@/modules/auth/ui/RegistrationView/types';
-import type { RootStackParamList } from '@/navigation/types';
+import type { GuestStackParamList } from '@/navigation/types';
 import { useAuthStore } from '@/storage/authStore';
 
 import { validateRegistration } from './registrationValidation';
 
 export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList, 'Registration'>>();
+    useNavigation<NativeStackNavigationProp<GuestStackParamList, 'Registration'>>();
   const setUser = useAuthStore((state) => state.setUser);
   const isSubmittingRef = useRef(false);
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -50,7 +50,9 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
     }));
   }, []);
 
-  const onLogin = useCallback(() => undefined, []);
+  const onLogin = useCallback(() => {
+    navigation.navigate('Login');
+  }, [navigation]);
 
   const onRegister = useCallback(async () => {
     if (isSubmittingRef.current) {
@@ -78,7 +80,7 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
 
     try {
       const response = await register({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         fullName: fullName.trim(),
         language,
         password,
@@ -98,10 +100,6 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
         refreshToken,
       });
       setUser(user);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Home' }],
-      });
     } catch (error: unknown) {
       console.error('Unexpected registration failure', error);
       toastService.showError(
@@ -112,7 +110,7 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
       isSubmittingRef.current = false;
       setIsLoading(false);
     }
-  }, [confirmPassword, email, fullName, language, navigation, password, setUser, t]);
+  }, [confirmPassword, email, fullName, language, password, setUser, t]);
 
   return {
     confirmPassword,

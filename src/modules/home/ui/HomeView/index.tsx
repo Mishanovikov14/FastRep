@@ -17,14 +17,14 @@ export const HomeView = () => {
 
   if (!user) {
     return (
-      <ScreenContainer contentContainerStyle={styles.content}>
+      <ScreenContainer containerStyle={styles.content}>
         <Loader size="large" />
       </ScreenContainer>
     );
   }
 
   return (
-    <ScreenContainer contentContainerStyle={styles.content} horizontalPadding>
+    <ScreenContainer containerStyle={styles.content}>
       <View style={styles.card}>
         <Typography variant="title">{t('home.title')}</Typography>
 
@@ -52,7 +52,7 @@ export const HomeView = () => {
               {t('home.premium')}
             </Typography>
             <Typography variant="bodyMedium">
-              {user.isPremium ? t('common.yes') : t('common.no')}
+              {user.isPremium ? t('home.premiumActive') : t('home.premiumInactive')}
             </Typography>
           </View>
         </View>

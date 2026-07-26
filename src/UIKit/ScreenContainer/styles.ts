@@ -1,20 +1,20 @@
 import { StyleSheet } from 'react-native';
 
-import type { Colors, Spacing } from '@/UIProvider/theme/types';
+import type { Colors } from '@/UIProvider/theme/types';
 
-export const getStyles = (colors: Colors, spacing: Spacing) => {
+export const getStyles = (colors: Colors) => {
   const styles = StyleSheet.create({
-    content: {
-      flexGrow: 1,
-    },
-    flex: {
+    container: {
       flex: 1,
     },
-    horizontalPadding: {
-      paddingHorizontal: spacing.lg,
+    contentContainer: {
+      flexGrow: 1,
     },
-    root: {
+    mainContainer: {
       backgroundColor: colors.background,
+      flex: 1,
+    },
+    scroll: {
       flex: 1,
     },
   });

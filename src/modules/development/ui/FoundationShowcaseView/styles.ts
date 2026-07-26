@@ -21,6 +21,7 @@ export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
     sections: {
       gap: spacing.xl,
       paddingBottom: spacing.xxl,
+      paddingHorizontal: spacing.lg,
       paddingTop: spacing.lg,
     },
     surface: {

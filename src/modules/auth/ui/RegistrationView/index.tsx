@@ -33,10 +33,9 @@ export const RegistrationView = () => {
 
   return (
     <ScreenContainer
-      avoidKeyboard
       contentContainerStyle={styles.content}
-      horizontalPadding
-      scroll
+      isKeyboardAvoiding
+      scrollEnabled
     >
       <View style={styles.card}>
         <View style={styles.header}>

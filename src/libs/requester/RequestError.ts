@@ -22,6 +22,7 @@ export const normalizeRequestError = (error: unknown): IResponse<never> => {
       errors: error,
       isError: true,
       message: 'Something went wrong.',
+      type: 'unexpected_error',
     };
   }
 
@@ -46,6 +47,13 @@ export const normalizeRequestError = (error: unknown): IResponse<never> => {
     isError: true,
     message,
     status: axiosError.response?.status,
-    type: typeof backendError.type === 'string' ? backendError.type : undefined,
+    type:
+      typeof backendError.type === 'string'
+        ? backendError.type
+        : isTimeout
+          ? 'timeout_error'
+          : isNetworkError
+            ? 'network_error'
+            : undefined,
   };
 };

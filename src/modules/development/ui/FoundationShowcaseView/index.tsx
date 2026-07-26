@@ -30,7 +30,7 @@ export const FoundationShowcaseView = () => {
   });
 
   return (
-    <ScreenContainer contentContainerStyle={styles.sections} horizontalPadding scroll>
+    <ScreenContainer contentContainerStyle={styles.sections} scrollEnabled>
       <View style={styles.section}>
         <Typography variant="title">{t('showcase.title')}</Typography>
         <Typography color={colors.textSecondary}>{t('showcase.description')}</Typography>

@@ -36,6 +36,28 @@ jest.mock('react-native-localize', () => ({
     },
   ],
 }));
+jest.mock('react-native-keyboard-controller', () => {
+  const React = require('react');
+  const {
+    KeyboardAvoidingView,
+    ScrollView,
+    View,
+  } = require('react-native');
+
+  return {
+    KeyboardAvoidingView,
+    KeyboardAwareScrollView: React.forwardRef((props, ref) =>
+      React.createElement(ScrollView, { ...props, ref }),
+    ),
+    KeyboardProvider: ({ children }) => children,
+    KeyboardStickyView: View,
+  };
+});
+jest.mock('react-native-linear-gradient', () => {
+  const { View } = require('react-native');
+
+  return View;
+});
 jest.mock('react-native-toast-message', () => {
   const React = require('react');
   const { View } = require('react-native');

@@ -1,5 +1,23 @@
 export interface TranslationResources {
   auth: {
+    login: {
+      createAccount: string;
+      description: string;
+      email: string;
+      forgotPassword: string;
+      invalidCredentials: string;
+      logIn: string;
+      password: string;
+      passwordRecoveryComingSoon: string;
+      title: string;
+      validation: {
+        emailInvalid: string;
+        emailRequired: string;
+        passwordMax: string;
+        passwordMin: string;
+        passwordRequired: string;
+      };
+    };
     registration: {
       alreadyHaveAccount: string;
       confirmPassword: string;
@@ -22,6 +40,14 @@ export interface TranslationResources {
         passwordsMismatch: string;
       };
     };
+    session: {
+      expired: string;
+      genericError: string;
+      networkUnavailable: string;
+      restoring: string;
+      serverError: string;
+      timeout: string;
+    };
   };
   common: {
     cancel: string;
@@ -42,7 +68,10 @@ export interface TranslationResources {
     fullName: string;
     language: string;
     logout: string;
+    logoutError: string;
     premium: string;
+    premiumActive: string;
+    premiumInactive: string;
     title: string;
   };
   languages: {

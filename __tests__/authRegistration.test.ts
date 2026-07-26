@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
 
 import { requester } from '@/libs/requester/requester';
-import { register } from '@/modules/auth/API/register';
-import type { User } from '@/modules/auth/models/User';
+import { register } from '@/modules/auth/API/authApi';
 import { validateRegistration } from '@/modules/auth/ui/RegistrationView/presenters/registrationValidation';
 import { useAuthStore } from '@/storage/authStore';
+import type { IUser } from '@/types/auth';
 
 jest.mock('@/libs/requester/requester', () => ({
   requester: {
@@ -14,7 +14,7 @@ jest.mock('@/libs/requester/requester', () => ({
 
 const t = ((key: string) => key) as unknown as TFunction;
 
-const user: User = {
+const user: IUser = {
   createdAt: '2026-07-26T10:00:00.000Z',
   email: 'alex@example.com',
   fullName: 'Alex Morgan',
@@ -56,6 +56,7 @@ describe('registration', () => {
     expect(request).toHaveBeenCalledWith({
       data: payload,
       method: 'POST',
+      requiresAuth: false,
       url: '/auth/register',
     });
   });

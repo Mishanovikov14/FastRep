@@ -2,6 +2,25 @@ import type { TranslationResources } from './types';
 
 export const es: TranslationResources = {
   auth: {
+    login: {
+      createAccount: 'Crear cuenta',
+      description: 'Inicia sesión para seguir usando FastRep.',
+      email: 'Correo electrónico',
+      forgotPassword: '¿Has olvidado tu contraseña?',
+      invalidCredentials: 'El correo electrónico o la contraseña son incorrectos.',
+      logIn: 'Iniciar sesión',
+      password: 'Contraseña',
+      passwordRecoveryComingSoon:
+        'La recuperación de contraseña estará disponible próximamente.',
+      title: 'Te damos la bienvenida de nuevo',
+      validation: {
+        emailInvalid: 'Introduce un correo electrónico válido.',
+        emailRequired: 'El correo electrónico es obligatorio.',
+        passwordMax: 'La contraseña no puede superar los 128 caracteres.',
+        passwordMin: 'La contraseña debe tener al menos 8 caracteres.',
+        passwordRequired: 'La contraseña es obligatoria.',
+      },
+    },
     registration: {
       alreadyHaveAccount: '¿Ya tienes una cuenta?',
       confirmPassword: 'Confirmar contraseña',
@@ -24,6 +43,16 @@ export const es: TranslationResources = {
         passwordsMismatch: 'Las contraseñas no coinciden.',
       },
     },
+    session: {
+      expired: 'Tu sesión ha caducado. Vuelve a iniciar sesión.',
+      genericError: 'No se pudo completar la autenticación. Inténtalo de nuevo.',
+      networkUnavailable:
+        'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
+      restoring: 'Restaurando tu sesión…',
+      serverError:
+        'El servidor no está disponible temporalmente. Inténtalo de nuevo más tarde.',
+      timeout: 'La solicitud ha agotado el tiempo de espera. Inténtalo de nuevo.',
+    },
   },
   common: {
     cancel: 'Cancelar',
@@ -44,7 +73,11 @@ export const es: TranslationResources = {
     fullName: 'Nombre completo',
     language: 'Idioma',
     logout: 'Cerrar sesión',
+    logoutError:
+      'Has cerrado sesión en este dispositivo, pero no se pudo notificar al servidor.',
     premium: 'Premium',
+    premiumActive: 'Activo',
+    premiumInactive: 'Inactivo',
     title: 'Inicio',
   },
   languages: {

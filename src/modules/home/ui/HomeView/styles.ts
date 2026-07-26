@@ -18,6 +18,7 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
     content: {
       justifyContent: 'center',
       paddingBottom: spacing.xl,
+      paddingHorizontal: spacing.lg,
       paddingTop: spacing.xl,
     },
     details: {

@@ -2,6 +2,24 @@ import type { TranslationResources } from './types';
 
 export const uk: TranslationResources = {
   auth: {
+    login: {
+      createAccount: 'Створити обліковий запис',
+      description: 'Увійдіть, щоб продовжити користуватися FastRep.',
+      email: 'Електронна пошта',
+      forgotPassword: 'Забули пароль?',
+      invalidCredentials: 'Електронну пошту або пароль введено неправильно.',
+      logIn: 'Увійти',
+      password: 'Пароль',
+      passwordRecoveryComingSoon: 'Відновлення пароля незабаром стане доступним.',
+      title: 'З поверненням',
+      validation: {
+        emailInvalid: 'Введіть коректну адресу електронної пошти.',
+        emailRequired: 'Електронна пошта обов’язкова.',
+        passwordMax: 'Пароль не може містити більше ніж 128 символів.',
+        passwordMin: 'Пароль має містити щонайменше 8 символів.',
+        passwordRequired: 'Пароль обов’язковий.',
+      },
+    },
     registration: {
       alreadyHaveAccount: 'Уже маєте обліковий запис?',
       confirmPassword: 'Підтвердьте пароль',
@@ -24,6 +42,15 @@ export const uk: TranslationResources = {
         passwordsMismatch: 'Паролі не збігаються.',
       },
     },
+    session: {
+      expired: 'Термін дії сеансу минув. Увійдіть знову.',
+      genericError: 'Не вдалося завершити автентифікацію. Повторіть спробу.',
+      networkUnavailable:
+        'Немає з’єднання з інтернетом. Перевірте з’єднання та повторіть спробу.',
+      restoring: 'Відновлюємо сеанс…',
+      serverError: 'Сервер тимчасово недоступний. Спробуйте пізніше.',
+      timeout: 'Час очікування запиту минув. Повторіть спробу.',
+    },
   },
   common: {
     cancel: 'Скасувати',
@@ -44,7 +71,11 @@ export const uk: TranslationResources = {
     fullName: "Повне ім'я",
     language: 'Мова',
     logout: 'Вийти',
+    logoutError:
+      'Ви вийшли з облікового запису на цьому пристрої, але повідомити сервер не вдалося.',
     premium: 'Преміум',
+    premiumActive: 'Активний',
+    premiumInactive: 'Неактивний',
     title: 'Головна',
   },
   languages: {

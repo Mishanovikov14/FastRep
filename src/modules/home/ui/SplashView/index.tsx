@@ -1,15 +1,22 @@
+import { useMemo } from 'react';
+
 import { Loader } from '@/UIKit/Loader';
 import { ScreenContainer } from '@/UIKit/ScreenContainer';
+import { Typography } from '@/UIKit/Typography';
+import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { useSplashViewPresenter } from './presenters/useSplashViewPresenter';
-import { styles } from './styles';
+import { getStyles } from './styles';
 
 export const SplashView = () => {
-  useSplashViewPresenter();
+  const { colors, spacing, t } = useUIContext();
+  const styles = useMemo(() => getStyles(spacing), [spacing]);
+  const { isRestoring } = useSplashViewPresenter();
 
   return (
-    <ScreenContainer contentContainerStyle={styles.content}>
-      <Loader size="large" />
+    <ScreenContainer containerStyle={styles.content}>
+      {isRestoring ? <Loader size="large" /> : null}
+      <Typography color={colors.textSecondary}>{t('auth.session.restoring')}</Typography>
     </ScreenContainer>
   );
 };

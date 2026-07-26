@@ -1,4 +1,5 @@
 import React from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import ReactTestRenderer from 'react-test-renderer';
 
 import { ToastHost } from '@/libs/toast';
@@ -15,15 +16,22 @@ describe('UIKit', () => {
 
     await ReactTestRenderer.act(async () => {
       renderer = ReactTestRenderer.create(
-        <UIProvider>
-          <ScreenContainer>
-            <Typography>FastRep</Typography>
-            <Input label="Email" onChangeText={() => undefined} value="" />
-            <Button onPress={() => undefined} title="Continue" />
-            <Loader />
-          </ScreenContainer>
-          <ToastHost />
-        </UIProvider>,
+        <SafeAreaProvider
+          initialMetrics={{
+            frame: { height: 844, width: 390, x: 0, y: 0 },
+            insets: { bottom: 0, left: 0, right: 0, top: 0 },
+          }}
+        >
+          <UIProvider>
+            <ScreenContainer>
+              <Typography>FastRep</Typography>
+              <Input label="Email" onChangeText={() => undefined} value="" />
+              <Button onPress={() => undefined} title="Continue" />
+              <Loader />
+            </ScreenContainer>
+            <ToastHost />
+          </UIProvider>
+        </SafeAreaProvider>,
       );
       await Promise.resolve();
     });

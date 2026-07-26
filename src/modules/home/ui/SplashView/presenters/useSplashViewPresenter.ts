@@ -1,22 +1,46 @@
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-import type { RootStackParamList } from '@/navigation/types';
+import { restoreAuthSession } from '@/modules/auth/services/authSessionService';
 import { useAuthStore } from '@/storage/authStore';
 
-import type { SplashDestination } from '../types';
+import type { IUseSplashViewPresenterResult } from '../types';
 
-export const useSplashViewPresenter = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList, 'Splash'>>();
-  const isAuthorized = useAuthStore((state) => state.isAuthorized);
+export const useSplashViewPresenter = (): IUseSplashViewPresenterResult => {
+  const clearUser = useAuthStore((state) => state.clearUser);
+  const setSessionRestored = useAuthStore((state) => state.setSessionRestored);
+  const setUser = useAuthStore((state) => state.setUser);
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
-    const destination: SplashDestination = isAuthorized ? 'Home' : 'Registration';
+    if (hasStartedRef.current) {
+      return;
+    }
 
-    navigation.reset({
-      index: 0,
-      routes: [{ name: destination }],
+    hasStartedRef.current = true;
+
+    const onRestoreSession = async () => {
+      try {
+        const result = await restoreAuthSession();
+
+        if (result.isAuthorized) {
+          setUser(result.user);
+        } else {
+          clearUser();
+        }
+      } catch (error: unknown) {
+        console.error('Unexpected splash restoration failure', error);
+        clearUser();
+      } finally {
+        setSessionRestored(true);
+      }
+    };
+
+    onRestoreSession().catch((error: unknown) => {
+      console.error('Unable to finish splash session restoration', error);
     });
-  }, [isAuthorized, navigation]);
+  }, [clearUser, setSessionRestored, setUser]);
+
+  return {
+    isRestoring: true,
+  };
 };

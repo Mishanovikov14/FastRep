@@ -2,6 +2,24 @@ import type { TranslationResources } from './types';
 
 export const en: TranslationResources = {
   auth: {
+    login: {
+      createAccount: 'Create account',
+      description: 'Log in to continue using FastRep.',
+      email: 'Email',
+      forgotPassword: 'Forgot password?',
+      invalidCredentials: 'The email or password is incorrect.',
+      logIn: 'Log in',
+      password: 'Password',
+      passwordRecoveryComingSoon: 'Password recovery will be available soon.',
+      title: 'Welcome back',
+      validation: {
+        emailInvalid: 'Enter a valid email address.',
+        emailRequired: 'Email is required.',
+        passwordMax: 'Password must contain no more than 128 characters.',
+        passwordMin: 'Password must contain at least 8 characters.',
+        passwordRequired: 'Password is required.',
+      },
+    },
     registration: {
       alreadyHaveAccount: 'Already have an account?',
       confirmPassword: 'Confirm password',
@@ -24,6 +42,14 @@ export const en: TranslationResources = {
         passwordsMismatch: 'Passwords do not match.',
       },
     },
+    session: {
+      expired: 'Your session has expired. Please log in again.',
+      genericError: "We couldn't complete authentication. Please try again.",
+      networkUnavailable: 'No internet connection. Check your connection and try again.',
+      restoring: 'Restoring your session…',
+      serverError: 'The server is temporarily unavailable. Please try again later.',
+      timeout: 'The request timed out. Please try again.',
+    },
   },
   common: {
     cancel: 'Cancel',
@@ -44,7 +70,11 @@ export const en: TranslationResources = {
     fullName: 'Full name',
     language: 'Language',
     logout: 'Log out',
+    logoutError:
+      "You were logged out on this device, but we couldn't notify the server.",
     premium: 'Premium',
+    premiumActive: 'Active',
+    premiumInactive: 'Inactive',
     title: 'Home',
   },
   languages: {

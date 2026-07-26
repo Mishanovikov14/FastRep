@@ -1,1 +1,3 @@
-export type SplashDestination = 'Home' | 'Registration';
+export interface IUseSplashViewPresenterResult {
+  isRestoring: boolean;
+}

@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 
-import type { User } from '@/modules/auth/models/User';
+import type { IUser } from '@/types/auth';
 
 interface AuthState {
   clearUser(): void;
   isAuthorized: boolean;
-  setUser(user: User): void;
-  user: User | null;
+  isSessionRestored: boolean;
+  resetAuth(): void;
+  setSessionRestored(value: boolean): void;
+  setUser(user: IUser): void;
+  user: IUser | null;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -17,6 +20,17 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
   isAuthorized: false,
+  isSessionRestored: false,
+  resetAuth: () => {
+    set({
+      isAuthorized: false,
+      isSessionRestored: true,
+      user: null,
+    });
+  },
+  setSessionRestored: (value) => {
+    set({ isSessionRestored: value });
+  },
   setUser: (user) => {
     set({
       isAuthorized: true,
