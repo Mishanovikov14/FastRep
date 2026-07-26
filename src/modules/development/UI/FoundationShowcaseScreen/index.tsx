@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
-import Config from 'react-native-config';
 
 import { Button, Loader, ScreenContainer, Typography } from '@/UIKit';
 import { useUIContext } from '@/UIProvider';
@@ -12,6 +11,7 @@ export function FoundationShowcaseScreen() {
   const { colors, language, languages, radius, setLanguage, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, spacing, radius), [colors, radius, spacing]);
   const {
+    apiUrl,
     fontLanguageSamples,
     fontWeightSamples,
     languageControls,
@@ -122,7 +122,7 @@ export function FoundationShowcaseScreen() {
         <Typography color={colors.textSecondary} variant="caption">
           API_URL
         </Typography>
-        <Typography>{Config.API_URL}</Typography>
+        <Typography>{apiUrl}</Typography>
         <Typography color={colors.textSecondary} variant="caption">
           No public health endpoint is defined, so no product API request is sent from this
           showcase. Request normalization and headers are covered by unit tests.

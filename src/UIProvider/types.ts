@@ -2,8 +2,17 @@ import type { TFunction } from 'i18next';
 
 import type { SupportedLanguage } from '@/localization';
 
-import type { LanguageOption } from './localization/types';
 import type { Colors, FontFamilies, Fonts, Radius, Spacing } from './theme';
+
+export interface LanguageOption {
+  code: SupportedLanguage;
+  translationKey:
+    | 'languages.english'
+    | 'languages.french'
+    | 'languages.german'
+    | 'languages.spanish'
+    | 'languages.ukrainian';
+}
 
 export interface UIContextValue {
   colors: Colors;

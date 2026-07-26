@@ -6,8 +6,8 @@ import { useUIContext } from '@/UIProvider';
 import { createToastConfig } from './toastConfig';
 
 export function ToastHost() {
-  const { colors } = useUIContext();
-  const config = useMemo(() => createToastConfig(colors), [colors]);
+  const { colors, fonts, spacing } = useUIContext();
+  const config = useMemo(() => createToastConfig(colors, fonts, spacing), [colors, fonts, spacing]);
 
   return <Toast config={config} />;
 }

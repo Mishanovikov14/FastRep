@@ -13,9 +13,6 @@ const DEFAULT_AUTH_CALLBACKS: RequesterAuthCallbacks = {
   async getAccessToken() {
     return null;
   },
-  async onUnauthorized() {
-    return Promise.resolve();
-  },
 };
 
 export class AxiosRequester implements IRequester {

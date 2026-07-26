@@ -1,12 +1,9 @@
 import * as Keychain from 'react-native-keychain';
 
+import type { AuthTokens } from './types';
+
 const TOKEN_SERVICE = 'com.fastrep.auth.tokens';
 const TOKEN_USERNAME = 'fastrep';
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-}
 
 function isAuthTokens(value: unknown): value is AuthTokens {
   if (typeof value !== 'object' || value === null) {

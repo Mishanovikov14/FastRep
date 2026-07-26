@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import Config from 'react-native-config';
 
 import { toastService } from '@/libs/toast';
 
@@ -44,20 +45,32 @@ export function useFoundationShowcasePresenter({
     toastService.showInfo(String(t('common.info')), String(t('common.info')));
   }, [t]);
 
+  const onSelectLanguage = useCallback(
+    async (nextLanguage: IFontLanguageSample['code']) => {
+      try {
+        await setLanguage(nextLanguage);
+      } catch {
+        toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
+      }
+    },
+    [setLanguage, t],
+  );
+
   const languageControls = useMemo<ILanguageControl[]>(
     () =>
       languages.map((option) => ({
         code: option.code,
         disabled: language === option.code,
         onPress: () => {
-          setLanguage(option.code).catch(() => undefined);
+          onSelectLanguage(option.code);
         },
         title: String(t(option.translationKey)),
       })),
-    [language, languages, setLanguage, t],
+    [language, languages, onSelectLanguage, t],
   );
 
   return {
+    apiUrl: Config.API_URL,
     fontLanguageSamples,
     fontWeightSamples,
     languageControls,

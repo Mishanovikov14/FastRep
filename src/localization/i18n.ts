@@ -2,9 +2,13 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import { resolveAndPersistLanguage } from './languageResolver';
-import type { SupportedLanguage } from './languages';
 import { DEFAULT_LANGUAGE, supportedLanguages } from './languages';
-import { de, en, es, fr, uk } from './resources';
+import { de } from './resources/de';
+import { en } from './resources/en';
+import { es } from './resources/es';
+import { fr } from './resources/fr';
+import { uk } from './resources/uk';
+import type { SupportedLanguage } from './types';
 
 export const i18n = i18next.createInstance();
 

@@ -1,10 +1,23 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = StyleSheet.create({
-  content: {
-    flexGrow: 1,
-  },
-  flex: {
-    flex: 1,
-  },
-});
+import type { Colors, Spacing } from '@/UIProvider';
+
+export function getStyles(colors: Colors, spacing: Spacing) {
+  const styles = StyleSheet.create({
+    content: {
+      flexGrow: 1,
+    },
+    flex: {
+      flex: 1,
+    },
+    horizontalPadding: {
+      paddingHorizontal: spacing.lg,
+    },
+    root: {
+      backgroundColor: colors.background,
+      flex: 1,
+    },
+  });
+
+  return styles;
+}

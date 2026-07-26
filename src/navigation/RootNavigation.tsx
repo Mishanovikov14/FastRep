@@ -1,11 +1,9 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { FoundationShowcaseScreen } from './FoundationShowcaseScreen';
+import { FoundationShowcaseScreen } from '@/modules/development/UI/FoundationShowcaseScreen';
 
-export type RootStackParamList = {
-  Foundation: undefined;
-};
+import type { RootStackParamList } from './types';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 

@@ -1,28 +1,13 @@
-import { StyleSheet } from 'react-native';
 import type { ToastConfig } from 'react-native-toast-message';
 import { BaseToast } from 'react-native-toast-message';
 
-import type { Colors } from '@/UIProvider';
+import type { Colors, Fonts, Spacing } from '@/UIProvider';
 
-export function createToastConfig(colors: Colors): ToastConfig {
+import { getStyles } from './styles';
+
+export function createToastConfig(colors: Colors, fonts: Fonts, spacing: Spacing): ToastConfig {
   const createToast = (accentColor: string): ToastConfig[string] => {
-    const styles = StyleSheet.create({
-      content: {
-        paddingHorizontal: 16,
-      },
-      root: {
-        borderLeftColor: accentColor,
-      },
-      text1: {
-        color: colors.textPrimary,
-        fontSize: 15,
-        fontWeight: '600',
-      },
-      text2: {
-        color: colors.textSecondary,
-        fontSize: 14,
-      },
-    });
+    const styles = getStyles(colors, fonts, spacing, accentColor);
 
     return (props) => (
       <BaseToast

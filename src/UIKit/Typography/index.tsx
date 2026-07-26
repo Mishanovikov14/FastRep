@@ -1,6 +1,6 @@
 import { Text } from 'react-native';
 
-import { fonts as googleSansFonts, systemFonts } from '@/UIProvider/theme';
+import { resolveFonts } from '@/UIProvider/theme/resolveFonts';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { typographyVariantWeights } from './config';
@@ -18,7 +18,7 @@ export function Typography({
   ...textProps
 }: IProps) {
   const { colors, fonts } = useUIContext();
-  const fontSet = language ? (language === 'uk' ? systemFonts : googleSansFonts) : fonts;
+  const fontSet = language ? resolveFonts(language) : fonts;
   const resolvedWeight = weight ?? typographyVariantWeights[variant];
 
   return (
@@ -38,6 +38,3 @@ export function Typography({
     </Text>
   );
 }
-
-export { typographyVariantWeights } from './config';
-export type { IProps, TypographyVariant, TypographyWeight } from './types';

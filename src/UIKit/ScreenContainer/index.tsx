@@ -1,9 +1,10 @@
+import { useMemo } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useUIContext } from '@/UIProvider';
 
-import { styles } from './styles';
+import { getStyles } from './styles';
 import type { IProps } from './types';
 
 export function ScreenContainer({
@@ -16,9 +17,10 @@ export function ScreenContainer({
   style,
 }: IProps) {
   const { colors, spacing } = useUIContext();
+  const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
   const contentStyle = [
     styles.content,
-    horizontalPadding && { paddingHorizontal: spacing.lg },
+    horizontalPadding && styles.horizontalPadding,
     contentContainerStyle,
   ];
   const content = scroll ? (
@@ -34,10 +36,7 @@ export function ScreenContainer({
   );
 
   return (
-    <SafeAreaView
-      edges={edges}
-      style={[styles.flex, { backgroundColor: colors.background }, style]}
-    >
+    <SafeAreaView edges={edges} style={[styles.root, style]}>
       {avoidKeyboard ? (
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}

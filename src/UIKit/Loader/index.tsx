@@ -1,12 +1,14 @@
+import { useMemo } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { useUIContext } from '@/UIProvider/useUIContext';
 
-import { styles } from './styles';
+import { getStyles } from './styles';
 import type { IProps } from './types';
 
 export function Loader({ color, fullscreen = false, size = 'small' }: IProps) {
   const { colors, t } = useUIContext();
+  const styles = useMemo(() => getStyles(colors), [colors]);
   const indicator = (
     <ActivityIndicator
       accessibilityLabel={String(t('common.loading'))}
@@ -20,7 +22,5 @@ export function Loader({ color, fullscreen = false, size = 'small' }: IProps) {
     return indicator;
   }
 
-  return (
-    <View style={[styles.fullscreen, { backgroundColor: colors.background }]}>{indicator}</View>
-  );
+  return <View style={styles.fullscreen}>{indicator}</View>;
 }

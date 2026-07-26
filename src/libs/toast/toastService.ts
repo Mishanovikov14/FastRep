@@ -2,8 +2,6 @@ import Toast from 'react-native-toast-message';
 
 import type { ToastMessage, ToastType } from './types';
 
-let errorSuppressionDepth = 0;
-
 function show(type: ToastType, { message, title }: ToastMessage): void {
   Toast.show({
     text1: title,
@@ -18,9 +16,7 @@ export const toastService = {
   },
 
   showError(title: string, message?: string): void {
-    if (errorSuppressionDepth === 0) {
-      show('error', { message, title });
-    }
+    show('error', { message, title });
   },
 
   showInfo(title: string, message?: string): void {
@@ -33,15 +29,5 @@ export const toastService = {
 
   showWarning(title: string, message?: string): void {
     show('warning', { message, title });
-  },
-
-  async suppressErrorsFor<T>(operation: () => Promise<T>): Promise<T> {
-    errorSuppressionDepth += 1;
-
-    try {
-      return await operation();
-    } finally {
-      errorSuppressionDepth = Math.max(0, errorSuppressionDepth - 1);
-    }
   },
 };

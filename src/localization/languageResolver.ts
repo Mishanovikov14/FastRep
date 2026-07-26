@@ -1,13 +1,8 @@
 import { getLocales } from 'react-native-localize';
 
-import type { SupportedLanguage } from './languages';
 import { DEFAULT_LANGUAGE, isSupportedLanguage } from './languages';
 import { getStoredLanguage, persistLanguage } from './storage';
-
-export interface LocaleCandidate {
-  languageCode?: string;
-  languageTag: string;
-}
+import type { LocaleCandidate, SupportedLanguage } from './types';
 
 export function normalizeLanguage(locale: LocaleCandidate): SupportedLanguage | null {
   const candidate = locale.languageCode ?? locale.languageTag.split(/[-_]/)[0];

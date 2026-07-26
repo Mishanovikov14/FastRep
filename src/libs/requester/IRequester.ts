@@ -8,5 +8,4 @@ export interface IRequester {
 
 export interface RequesterAuthCallbacks {
   getAccessToken(): Promise<string | null>;
-  onUnauthorized(): Promise<void>;
 }

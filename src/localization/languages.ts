@@ -1,6 +1,7 @@
-export const supportedLanguages = ['en', 'fr', 'es', 'uk', 'de'] as const;
+import { supportedLanguages } from './config';
+import type { SupportedLanguage } from './types';
 
-export type SupportedLanguage = (typeof supportedLanguages)[number];
+export { supportedLanguages };
 
 export const DEFAULT_LANGUAGE: SupportedLanguage = 'en';
 

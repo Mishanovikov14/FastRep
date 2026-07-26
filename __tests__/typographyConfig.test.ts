@@ -1,4 +1,4 @@
-import { typographyVariantWeights } from '@/UIKit/Typography';
+import { typographyVariantWeights } from '@/UIKit';
 import { fontFamiliesByPlatform } from '@/UIProvider/theme';
 
 describe('Typography font configuration', () => {
