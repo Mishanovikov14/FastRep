@@ -1,5 +1,5 @@
-import type { SupportedLanguage } from '@/localization';
 import { supportedLanguages } from '@/localization/config';
+import type { SupportedLanguage } from '@/localization/types';
 
 import type { LanguageOption } from './types';
 

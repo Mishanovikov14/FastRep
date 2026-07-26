@@ -1,6 +1,7 @@
 import type { TextStyle } from 'react-native';
 
-import type { radius, spacing } from '@/theme';
+import type { radius } from '@/theme/radius';
+import type { spacing } from '@/theme/spacing';
 
 export interface Colors {
   background: string;

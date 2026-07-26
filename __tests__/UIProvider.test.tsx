@@ -3,19 +3,20 @@ import { Text } from 'react-native';
 import ReactTestRenderer from 'react-test-renderer';
 
 import { storage, storageKeys } from '@/libs/storage';
-import { initializeLocalization } from '@/localization';
-import type { UIContextValue } from '@/UIProvider';
-import { UIProvider, useUIContext } from '@/UIProvider';
+import { initializeLocalization } from '@/localization/i18n';
+import type { UIContextValue } from '@/UIProvider/types';
+import { UIProvider } from '@/UIProvider/UIProvider';
+import { useUIContext } from '@/UIProvider/useUIContext';
 
 describe('UIProvider', () => {
   it('initializes once and persists language changes', async () => {
     let context: UIContextValue | undefined;
 
-    function LanguageProbe() {
+    const LanguageProbe = () => {
       context = useUIContext();
 
       return <Text>{context.language}</Text>;
-    }
+    };
 
     storage.clearAll();
 

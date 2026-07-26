@@ -5,9 +5,9 @@ export { supportedLanguages };
 
 export const DEFAULT_LANGUAGE: SupportedLanguage = 'en';
 
-export function isSupportedLanguage(value: unknown): value is SupportedLanguage {
+export const isSupportedLanguage = (value: unknown): value is SupportedLanguage => {
   return (
     typeof value === 'string' &&
     supportedLanguages.includes(value.toLowerCase() as SupportedLanguage)
   );
-}
+};

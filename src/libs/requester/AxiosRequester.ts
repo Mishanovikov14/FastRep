@@ -3,7 +3,7 @@ import { AxiosHeaders } from 'axios';
 import { Platform } from 'react-native';
 import { getUniqueId, getVersion } from 'react-native-device-info';
 
-import { i18n } from '@/localization';
+import { i18n } from '@/localization/i18n';
 
 import type { IRequester, RequesterAuthCallbacks } from './IRequester';
 import type { IResponse } from './IResponse';

@@ -2,13 +2,13 @@ import Toast from 'react-native-toast-message';
 
 import type { ToastMessage, ToastType } from './types';
 
-function show(type: ToastType, { message, title }: ToastMessage): void {
+const show = (type: ToastType, { message, title }: ToastMessage): void => {
   Toast.show({
     text1: title,
     text2: message,
     type,
   });
-}
+};
 
 export const toastService = {
   hide(): void {

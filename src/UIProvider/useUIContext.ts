@@ -3,7 +3,7 @@ import { useContext } from 'react';
 import type { UIContextValue } from './types';
 import { UIContext } from './UIContext';
 
-export function useUIContext(): UIContextValue {
+export const useUIContext = (): UIContextValue => {
   const context = useContext(UIContext);
 
   if (!context) {
@@ -11,4 +11,4 @@ export function useUIContext(): UIContextValue {
   }
 
   return context;
-}
+};

@@ -25,12 +25,12 @@ const fontLanguageSamples: readonly IFontLanguageSample[] = [
   { code: 'de', label: 'German', text: 'Schnelle und gut organisierte Berichte.' },
 ];
 
-export function useFoundationShowcasePresenter({
+export const useFoundationShowcasePresenter = ({
   language,
   languages,
   setLanguage,
   t,
-}: IPresenterInput) {
+}: IPresenterInput) => {
   const onPressNoop = useCallback(() => undefined, []);
 
   const onPressShowSuccess = useCallback(() => {
@@ -79,4 +79,4 @@ export function useFoundationShowcasePresenter({
     onPressShowInfo,
     onPressShowSuccess,
   };
-}
+};

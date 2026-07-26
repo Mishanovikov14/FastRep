@@ -3,7 +3,7 @@ import { AxiosHeaders } from 'axios';
 
 import { axiosClient, AxiosRequester } from '@/libs/requester';
 
-jest.mock('@/localization', () => ({
+jest.mock('@/localization/i18n', () => ({
   i18n: {
     language: 'fr',
   },
@@ -13,7 +13,7 @@ interface SuccessPayload {
   id: number;
 }
 
-function createClient() {
+const createClient = () => {
   const request = jest.fn();
   const client = { request } as unknown as AxiosInstance;
 
@@ -21,7 +21,7 @@ function createClient() {
     client,
     request,
   };
-}
+};
 
 describe('AxiosRequester', () => {
   it('uses the configured API URL', () => {

@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-import type { Colors, Spacing } from '@/UIProvider';
+import type { Colors, Spacing } from '@/UIProvider/theme/types';
 
-export function getStyles(colors: Colors, spacing: Spacing) {
+export const getStyles = (colors: Colors, spacing: Spacing) => {
   const styles = StyleSheet.create({
     content: {
       flexGrow: 1,
@@ -20,4 +20,4 @@ export function getStyles(colors: Colors, spacing: Spacing) {
   });
 
   return styles;
-}
+};

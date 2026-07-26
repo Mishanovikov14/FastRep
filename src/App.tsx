@@ -1,10 +1,10 @@
 import { AppProviders } from '@/AppProviders';
 import { RootNavigation } from '@/navigation/RootNavigation';
 
-export default function App() {
+export const App = () => {
   return (
     <AppProviders>
       <RootNavigation />
     </AppProviders>
   );
-}
+};

@@ -1,17 +1,20 @@
-import type { PropsWithChildren } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { SupportedLanguage } from '@/localization';
-import { DEFAULT_LANGUAGE, i18n, initializeLocalization, persistLanguage } from '@/localization';
-import { radius, spacing } from '@/theme';
+import { i18n, initializeLocalization } from '@/localization/i18n';
+import { DEFAULT_LANGUAGE } from '@/localization/languages';
+import { persistLanguage } from '@/localization/storage';
+import type { SupportedLanguage } from '@/localization/types';
+import { radius } from '@/theme/radius';
+import { spacing } from '@/theme/spacing';
 
 import { languages } from './config';
-import { colors, fontFamilies } from './theme';
+import { colors } from './theme/Colors';
+import { fontFamilies } from './theme/Fonts';
 import { resolveFonts } from './theme/resolveFonts';
-import type { UIContextValue } from './types';
+import type { IProps, UIContextValue } from './types';
 import { UIContext } from './UIContext';
 
-export function UIProvider({ children }: PropsWithChildren) {
+export const UIProvider = ({ children }: IProps) => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [language, setCurrentLanguage] = useState<SupportedLanguage>(DEFAULT_LANGUAGE);
 
@@ -55,4 +58,4 @@ export function UIProvider({ children }: PropsWithChildren) {
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;
-}
+};

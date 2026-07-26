@@ -7,7 +7,7 @@ import { typographyVariantWeights } from './config';
 import { variantStyles } from './styles';
 import type { IProps } from './types';
 
-export function Typography({
+export const Typography = ({
   align,
   children,
   color,
@@ -16,7 +16,7 @@ export function Typography({
   variant = 'body',
   weight,
   ...textProps
-}: IProps) {
+}: IProps) => {
   const { colors, fonts } = useUIContext();
   const fontSet = language ? resolveFonts(language) : fonts;
   const resolvedWeight = weight ?? typographyVariantWeights[variant];
@@ -37,4 +37,4 @@ export function Typography({
       {children}
     </Text>
   );
-}
+};

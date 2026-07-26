@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 
 import { Button, Loader, ScreenContainer, Typography } from '@/UIKit';
-import { useUIContext } from '@/UIProvider';
+import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { useFoundationShowcasePresenter } from './presenters/useFoundationShowcasePresenter';
 import { getStyles } from './styles';
 
-export function FoundationShowcaseScreen() {
+export const FoundationShowcaseScreen = () => {
   const { colors, language, languages, radius, setLanguage, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, spacing, radius), [colors, radius, spacing]);
   const {
@@ -130,4 +130,4 @@ export function FoundationShowcaseScreen() {
       </View>
     </ScreenContainer>
   );
-}
+};

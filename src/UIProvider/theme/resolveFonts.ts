@@ -1,8 +1,8 @@
-import type { SupportedLanguage } from '@/localization';
+import type { SupportedLanguage } from '@/localization/types';
 
 import { fonts, systemFonts } from './Fonts';
 import type { Fonts } from './types';
 
-export function resolveFonts(language: SupportedLanguage): Fonts {
+export const resolveFonts = (language: SupportedLanguage): Fonts => {
   return language === 'uk' ? systemFonts : fonts;
-}
+};

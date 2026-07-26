@@ -3,7 +3,7 @@ import ReactTestRenderer from 'react-test-renderer';
 
 import { ToastHost } from '@/libs/toast';
 import { Button, Loader, ScreenContainer, Typography } from '@/UIKit';
-import { UIProvider } from '@/UIProvider';
+import { UIProvider } from '@/UIProvider/UIProvider';
 
 describe('UIKit', () => {
   it('renders every reusable component', async () => {

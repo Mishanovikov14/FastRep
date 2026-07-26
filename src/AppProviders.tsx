@@ -1,13 +1,15 @@
-import type { PropsWithChildren } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { ReactQueryProvider } from '@/libs/query';
+import { ReactQueryProvider } from '@/libs/query/ReactQueryProvider';
 import { ToastHost } from '@/libs/toast';
 import { Loader } from '@/UIKit';
-import { UIProvider, useUIContext } from '@/UIProvider';
+import { UIProvider } from '@/UIProvider/UIProvider';
+import { useUIContext } from '@/UIProvider/useUIContext';
 
-function AppContent({ children }: PropsWithChildren) {
+import type { IProps } from './AppProviders.types';
+
+const AppContent = ({ children }: IProps) => {
   const { isInitialized } = useUIContext();
 
   if (!isInitialized) {
@@ -20,9 +22,9 @@ function AppContent({ children }: PropsWithChildren) {
       <ToastHost />
     </>
   );
-}
+};
 
-export function AppProviders({ children }: PropsWithChildren) {
+export const AppProviders = ({ children }: IProps) => {
   return (
     <GestureHandlerRootView>
       <SafeAreaProvider>
@@ -34,4 +36,4 @@ export function AppProviders({ children }: PropsWithChildren) {
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
-}
+};

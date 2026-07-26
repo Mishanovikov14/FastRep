@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-import type { Colors, Fonts, Spacing } from '@/UIProvider';
+import type { Colors, Fonts, Spacing } from '@/UIProvider/theme/types';
 
-export function getStyles(colors: Colors, fonts: Fonts, spacing: Spacing, accentColor: string) {
+export const getStyles = (colors: Colors, fonts: Fonts, spacing: Spacing, accentColor: string) => {
   const styles = StyleSheet.create({
     content: {
       paddingHorizontal: spacing.lg,
@@ -23,4 +23,4 @@ export function getStyles(colors: Colors, fonts: Fonts, spacing: Spacing, accent
   });
 
   return styles;
-}
+};

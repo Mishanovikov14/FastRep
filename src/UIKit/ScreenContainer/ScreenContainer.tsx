@@ -2,12 +2,12 @@ import { useMemo } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useUIContext } from '@/UIProvider';
+import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getStyles } from './styles';
 import type { IProps } from './types';
 
-export function ScreenContainer({
+export const ScreenContainer = ({
   avoidKeyboard = false,
   children,
   contentContainerStyle,
@@ -15,7 +15,7 @@ export function ScreenContainer({
   horizontalPadding = false,
   scroll = false,
   style,
-}: IProps) {
+}: IProps) => {
   const { colors, spacing } = useUIContext();
   const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
   const contentStyle = [
@@ -49,4 +49,4 @@ export function ScreenContainer({
       )}
     </SafeAreaView>
   );
-}
+};

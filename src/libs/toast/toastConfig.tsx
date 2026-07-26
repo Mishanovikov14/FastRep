@@ -1,11 +1,11 @@
 import type { ToastConfig } from 'react-native-toast-message';
 import { BaseToast } from 'react-native-toast-message';
 
-import type { Colors, Fonts, Spacing } from '@/UIProvider';
+import type { Colors, Fonts, Spacing } from '@/UIProvider/theme/types';
 
 import { getStyles } from './styles';
 
-export function createToastConfig(colors: Colors, fonts: Fonts, spacing: Spacing): ToastConfig {
+export const createToastConfig = (colors: Colors, fonts: Fonts, spacing: Spacing): ToastConfig => {
   const createToast = (accentColor: string): ToastConfig[string] => {
     const styles = getStyles(colors, fonts, spacing, accentColor);
 
@@ -26,4 +26,4 @@ export function createToastConfig(colors: Colors, fonts: Fonts, spacing: Spacing
     success: createToast(colors.success),
     warning: createToast(colors.warning),
   };
-}
+};

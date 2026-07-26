@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 
-import type { Colors, Radius, Spacing } from '@/UIProvider';
+import type { Colors, Radius, Spacing } from '@/UIProvider/theme/types';
 
-export function getStyles(colors: Colors, spacing: Spacing, radius: Radius) {
+export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
   const styles = StyleSheet.create({
     buttonGroup: {
       gap: spacing.sm,
@@ -34,4 +34,4 @@ export function getStyles(colors: Colors, spacing: Spacing, radius: Radius) {
   });
 
   return styles;
-}
+};

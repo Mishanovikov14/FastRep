@@ -6,7 +6,7 @@ import { useUIContext } from '@/UIProvider/useUIContext';
 import { getStyles } from './styles';
 import type { IProps } from './types';
 
-export function Loader({ color, fullscreen = false, size = 'small' }: IProps) {
+export const Loader = ({ color, fullscreen = false, size = 'small' }: IProps) => {
   const { colors, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors), [colors]);
   const indicator = (
@@ -23,4 +23,4 @@ export function Loader({ color, fullscreen = false, size = 'small' }: IProps) {
   }
 
   return <View style={styles.fullscreen}>{indicator}</View>;
-}
+};

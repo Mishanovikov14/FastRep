@@ -14,7 +14,7 @@ export const i18n = i18next.createInstance();
 
 let initializationPromise: Promise<SupportedLanguage> | null = null;
 
-export function initializeLocalization(): Promise<SupportedLanguage> {
+export const initializeLocalization = (): Promise<SupportedLanguage> => {
   if (initializationPromise) {
     return initializationPromise;
   }
@@ -43,4 +43,4 @@ export function initializeLocalization(): Promise<SupportedLanguage> {
   })();
 
   return initializationPromise;
-}
+};

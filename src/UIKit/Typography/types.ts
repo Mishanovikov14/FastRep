@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { StyleProp, TextProps, TextStyle } from 'react-native';
 
-import type { SupportedLanguage } from '@/localization';
+import type { SupportedLanguage } from '@/localization/types';
 
 export type TypographyVariant = 'body' | 'bodyMedium' | 'button' | 'caption' | 'heading' | 'title';
 export type TypographyWeight = 'bold' | 'medium' | 'regular' | 'semibold';

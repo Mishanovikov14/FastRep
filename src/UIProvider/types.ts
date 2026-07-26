@@ -1,8 +1,9 @@
 import type { TFunction } from 'i18next';
+import type { ReactNode } from 'react';
 
-import type { SupportedLanguage } from '@/localization';
+import type { SupportedLanguage } from '@/localization/types';
 
-import type { Colors, FontFamilies, Fonts, Radius, Spacing } from './theme';
+import type { Colors, FontFamilies, Fonts, Radius, Spacing } from './theme/types';
 
 export interface LanguageOption {
   code: SupportedLanguage;
@@ -12,6 +13,10 @@ export interface LanguageOption {
     | 'languages.german'
     | 'languages.spanish'
     | 'languages.ukrainian';
+}
+
+export interface IProps {
+  children?: ReactNode;
 }
 
 export interface UIContextValue {

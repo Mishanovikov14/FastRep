@@ -5,7 +5,7 @@ import type { AuthTokens } from './types';
 const TOKEN_SERVICE = 'com.fastrep.auth.tokens';
 const TOKEN_USERNAME = 'fastrep';
 
-function isAuthTokens(value: unknown): value is AuthTokens {
+const isAuthTokens = (value: unknown): value is AuthTokens => {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
@@ -13,7 +13,7 @@ function isAuthTokens(value: unknown): value is AuthTokens {
   const tokens = value as Partial<AuthTokens>;
 
   return typeof tokens.accessToken === 'string' && typeof tokens.refreshToken === 'string';
-}
+};
 
 export class KeychainStorage {
   async clearTokens(): Promise<void> {

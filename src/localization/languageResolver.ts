@@ -4,17 +4,17 @@ import { DEFAULT_LANGUAGE, isSupportedLanguage } from './languages';
 import { getStoredLanguage, persistLanguage } from './storage';
 import type { LocaleCandidate, SupportedLanguage } from './types';
 
-export function normalizeLanguage(locale: LocaleCandidate): SupportedLanguage | null {
+export const normalizeLanguage = (locale: LocaleCandidate): SupportedLanguage | null => {
   const candidate = locale.languageCode ?? locale.languageTag.split(/[-_]/)[0];
   const normalizedCandidate = candidate.toLowerCase();
 
   return isSupportedLanguage(normalizedCandidate) ? normalizedCandidate : null;
-}
+};
 
-export function resolveLanguage(
+export const resolveLanguage = (
   storedLanguage: unknown,
   locales: readonly LocaleCandidate[],
-): SupportedLanguage {
+): SupportedLanguage => {
   if (isSupportedLanguage(storedLanguage)) {
     return storedLanguage.toLowerCase() as SupportedLanguage;
   }
@@ -28,12 +28,12 @@ export function resolveLanguage(
   }
 
   return DEFAULT_LANGUAGE;
-}
+};
 
-export function resolveAndPersistLanguage(): SupportedLanguage {
+export const resolveAndPersistLanguage = (): SupportedLanguage => {
   const language = resolveLanguage(getStoredLanguage(), getLocales());
 
   persistLanguage(language);
 
   return language;
-}
+};

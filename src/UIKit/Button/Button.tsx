@@ -2,14 +2,14 @@ import { useMemo } from 'react';
 import type { PressableStateCallbackType, StyleProp, ViewStyle } from 'react-native';
 import { Pressable, View } from 'react-native';
 
-import { Loader } from '@/UIKit/Loader';
-import { Typography } from '@/UIKit/Typography';
-import { useUIContext } from '@/UIProvider';
+import { Loader } from '@/UIKit/Loader/Loader';
+import { Typography } from '@/UIKit/Typography/Typography';
+import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getStyles } from './styles';
 import type { IProps } from './types';
 
-export function Button({
+export const Button = ({
   disabled = false,
   fullWidth = false,
   leftElement,
@@ -20,7 +20,7 @@ export function Button({
   style,
   title,
   variant = 'primary',
-}: IProps) {
+}: IProps) => {
   const { colors, spacing, radius } = useUIContext();
   const styles = useMemo(() => getStyles(colors, spacing, radius), [colors, radius, spacing]);
   const isDisabled = disabled || loading;
@@ -59,4 +59,4 @@ export function Button({
       </View>
     </Pressable>
   );
-}
+};

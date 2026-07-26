@@ -1,5 +1,5 @@
 import { typographyVariantWeights } from '@/UIKit';
-import { fontFamiliesByPlatform } from '@/UIProvider/theme';
+import { fontFamiliesByPlatform } from '@/UIProvider/theme/Fonts';
 
 describe('Typography font configuration', () => {
   it('maps variants to the bundled static font weights', () => {

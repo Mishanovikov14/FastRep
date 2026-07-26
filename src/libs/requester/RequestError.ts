@@ -8,15 +8,15 @@ interface BackendErrorBody {
   type?: unknown;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+const isRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null;
-}
+};
 
-function parseBackendError(value: unknown): BackendErrorBody {
+const parseBackendError = (value: unknown): BackendErrorBody => {
   return isRecord(value) ? value : {};
-}
+};
 
-export function normalizeRequestError(error: unknown): IResponse<never> {
+export const normalizeRequestError = (error: unknown): IResponse<never> => {
   if (!axios.isAxiosError(error)) {
     return {
       errors: error,
@@ -48,4 +48,4 @@ export function normalizeRequestError(error: unknown): IResponse<never> {
     status: axiosError.response?.status,
     type: typeof backendError.type === 'string' ? backendError.type : undefined,
   };
-}
+};
