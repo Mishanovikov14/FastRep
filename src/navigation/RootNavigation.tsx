@@ -1,0 +1,64 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import { LoginView } from '@/modules/auth/ui/LoginView';
+import { RegistrationView } from '@/modules/auth/ui/RegistrationView';
+import { HomeView } from '@/modules/home/ui/HomeView';
+import { SplashView } from '@/modules/home/ui/SplashView';
+import { useAuthStore } from '@/storage/authStore';
+
+import { getRootNavigationState } from './getRootNavigationState';
+import type { AppStackParamList, GuestStackParamList, SplashStackParamList } from './types';
+
+const AppStack = createNativeStackNavigator<AppStackParamList>();
+const GuestStack = createNativeStackNavigator<GuestStackParamList>();
+const SplashStack = createNativeStackNavigator<SplashStackParamList>();
+
+const AppNavigation = () => {
+  return (
+    <AppStack.Navigator screenOptions={{ headerShown: false }}>
+      <AppStack.Screen component={HomeView} name="Home" />
+    </AppStack.Navigator>
+  );
+};
+
+const GuestNavigation = () => {
+  return (
+    <GuestStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
+      <GuestStack.Screen component={LoginView} name="Login" />
+      <GuestStack.Screen component={RegistrationView} name="Registration" />
+    </GuestStack.Navigator>
+  );
+};
+
+const SplashNavigation = () => {
+  return (
+    <SplashStack.Navigator screenOptions={{ headerShown: false }}>
+      <SplashStack.Screen component={SplashView} name="Splash" />
+    </SplashStack.Navigator>
+  );
+};
+
+export const RootNavigation = () => {
+  const isAuthorized = useAuthStore((state) => state.isAuthorized);
+  const isSessionRestored = useAuthStore((state) => state.isSessionRestored);
+  const navigationState = getRootNavigationState({
+    isAuthorized,
+    isSessionRestored,
+  });
+
+  const renderNavigation = () => {
+    switch (navigationState) {
+      case 'app':
+        return <AppNavigation />;
+      case 'guest':
+        return <GuestNavigation />;
+      case 'splash':
+        return <SplashNavigation />;
+    }
+  };
+
+  return (
+    <NavigationContainer>{renderNavigation()}</NavigationContainer>
+  );
+};

@@ -1,0 +1,97 @@
+import type { TranslationResources } from './types';
+
+export const es: TranslationResources = {
+  auth: {
+    login: {
+      createAccount: 'Crear cuenta',
+      description: 'Inicia sesión para seguir usando FastRep.',
+      email: 'Correo electrónico',
+      forgotPassword: '¿Has olvidado tu contraseña?',
+      invalidCredentials: 'El correo electrónico o la contraseña son incorrectos.',
+      logIn: 'Iniciar sesión',
+      password: 'Contraseña',
+      passwordRecoveryComingSoon:
+        'La recuperación de contraseña estará disponible próximamente.',
+      title: 'Te damos la bienvenida de nuevo',
+      validation: {
+        emailInvalid: 'Introduce un correo electrónico válido.',
+        emailRequired: 'El correo electrónico es obligatorio.',
+        passwordMax: 'La contraseña no puede superar los 128 caracteres.',
+        passwordMin: 'La contraseña debe tener al menos 8 caracteres.',
+        passwordRequired: 'La contraseña es obligatoria.',
+      },
+    },
+    registration: {
+      alreadyHaveAccount: '¿Ya tienes una cuenta?',
+      confirmPassword: 'Confirmar contraseña',
+      createAccount: 'Crear cuenta',
+      email: 'Correo electrónico',
+      fullName: 'Nombre completo',
+      logIn: 'Iniciar sesión',
+      password: 'Contraseña',
+      subtitle: 'Crea tu cuenta de FastRep para comenzar.',
+      title: 'Crea tu cuenta',
+      validation: {
+        confirmPasswordRequired: 'Confirma tu contraseña.',
+        emailInvalid: 'Introduce un correo electrónico válido.',
+        emailRequired: 'El correo electrónico es obligatorio.',
+        fullNameMax: 'El nombre completo no puede superar los 80 caracteres.',
+        fullNameMin: 'El nombre completo debe tener al menos 2 caracteres.',
+        fullNameRequired: 'El nombre completo es obligatorio.',
+        passwordMin: 'La contraseña debe tener al menos 8 caracteres.',
+        passwordRequired: 'La contraseña es obligatoria.',
+        passwordsMismatch: 'Las contraseñas no coinciden.',
+      },
+    },
+    session: {
+      expired: 'Tu sesión ha caducado. Vuelve a iniciar sesión.',
+      genericError: 'No se pudo completar la autenticación. Inténtalo de nuevo.',
+      networkUnavailable:
+        'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
+      restoring: 'Restaurando tu sesión…',
+      serverError:
+        'El servidor no está disponible temporalmente. Inténtalo de nuevo más tarde.',
+      timeout: 'La solicitud ha agotado el tiempo de espera. Inténtalo de nuevo.',
+    },
+  },
+  common: {
+    cancel: 'Cancelar',
+    close: 'Cerrar',
+    continue: 'Continuar',
+    error: 'Error',
+    info: 'Información',
+    loading: 'Cargando',
+    no: 'No',
+    retry: 'Reintentar',
+    save: 'Guardar',
+    somethingWentWrong: 'Algo salió mal',
+    success: 'Éxito',
+    yes: 'Sí',
+  },
+  home: {
+    email: 'Correo electrónico',
+    fullName: 'Nombre completo',
+    language: 'Idioma',
+    logout: 'Cerrar sesión',
+    logoutError:
+      'Has cerrado sesión en este dispositivo, pero no se pudo notificar al servidor.',
+    premium: 'Premium',
+    premiumActive: 'Activo',
+    premiumInactive: 'Inactivo',
+    title: 'Inicio',
+  },
+  languages: {
+    english: 'Inglés',
+    french: 'Francés',
+    german: 'Alemán',
+    spanish: 'Español',
+    ukrainian: 'Ucraniano',
+  },
+  showcase: {
+    currentLanguage: 'Idioma actual',
+    description: 'Demostración de la base reutilizable de la aplicación',
+    showError: 'Mostrar error',
+    showSuccess: 'Mostrar éxito',
+    title: 'Base FastRep',
+  },
+};

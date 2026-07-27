@@ -19,3 +19,16 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Reanimated 4.5.x can leave its Prefab configuration task marked up-to-date after
+// `clean`, even though the generated package has been removed. Force that small
+// configuration task to run so New Architecture clean builds are reproducible.
+subprojects { subproject ->
+    if (subproject.name == "react-native-reanimated") {
+        subproject.tasks.configureEach { task ->
+            if (task.name ==~ /^prefab.+ConfigurePackage$/) {
+                task.outputs.upToDateWhen { false }
+            }
+        }
+    }
+}
