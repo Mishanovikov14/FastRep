@@ -51,7 +51,7 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
   }, []);
 
   const onLogin = useCallback(() => {
-    navigation.navigate('Login');
+    navigation.goBack();
   }, [navigation]);
 
   const onRegister = useCallback(async () => {

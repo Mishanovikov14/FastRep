@@ -34,11 +34,10 @@ export const RegistrationView = () => {
   return (
     <ScreenContainer
       backgroundColor={colors.white}
-      contentContainerStyle={styles.content}
       isKeyboardAvoiding
       scrollEnabled
     >
-      <View style={styles.card}>
+      <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"
           resizeMode="contain"
@@ -47,9 +46,6 @@ export const RegistrationView = () => {
         />
 
         <View style={styles.header}>
-          <Typography align="center" variant="title">
-            {t('auth.registration.createAccount')}
-          </Typography>
           <Typography align="center" color={colors.textSecondary}>
             {t('auth.registration.subtitle')}
           </Typography>
@@ -105,26 +101,26 @@ export const RegistrationView = () => {
           />
         </View>
 
-        <Button
-          disabled={isLoading}
-          fullWidth
-          loading={isLoading}
-          onPress={onRegister}
-          size="large"
-          title={String(t('auth.registration.createAccount'))}
-        />
-
-        <View style={styles.login}>
-          <Typography color={colors.textSecondary}>
-            {t('auth.registration.alreadyHaveAccount')}
-          </Typography>
+        <View style={styles.buttonsContainer}>
           <Button
             disabled={isLoading}
-            onPress={onLogin}
-            size="small"
-            title={String(t('auth.registration.logIn'))}
-            variant="text"
+            fullWidth
+            loading={isLoading}
+            onPress={onRegister}
+            size="large"
+            title={String(t('auth.registration.createAccount'))}
           />
+
+          <View style={styles.login}>
+            <Typography color={colors.textSecondary}>{t('auth.registration.alreadyHaveAccount')}</Typography>
+            <Button
+              disabled={isLoading}
+              onPress={onLogin}
+              size="small"
+              title={String(t('auth.registration.logIn'))}
+              variant="text"
+            />
+          </View>
         </View>
       </View>
     </ScreenContainer>

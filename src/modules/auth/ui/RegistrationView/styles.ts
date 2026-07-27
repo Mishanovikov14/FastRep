@@ -5,17 +5,12 @@ import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, spacing: Spacing) => {
   const styles = StyleSheet.create({
-    card: {
-      alignSelf: 'center',
-      gap: scaleVertical(spacing.xl),
-      maxWidth: Math.min(scaleHorizontal(440), 440),
-      width: '100%',
-    },
-    content: {
+    container: {
+      flex: 1,
       backgroundColor: colors.white,
-      justifyContent: 'center',
+      gap: scaleVertical(spacing.lg),
       paddingHorizontal: scaleHorizontal(spacing.xl),
-      paddingVertical: scaleVertical(spacing.xxl),
+      paddingTop: scaleVertical(46),
     },
     fields: {
       gap: scaleVertical(spacing.lg),
@@ -33,6 +28,9 @@ export const getStyles = (colors: Colors, spacing: Spacing) => {
       height: scaleVertical(80),
       maxWidth: Math.min(scaleHorizontal(320), 320),
       width: '82%',
+    },
+    buttonsContainer: {
+      gap: scaleVertical(spacing.sm),
     },
   });
 
