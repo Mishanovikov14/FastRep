@@ -2,32 +2,34 @@ This is a new [**React Native**](https://reactnative.dev) project, bootstrapped 
 
 # Environment
 
-Copy `.env.example` to `.env` and keep environment-specific values out of Git:
-
-```sh
-API_URL=http://localhost:3000
-```
-
-The iOS simulator can reach a backend running on the Mac through `localhost`. The standard
-Android emulator uses `10.0.2.2` to reach the host machine, so use an Android-specific environment
-file or change `API_URL` for that run:
-
-```sh
-API_URL=http://10.0.2.2:3000
-```
-
-Application code reads the backend URL only through `react-native-config`; do not hardcode
-platform-specific URLs in requester or feature code.
-
-Release builds use the tracked `.env.production` configuration:
+FastRep uses one canonical `API_URL` variable through `react-native-config`. Normal Debug
+and Release builds both use the shared remote backend:
 
 ```sh
 API_URL=https://api.fastrep.app
 ```
 
-Debug builds continue to use the untracked `.env`. For a physical device, set `API_URL` there
-to the development machine's LAN address, such as `http://192.168.1.20:3000`, and ensure the
-device and machine share a network.
+- iOS Debug: `.env.development`
+- iOS Release: `.env.production`
+- Android Debug and DebugOptimized: `.env.development`
+- Android Release: `.env.production`
+
+Both environment files are tracked, so a clean checkout resolves the same backend without a
+developer-specific `.env`. Application code reads the backend URL only through
+`react-native-config`; requester and feature code must not contain platform-specific fallbacks.
+
+To explicitly use a local backend later, create an ignored `.env.local`, choose the URL that is
+reachable from the target, and select that file only for the intended launch:
+
+```sh
+API_URL=http://localhost:3000
+ENVFILE=.env.local npm run ios
+ENVFILE=.env.local npm run android
+```
+
+For the standard Android emulator, use `http://10.0.2.2:3000` in `.env.local`. For a physical
+device, use the development machine's reachable LAN address and ensure both devices share a
+network. Never commit `.env.local`.
 
 # Typography
 
