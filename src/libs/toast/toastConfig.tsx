@@ -14,7 +14,9 @@ export const createToastConfig = (colors: Colors, fonts: Fonts, spacing: Spacing
         {...props}
         contentContainerStyle={styles.content}
         style={styles.root}
+        text1NumberOfLines={0}
         text1Style={styles.text1}
+        text2NumberOfLines={0}
         text2Style={styles.text2}
       />
     );
