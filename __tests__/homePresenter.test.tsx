@@ -3,9 +3,9 @@ import type { TFunction } from 'i18next';
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
-import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
-import { clearUserSession } from '@/entities/user/services/userStateService';
 import { useUserStore } from '@/entities/user/model/userStore';
+import { clearUserSession } from '@/entities/user/services/userStateService';
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import type { IUser } from '@/entities/user/types/user';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { toastService } from '@/libs/toast/toastService';

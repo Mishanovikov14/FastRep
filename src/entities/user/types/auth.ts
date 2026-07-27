@@ -16,11 +16,21 @@ export interface ILoginRequest {
   password: string;
 }
 
+export interface IForgotPasswordRequest {
+  email: string;
+}
+
 export interface IRegisterRequest {
   email: string;
   fullName: string;
   language: SupportedLanguage;
   password: string;
+}
+
+export interface IResetPasswordRequest {
+  code: string;
+  email: string;
+  newPassword: string;
 }
 
 export interface IRefreshRequest {

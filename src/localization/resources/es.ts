@@ -2,6 +2,19 @@ import type { TranslationResources } from './types';
 
 export const es: TranslationResources = {
   auth: {
+    forgotPassword: {
+      codeSent:
+        'Si existe una cuenta con este correo, hemos enviado un código de verificación.',
+      email: 'Correo electrónico',
+      explanation:
+        'Introduce tu correo para recibir un código de verificación de seis dígitos.',
+      sendCode: 'Enviar código',
+      title: 'Contraseña olvidada',
+      validation: {
+        emailInvalid: 'Introduce un correo electrónico válido.',
+        emailRequired: 'El correo electrónico es obligatorio.',
+      },
+    },
     login: {
       createAccount: 'Crear cuenta',
       description: 'Inicia sesión para seguir usando FastRep.',
@@ -10,8 +23,6 @@ export const es: TranslationResources = {
       invalidCredentials: 'El correo electrónico o la contraseña son incorrectos.',
       logIn: 'Iniciar sesión',
       password: 'Contraseña',
-      passwordRecoveryComingSoon:
-        'La recuperación de contraseña estará disponible próximamente.',
       title: 'Te damos la bienvenida de nuevo',
       validation: {
         emailInvalid: 'Introduce un correo electrónico válido.',
@@ -38,6 +49,47 @@ export const es: TranslationResources = {
         fullNameMax: 'El nombre completo no puede superar los 80 caracteres.',
         fullNameMin: 'El nombre completo debe tener al menos 2 caracteres.',
         fullNameRequired: 'El nombre completo es obligatorio.',
+        passwordMax: 'La contraseña no puede superar los 128 caracteres.',
+        passwordMin: 'La contraseña debe tener al menos 8 caracteres.',
+        passwordRequired: 'La contraseña es obligatoria.',
+        passwordsMismatch: 'Las contraseñas no coinciden.',
+      },
+    },
+    otp: {
+      codeResent:
+        'Si existe una cuenta con este correo, hemos enviado un código nuevo.',
+      codeSentTo: 'Código enviado a {{email}}',
+      explanation: 'Introduce el código de seis dígitos enviado a tu correo.',
+      invalidCodeFormat: 'Introduce exactamente seis dígitos.',
+      resendCode: 'Reenviar código',
+      resendIn: 'Reenviar en {{seconds}} s',
+      title: 'Introduce el código de verificación',
+      verificationCode: 'Código de verificación',
+    },
+    recovery: {
+      back: 'Atrás',
+      backToLogin: 'Volver al inicio de sesión',
+      invalidOrExpiredCode: 'El código de verificación no es válido o ha caducado.',
+      networkError:
+        'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
+      rateLimited: 'Demasiadas solicitudes. Espera antes de volver a intentarlo.',
+      serverUnavailable:
+        'El servidor no está disponible temporalmente. Inténtalo más tarde.',
+      timeoutError: 'La solicitud ha agotado el tiempo de espera.',
+      tooManyAttempts: 'Demasiados intentos fallidos. Solicita un código nuevo.',
+      usedCode: 'Este código ya se ha utilizado. Solicita un código nuevo.',
+    },
+    resetPassword: {
+      confirmNewPassword: 'Confirmar contraseña nueva',
+      explanation: 'Elige una contraseña nueva para tu cuenta de FastRep.',
+      newPassword: 'Contraseña nueva',
+      resetPassword: 'Restablecer contraseña',
+      success:
+        'Tu contraseña se ha restablecido. Inicia sesión con la contraseña nueva.',
+      title: 'Restablecer contraseña',
+      validation: {
+        confirmPasswordRequired: 'Confirma tu contraseña nueva.',
+        passwordMax: 'La contraseña no puede superar los 128 caracteres.',
         passwordMin: 'La contraseña debe tener al menos 8 caracteres.',
         passwordRequired: 'La contraseña es obligatoria.',
         passwordsMismatch: 'Las contraseñas no coinciden.',

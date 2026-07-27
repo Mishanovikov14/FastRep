@@ -82,7 +82,11 @@ describe('AxiosRequester authentication and refresh', () => {
     expect(getRequestHeaders(request, 0).get('Authorization')).toBe('Bearer access-token');
   });
 
-  it('keeps a public request free of Authorization and never refreshes its 401', async () => {
+  it.each([
+    '/auth/login',
+    '/auth/forgot-password',
+    '/auth/reset-password',
+  ])('keeps public endpoint %s free of Authorization and refresh', async (url) => {
     const { client, request } = createClient();
     const getAuthState = jest.fn().mockResolvedValue(createAuthState('access-token'));
     const refreshAuthState = jest
@@ -98,7 +102,8 @@ describe('AxiosRequester authentication and refresh', () => {
         Authorization: 'Bearer stale-token',
       },
       requiresAuth: false,
-      url: '/auth/login',
+      skipAuthRefresh: true,
+      url,
     });
 
     expect(result).toMatchObject({

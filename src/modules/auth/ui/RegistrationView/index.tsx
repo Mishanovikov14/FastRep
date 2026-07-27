@@ -81,6 +81,7 @@ export const RegistrationView = () => {
             disabled={isLoading}
             error={errors.password}
             label={String(t('auth.registration.password'))}
+            maxLength={128}
             onChangeText={onChangePassword}
             returnKeyType="next"
             secureTextEntry

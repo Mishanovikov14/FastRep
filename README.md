@@ -19,6 +19,16 @@ API_URL=http://10.0.2.2:3000
 Application code reads the backend URL only through `react-native-config`; do not hardcode
 platform-specific URLs in requester or feature code.
 
+Release builds use the tracked `.env.production` configuration:
+
+```sh
+API_URL=https://api.fastrep.app
+```
+
+Debug builds continue to use the untracked `.env`. For a physical device, set `API_URL` there
+to the development machine's LAN address, such as `http://192.168.1.20:3000`, and ensure the
+device and machine share a network.
+
 # Typography
 
 FastRep bundles **Google Sans Flex** locally; the application never downloads fonts at runtime.

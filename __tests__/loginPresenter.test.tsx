@@ -31,7 +31,6 @@ jest.mock('@/entities/user/services/userTokenStorage', () => ({
 jest.mock('@/libs/toast/toastService', () => ({
   toastService: {
     showError: jest.fn(),
-    showInfo: jest.fn(),
   },
 }));
 jest.mock('@/entities/user/API/userApi', () => ({
@@ -198,7 +197,7 @@ describe('useLoginViewPresenter', () => {
     );
   });
 
-  it('opens Registration and shows the password recovery information toast', async () => {
+  it('opens Registration and the real password-recovery flow', async () => {
     await ReactTestRenderer.act(async () => {
       renderer = ReactTestRenderer.create(<Harness />);
     });
@@ -209,10 +208,7 @@ describe('useLoginViewPresenter', () => {
     });
 
     expect(navigation.navigate).toHaveBeenCalledWith('Registration');
-    expect(toastService.showInfo).toHaveBeenCalledWith(
-      'common.info',
-      'auth.login.passwordRecoveryComingSoon',
-    );
+    expect(navigation.navigate).toHaveBeenCalledWith('ForgotPassword');
     expect(mockMutateAsync).not.toHaveBeenCalled();
   });
 });

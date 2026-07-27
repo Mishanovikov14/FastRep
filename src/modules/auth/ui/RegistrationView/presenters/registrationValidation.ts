@@ -33,6 +33,8 @@ export const validateRegistration = (
     errors.password = String(t('auth.registration.validation.passwordRequired'));
   } else if (values.password.length < 8) {
     errors.password = String(t('auth.registration.validation.passwordMin'));
+  } else if (values.password.length > 128) {
+    errors.password = String(t('auth.registration.validation.passwordMax'));
   }
 
   if (!values.confirmPassword) {

@@ -3,8 +3,16 @@ export type AppStackParamList = {
 };
 
 export type GuestStackParamList = {
+  ForgotPassword: undefined;
   Login: undefined;
+  OtpVerification: {
+    email: string;
+  };
   Registration: undefined;
+  ResetPassword: {
+    code: string;
+    email: string;
+  };
 };
 
 export type SplashStackParamList = {
