@@ -9,13 +9,14 @@ and Release builds both use the shared remote backend:
 API_URL=https://api.fastrep.app
 ```
 
-- iOS Debug: `.env.development`
-- iOS Release: `.env.production`
+- iOS Debug and Release: `.env`
 - Android Debug and DebugOptimized: `.env.development`
 - Android Release: `.env.production`
 
-Both environment files are tracked, so a clean checkout resolves the same backend without a
-developer-specific `.env`. Application code reads the backend URL only through
+These environment files are tracked, so a clean checkout resolves the same backend without a
+developer-specific override. The iOS `react-native-config` CocoaPods target reads the root `.env`
+for both configurations; app-target `ENVFILE` build settings do not propagate to that pod target.
+Application code reads the backend URL only through
 `react-native-config`; requester and feature code must not contain platform-specific fallbacks.
 
 To explicitly use a local backend later, create an ignored `.env.local`, choose the URL that is
@@ -29,7 +30,8 @@ ENVFILE=.env.local npm run android
 
 For the standard Android emulator, use `http://10.0.2.2:3000` in `.env.local`. For a physical
 device, use the development machine's reachable LAN address and ensure both devices share a
-network. Never commit `.env.local`.
+network. Never commit `.env.local`. Environment values are embedded in native builds, so stop the
+running app and rebuild it after changing the selected file; Fast Refresh is not sufficient.
 
 # Typography
 

@@ -16,7 +16,7 @@ const readProjectFile = (relativePath: string): string => {
 };
 
 describe('API environment selection', () => {
-  it.each(['.env.development', '.env.production', '.env.example'])(
+  it.each(['.env', '.env.development', '.env.production', '.env.example'])(
     'configures %s with the shared remote backend',
     environmentFile => {
       expect(readProjectFile(environmentFile).trim()).toBe(remoteEnvironment);
@@ -31,21 +31,16 @@ describe('API environment selection', () => {
     expect(androidBuild).toContain('release: ".env.production"');
   });
 
-  it('maps iOS Debug and Release to tracked environment files', () => {
+  it('lets the iOS config pod use the tracked default environment', () => {
     const iosProject = readProjectFile('ios/FastRep.xcodeproj/project.pbxproj');
-    const debugConfiguration = iosProject.match(
-      /13B07F941A680F5B00A75B9A \/\* Debug \*\/ = \{[\s\S]*?\n\t\t\};/,
-    )?.[0];
-    const releaseConfiguration = iosProject.match(
-      /13B07F951A680F5B00A75B9A \/\* Release \*\/ = \{[\s\S]*?\n\t\t\};/,
-    )?.[0];
 
-    expect(debugConfiguration).toContain('ENVFILE = .env.development;');
-    expect(releaseConfiguration).toContain('ENVFILE = .env.production;');
+    expect(readProjectFile('.env').trim()).toBe(remoteEnvironment);
+    expect(iosProject).not.toContain('ENVFILE =');
   });
 
   it('keeps localhost out of active environment files and requester setup', () => {
     const activeConfiguration = [
+      readProjectFile('.env'),
       readProjectFile('.env.development'),
       readProjectFile('.env.production'),
       readProjectFile('src/libs/requester/requester.ts'),
