@@ -26,12 +26,7 @@ export const LoginView = () => {
   } = useLoginViewPresenter({ t });
 
   return (
-    <ScreenContainer
-      backgroundColor={colors.white}
-      edges={['top', 'bottom']}
-      isKeyboardAvoiding
-      scrollEnabled
-    >
+    <ScreenContainer backgroundColor={colors.white} edges={['top', 'bottom']} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"
@@ -77,23 +72,24 @@ export const LoginView = () => {
           />
         </View>
 
-        <Button
-          disabled={isLoading}
-          fullWidth
-          loading={isLoading}
-          onPress={onSubmit}
-          size="large"
-          title={String(t('auth.login.logIn'))}
-        />
+        <View>
+          <Button
+            disabled={isLoading}
+            fullWidth
+            loading={isLoading}
+            onPress={onSubmit}
+            size="large"
+            title={String(t('auth.login.logIn'))}
+          />
 
+          <Button
+            disabled={isLoading}
+            onPress={onPressRegistration}
+            title={String(t('auth.login.createAccount'))}
+            variant="text"
+          />
+        </View>
       </View>
-        <Button
-          disabled={isLoading}
-          onPress={onPressRegistration}
-          title={String(t('auth.login.createAccount'))}
-          variant="text"
-          style={styles.signUpButton}
-        />
     </ScreenContainer>
   );
 };

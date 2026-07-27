@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		059312CFC10F42C9BFF69506 /* GoogleSansFlex_24pt-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8ADF383F247F4A9585FF2087 /* GoogleSansFlex_24pt-SemiBold.ttf */; };
 		0C80B921A6F3F58F76C31292 /* libPods-FastRep.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-FastRep.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		FD249BDEB3A5ABA67991FF0C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
-		059312CFC10F42C9BFF69506 /* GoogleSansFlex_24pt-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8ADF383F247F4A9585FF2087 /* GoogleSansFlex_24pt-SemiBold.ttf */; };
-		FD4231612D0049CCA0C50C02 /* GoogleSansFlex_24pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A5E2D6314C042238A651898 /* GoogleSansFlex_24pt-Regular.ttf */; };
 		83CBE2DE48354946B0BBBEFC /* GoogleSansFlex_24pt-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A0D5F30C41FB46C48387ECEF /* GoogleSansFlex_24pt-Medium.ttf */; };
-		9CFDABEAEC0E403FB36C3E32 /* GoogleSansFlex_24pt-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 88D264FEF79B4FA6A54E39D8 /* GoogleSansFlex_24pt-Bold.ttf */; };
 		86D4256F621E41158D45542D /* GoogleSansFlex-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = CB32BE6E266F4B379DCBF775 /* GoogleSansFlex-OFL.txt */; };
+		9CFDABEAEC0E403FB36C3E32 /* GoogleSansFlex_24pt-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 88D264FEF79B4FA6A54E39D8 /* GoogleSansFlex_24pt-Bold.ttf */; };
+		FD249BDEB3A5ABA67991FF0C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		FD4231612D0049CCA0C50C02 /* GoogleSansFlex_24pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3A5E2D6314C042238A651898 /* GoogleSansFlex_24pt-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,17 +24,17 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = FastRep/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = FastRep/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = FastRep/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3A5E2D6314C042238A651898 /* GoogleSansFlex_24pt-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSansFlex_24pt-Regular.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-Regular.ttf"; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-FastRep.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FastRep.debug.xcconfig"; path = "Target Support Files/Pods-FastRep/Pods-FastRep.debug.xcconfig"; sourceTree = "<group>"; };
 		5709B34CF0A7D63546082F79 /* Pods-FastRep.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FastRep.release.xcconfig"; path = "Target Support Files/Pods-FastRep/Pods-FastRep.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-FastRep.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-FastRep.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = FastRep/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = FastRep/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		88D264FEF79B4FA6A54E39D8 /* GoogleSansFlex_24pt-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSansFlex_24pt-Bold.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-Bold.ttf"; sourceTree = "<group>"; };
+		8ADF383F247F4A9585FF2087 /* GoogleSansFlex_24pt-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSansFlex_24pt-SemiBold.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-SemiBold.ttf"; sourceTree = "<group>"; };
+		A0D5F30C41FB46C48387ECEF /* GoogleSansFlex_24pt-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSansFlex_24pt-Medium.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-Medium.ttf"; sourceTree = "<group>"; };
+		CB32BE6E266F4B379DCBF775 /* GoogleSansFlex-OFL.txt */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GoogleSansFlex-OFL.txt"; path = "../assets/fonts/licenses/GoogleSansFlex-OFL.txt"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		8ADF383F247F4A9585FF2087 /* GoogleSansFlex_24pt-SemiBold.ttf */ = {isa = PBXFileReference; name = "GoogleSansFlex_24pt-SemiBold.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		3A5E2D6314C042238A651898 /* GoogleSansFlex_24pt-Regular.ttf */ = {isa = PBXFileReference; name = "GoogleSansFlex_24pt-Regular.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		A0D5F30C41FB46C48387ECEF /* GoogleSansFlex_24pt-Medium.ttf */ = {isa = PBXFileReference; name = "GoogleSansFlex_24pt-Medium.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		88D264FEF79B4FA6A54E39D8 /* GoogleSansFlex_24pt-Bold.ttf */ = {isa = PBXFileReference; name = "GoogleSansFlex_24pt-Bold.ttf"; path = "../assets/fonts/GoogleSansFlex_24pt-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		CB32BE6E266F4B379DCBF775 /* GoogleSansFlex-OFL.txt */ = {isa = PBXFileReference; name = "GoogleSansFlex-OFL.txt"; path = "../assets/fonts/licenses/GoogleSansFlex-OFL.txt"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +59,18 @@
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 			);
 			name = FastRep;
+			sourceTree = "<group>";
+		};
+		28DF63ADC1EF4F0E945EECF4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8ADF383F247F4A9585FF2087 /* GoogleSansFlex_24pt-SemiBold.ttf */,
+				3A5E2D6314C042238A651898 /* GoogleSansFlex_24pt-Regular.ttf */,
+				A0D5F30C41FB46C48387ECEF /* GoogleSansFlex_24pt-Medium.ttf */,
+				88D264FEF79B4FA6A54E39D8 /* GoogleSansFlex_24pt-Bold.ttf */,
+				CB32BE6E266F4B379DCBF775 /* GoogleSansFlex-OFL.txt */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -108,19 +120,6 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
-		};
-		28DF63ADC1EF4F0E945EECF4 /* Resources */ = {
-			isa = "PBXGroup";
-			children = (
-				8ADF383F247F4A9585FF2087 /* GoogleSansFlex_24pt-SemiBold.ttf */,
-				3A5E2D6314C042238A651898 /* GoogleSansFlex_24pt-Regular.ttf */,
-				A0D5F30C41FB46C48387ECEF /* GoogleSansFlex_24pt-Medium.ttf */,
-				88D264FEF79B4FA6A54E39D8 /* GoogleSansFlex_24pt-Bold.ttf */,
-				CB32BE6E266F4B379DCBF775 /* GoogleSansFlex-OFL.txt */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-			path = "";
 		};
 /* End PBXGroup section */
 
@@ -221,9 +220,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-FastRep/Pods-FastRep-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-FastRep/Pods-FastRep-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -260,9 +263,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-FastRep/Pods-FastRep-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-FastRep/Pods-FastRep-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

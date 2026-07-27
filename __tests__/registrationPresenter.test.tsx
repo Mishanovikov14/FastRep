@@ -170,7 +170,7 @@ describe('useRegistrationViewPresenter', () => {
 
   it('navigates back to Login without making a registration request', async () => {
     const navigation = {
-      navigate: jest.fn(),
+      goBack: jest.fn(),
     };
     let presenter: ReturnType<typeof useRegistrationViewPresenter> | undefined;
     const Harness = () => {
@@ -192,7 +192,7 @@ describe('useRegistrationViewPresenter', () => {
       presenter?.onLogin();
     });
 
-    expect(navigation.navigate).toHaveBeenCalledWith('Login');
+    expect(navigation.goBack).toHaveBeenCalledTimes(1);
     expect(register).not.toHaveBeenCalled();
     expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
   });

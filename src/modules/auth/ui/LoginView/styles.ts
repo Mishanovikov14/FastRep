@@ -10,7 +10,7 @@ export const getStyles = (colors: Colors, spacing: Spacing) => {
       flex: 1,
       gap: scaleVertical(spacing.lg),
       paddingHorizontal: scaleHorizontal(spacing.xl),
-      paddingTop: scaleVertical(72),
+      paddingTop: scaleVertical(46),
     },
     fields: {
       gap: scaleVertical(spacing.lg),
@@ -24,10 +24,6 @@ export const getStyles = (colors: Colors, spacing: Spacing) => {
       height: scaleVertical(80),
       maxWidth: Math.min(scaleHorizontal(320), 320),
       width: '82%',
-    },
-    signUpButton: {
-      marginVertical: scaleVertical(spacing.lg),
-      marginHorizontal: scaleHorizontal(spacing.lg),
     },
   });
 
