@@ -1,35 +1,38 @@
 import { StyleSheet } from 'react-native';
 
-import type { Colors, Radius, Spacing } from '@/UIProvider/theme/types';
+import type { Colors, Spacing } from '@/UIProvider/theme/types';
+import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
-export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
+export const getStyles = (colors: Colors, spacing: Spacing) => {
   const styles = StyleSheet.create({
     card: {
       alignSelf: 'center',
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-      borderRadius: radius.lg,
-      borderWidth: 1,
-      gap: spacing.xl,
-      maxWidth: 520,
-      padding: spacing.xl,
+      gap: scaleVertical(spacing.xl),
+      maxWidth: Math.min(scaleHorizontal(440), 440),
       width: '100%',
     },
     content: {
+      backgroundColor: colors.white,
       justifyContent: 'center',
-      paddingBottom: spacing.xl,
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.xl,
+      paddingHorizontal: scaleHorizontal(spacing.xl),
+      paddingVertical: scaleVertical(spacing.xxl),
     },
     fields: {
-      gap: spacing.lg,
+      gap: scaleVertical(spacing.lg),
     },
     header: {
-      gap: spacing.sm,
+      gap: scaleVertical(spacing.sm),
     },
     login: {
       alignItems: 'center',
-      gap: spacing.xs,
+      flexDirection: 'row',
+      justifyContent: 'center',
+    },
+    logo: {
+      alignSelf: 'center',
+      aspectRatio: 1160 / 330,
+      maxWidth: Math.min(scaleHorizontal(320), 320),
+      width: '82%',
     },
   });
 

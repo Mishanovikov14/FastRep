@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import type { Colors, Radius, Spacing } from '@/UIProvider/theme/types';
+import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
   const styles = StyleSheet.create({
@@ -8,24 +9,25 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       alignSelf: 'center',
       backgroundColor: colors.surface,
       borderColor: colors.border,
-      borderRadius: radius.lg,
+      borderRadius: scaleHorizontal(radius.lg),
       borderWidth: 1,
-      gap: spacing.xl,
-      maxWidth: 520,
-      padding: spacing.xl,
+      gap: scaleVertical(spacing.xl),
+      maxWidth: Math.min(scaleHorizontal(520), 520),
+      paddingHorizontal: scaleHorizontal(spacing.xl),
+      paddingVertical: scaleVertical(spacing.xl),
       width: '100%',
     },
     content: {
       justifyContent: 'center',
-      paddingBottom: spacing.xl,
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.xl,
+      paddingBottom: scaleVertical(spacing.xl),
+      paddingHorizontal: scaleHorizontal(spacing.lg),
+      paddingTop: scaleVertical(spacing.xl),
     },
     details: {
-      gap: spacing.lg,
+      gap: scaleVertical(spacing.lg),
     },
     detail: {
-      gap: spacing.xs,
+      gap: scaleVertical(spacing.xs),
     },
   });
 

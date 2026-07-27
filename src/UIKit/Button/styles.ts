@@ -1,13 +1,14 @@
 import { StyleSheet } from 'react-native';
 
 import type { Colors, Radius, Spacing } from '@/UIProvider/theme/types';
+import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
   const styles = StyleSheet.create({
     content: {
       alignItems: 'center',
       flexDirection: 'row',
-      gap: spacing.sm,
+      gap: scaleHorizontal(spacing.sm),
       justifyContent: 'center',
     },
     danger: {
@@ -24,12 +25,12 @@ export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
       alignSelf: 'stretch',
     },
     large: {
-      minHeight: spacing.xxl + spacing.lg,
-      paddingHorizontal: spacing.xl,
+      minHeight: scaleVertical(spacing.xxl + spacing.lg),
+      paddingHorizontal: scaleHorizontal(spacing.xl),
     },
     medium: {
-      minHeight: spacing.xxl + spacing.md,
-      paddingHorizontal: spacing.lg,
+      minHeight: scaleVertical(spacing.xxl + spacing.md),
+      paddingHorizontal: scaleHorizontal(spacing.lg),
     },
     primary: {
       backgroundColor: colors.primary,
@@ -41,13 +42,13 @@ export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
     },
     root: {
       alignItems: 'center',
-      borderRadius: radius.md,
+      borderRadius: scaleHorizontal(radius.md),
       borderWidth: 1,
       justifyContent: 'center',
     },
     small: {
-      minHeight: spacing.xxl,
-      paddingHorizontal: spacing.md,
+      minHeight: scaleVertical(spacing.xxl),
+      paddingHorizontal: scaleHorizontal(spacing.md),
     },
     secondary: {
       backgroundColor: colors.surface,

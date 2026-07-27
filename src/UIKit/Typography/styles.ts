@@ -1,31 +1,33 @@
 import type { TextStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 
+import { scaleFontSize, scaleLineHeight } from '@/utils/scaling';
+
 import type { TypographyVariant } from './types';
 
 export const variantStyles: Record<TypographyVariant, TextStyle> = StyleSheet.create({
   body: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: scaleFontSize(16),
+    lineHeight: scaleLineHeight(24),
   },
   bodyMedium: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: scaleFontSize(16),
+    lineHeight: scaleLineHeight(24),
   },
   button: {
-    fontSize: 16,
-    lineHeight: 20,
+    fontSize: scaleFontSize(16),
+    lineHeight: scaleLineHeight(20),
   },
   caption: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: scaleFontSize(13),
+    lineHeight: scaleLineHeight(18),
   },
   heading: {
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: scaleFontSize(22),
+    lineHeight: scaleLineHeight(28),
   },
   title: {
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: scaleFontSize(30),
+    lineHeight: scaleLineHeight(36),
   },
 });
