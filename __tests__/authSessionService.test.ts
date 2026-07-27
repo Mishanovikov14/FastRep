@@ -20,6 +20,15 @@ jest.mock('@/modules/auth/services/authStateService', () => ({
 }));
 
 jest.mock('@/modules/auth/services/tokenRefreshService', () => ({
+  getTokenRefreshErrorDetails: jest.fn((error: unknown) => ({
+    message: error instanceof Error ? error.message : undefined,
+  })),
+  isInvalidTokenRefreshError: jest.fn(
+    (error: unknown) =>
+      error instanceof Error &&
+      'shouldClearSession' in error &&
+      error.shouldClearSession === true,
+  ),
   refreshTokenPair: jest.fn(),
 }));
 
@@ -62,7 +71,7 @@ describe('restoreAuthSession', () => {
     jest.mocked(keychainStorage.getTokens).mockResolvedValueOnce(null);
 
     await expect(restoreAuthSession()).resolves.toEqual({
-      isAuthorized: false,
+      status: 'unauthorized',
     });
     expect(getMeWithoutRefresh).not.toHaveBeenCalled();
     expect(refreshTokenPair).not.toHaveBeenCalled();
@@ -77,7 +86,7 @@ describe('restoreAuthSession', () => {
     });
 
     await expect(restoreAuthSession()).resolves.toEqual({
-      isAuthorized: true,
+      status: 'authorized',
       user,
     });
     expect(getMeWithoutRefresh).toHaveBeenCalledTimes(1);
@@ -96,7 +105,7 @@ describe('restoreAuthSession', () => {
       });
 
     await expect(restoreAuthSession()).resolves.toEqual({
-      isAuthorized: true,
+      status: 'authorized',
       user,
     });
     expect(refreshTokenPair).toHaveBeenCalledTimes(1);
@@ -104,12 +113,20 @@ describe('restoreAuthSession', () => {
     expect(clearAuthSession).not.toHaveBeenCalled();
   });
 
-  it('returns unauthorized when invalid refresh cleanup fails upstream', async () => {
+  it('returns unauthorized when refresh proves the session invalid', async () => {
     jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse);
-    jest.mocked(refreshTokenPair).mockRejectedValueOnce(new Error('Refresh token is invalid'));
+    jest.mocked(refreshTokenPair).mockRejectedValueOnce(
+      Object.assign(new Error('Refresh token is invalid'), {
+        sessionSnapshot: {
+          tokens,
+          version: 1,
+        },
+        shouldClearSession: true,
+      }),
+    );
 
     await expect(restoreAuthSession()).resolves.toEqual({
-      isAuthorized: false,
+      status: 'unauthorized',
     });
     expect(refreshTokenPair).toHaveBeenCalledTimes(1);
     expect(getMeWithoutRefresh).toHaveBeenCalledTimes(1);
@@ -123,7 +140,7 @@ describe('restoreAuthSession', () => {
       .mockResolvedValueOnce(unauthorizedResponse);
 
     await expect(restoreAuthSession()).resolves.toEqual({
-      isAuthorized: false,
+      status: 'unauthorized',
     });
     expect(refreshTokenPair).toHaveBeenCalledTimes(1);
     expect(getMeWithoutRefresh).toHaveBeenCalledTimes(2);
@@ -143,14 +160,17 @@ describe('restoreAuthSession', () => {
     },
     {
       isError: true,
-      message: 'Service unavailable',
-      status: 503,
+      message: 'Internal server error',
+      status: 500,
     },
-  ])('preserves stored tokens after a transient initial /auth/me failure: %p', async (failure) => {
+  ])('returns a temporary error after a transient initial /auth/me failure: %p', async (failure) => {
     jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(failure);
 
     await expect(restoreAuthSession()).resolves.toEqual({
-      isAuthorized: false,
+      message: failure.message,
+      status: 'temporary_error',
+      statusCode: failure.status,
+      type: failure.type,
     });
     expect(refreshTokenPair).not.toHaveBeenCalled();
     expect(clearAuthSession).not.toHaveBeenCalled();
@@ -167,9 +187,27 @@ describe('restoreAuthSession', () => {
       });
 
     await expect(restoreAuthSession()).resolves.toEqual({
-      isAuthorized: false,
+      message: 'Service unavailable',
+      status: 'temporary_error',
+      statusCode: 503,
+      type: undefined,
     });
     expect(refreshTokenPair).toHaveBeenCalledTimes(1);
+    expect(clearAuthSession).not.toHaveBeenCalled();
+  });
+
+  it('returns a temporary error when token refresh fails transiently', async () => {
+    jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse);
+    jest
+      .mocked(refreshTokenPair)
+      .mockRejectedValueOnce(new Error('Network connection is unavailable.'));
+
+    await expect(restoreAuthSession()).resolves.toEqual({
+      message: 'Network connection is unavailable.',
+      status: 'temporary_error',
+      statusCode: undefined,
+      type: undefined,
+    });
     expect(clearAuthSession).not.toHaveBeenCalled();
   });
 });

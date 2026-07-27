@@ -2,6 +2,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AppLifecycle } from '@/AppLifecycle';
 import { ReactQueryProvider } from '@/libs/query/ReactQueryProvider';
 import { ToastHost } from '@/libs/toast';
 import { Loader } from '@/UIKit/Loader';
@@ -19,6 +20,7 @@ const AppContent = ({ children }: IProps) => {
 
   return (
     <>
+      <AppLifecycle />
       {children}
       <ToastHost />
     </>

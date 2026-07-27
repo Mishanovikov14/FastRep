@@ -1,15 +1,34 @@
+import type { TFunction } from 'i18next';
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
 import { restoreAuthSession } from '@/modules/auth/services/authSessionService';
 import { useSplashViewPresenter } from '@/modules/home/ui/SplashView/presenters/useSplashViewPresenter';
 import { useAuthStore } from '@/storage/authStore';
-import type { IUser } from '@/types/auth';
+import type { IUser,SessionRestoreResult } from '@/types/auth';
 
 jest.mock('@/modules/auth/services/authSessionService', () => ({
   restoreAuthSession: jest.fn(),
 }));
 
+interface IDeferred<T> {
+  promise: Promise<T>;
+  resolve(value: T): void;
+}
+
+const createDeferred = <T,>(): IDeferred<T> => {
+  let onResolve: (value: T) => void = () => undefined;
+  const promise = new Promise<T>((resolve) => {
+    onResolve = resolve;
+  });
+
+  return {
+    promise,
+    resolve: onResolve,
+  };
+};
+
+const t = ((key: string) => key) as unknown as TFunction;
 const user: IUser = {
   createdAt: '2026-07-26T10:00:00.000Z',
   email: 'alex@example.com',
@@ -34,16 +53,18 @@ const waitForAsyncWork = () =>
   });
 
 describe('useSplashViewPresenter', () => {
+  let presenter: ReturnType<typeof useSplashViewPresenter> | undefined;
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
 
   const Harness = () => {
-    useSplashViewPresenter();
+    presenter = useSplashViewPresenter({ t });
 
     return null;
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
+    presenter = undefined;
     renderer = undefined;
     useAuthStore.setState({
       clearUser: mockClearUser,
@@ -67,9 +88,9 @@ describe('useSplashViewPresenter', () => {
     });
   });
 
-  it('restores an authorized user once, including under Strict Mode effects', async () => {
+  it('updates the user and completes authorized restoration once under Strict Mode', async () => {
     jest.mocked(restoreAuthSession).mockResolvedValue({
-      isAuthorized: true,
+      status: 'authorized',
       user,
     });
 
@@ -83,16 +104,15 @@ describe('useSplashViewPresenter', () => {
     });
 
     expect(restoreAuthSession).toHaveBeenCalledTimes(1);
-    expect(mockSetUser).toHaveBeenCalledTimes(1);
     expect(mockSetUser).toHaveBeenCalledWith(user);
     expect(mockClearUser).not.toHaveBeenCalled();
-    expect(mockSetSessionRestored).toHaveBeenCalledTimes(1);
-    expect(mockSetSessionRestored).toHaveBeenCalledWith(true);
+    expect(mockSetSessionRestored).toHaveBeenLastCalledWith(true);
+    expect(presenter?.hasTemporaryError).toBe(false);
   });
 
   it('clears the user and completes restoration for an unauthorized session', async () => {
     jest.mocked(restoreAuthSession).mockResolvedValue({
-      isAuthorized: false,
+      status: 'unauthorized',
     });
 
     await ReactTestRenderer.act(async () => {
@@ -100,29 +120,69 @@ describe('useSplashViewPresenter', () => {
       await waitForAsyncWork();
     });
 
-    expect(restoreAuthSession).toHaveBeenCalledTimes(1);
     expect(mockSetUser).not.toHaveBeenCalled();
     expect(mockClearUser).toHaveBeenCalledTimes(1);
-    expect(mockSetSessionRestored).toHaveBeenCalledTimes(1);
-    expect(mockSetSessionRestored).toHaveBeenCalledWith(true);
+    expect(mockSetSessionRestored).toHaveBeenLastCalledWith(true);
   });
 
-  it('clears the user and completes restoration after an unexpected error', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
-
-    jest.mocked(restoreAuthSession).mockRejectedValue(new Error('restore failed'));
+  it('keeps restoration unresolved and exposes Retry after a temporary error', async () => {
+    jest.mocked(restoreAuthSession).mockResolvedValue({
+      message: 'Service unavailable',
+      status: 'temporary_error',
+      statusCode: 503,
+    });
 
     await ReactTestRenderer.act(async () => {
       renderer = ReactTestRenderer.create(<Harness />);
       await waitForAsyncWork();
     });
 
-    expect(restoreAuthSession).toHaveBeenCalledTimes(1);
+    expect(mockClearUser).not.toHaveBeenCalled();
     expect(mockSetUser).not.toHaveBeenCalled();
-    expect(mockClearUser).toHaveBeenCalledTimes(1);
-    expect(mockSetSessionRestored).toHaveBeenCalledTimes(1);
-    expect(mockSetSessionRestored).toHaveBeenCalledWith(true);
+    expect(mockSetSessionRestored).not.toHaveBeenCalledWith(true);
+    expect(presenter).toMatchObject({
+      errorMessage: 'auth.session.serverError',
+      hasTemporaryError: true,
+      isLoading: false,
+    });
+  });
 
-    consoleError.mockRestore();
+  it('prevents duplicate Retry calls and completes a successful Retry', async () => {
+    jest.mocked(restoreAuthSession).mockResolvedValueOnce({
+      status: 'temporary_error',
+      type: 'network_error',
+    });
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<Harness />);
+      await waitForAsyncWork();
+    });
+
+    const retryDeferred = createDeferred<SessionRestoreResult>();
+    jest.mocked(restoreAuthSession).mockReturnValueOnce(retryDeferred.promise);
+
+    let firstRetry: Promise<void> | undefined;
+    let duplicateRetry: Promise<void> | undefined;
+
+    await ReactTestRenderer.act(async () => {
+      firstRetry = presenter?.onRetry();
+      duplicateRetry = presenter?.onRetry();
+      await duplicateRetry;
+    });
+
+    expect(restoreAuthSession).toHaveBeenCalledTimes(2);
+
+    retryDeferred.resolve({
+      status: 'authorized',
+      user,
+    });
+
+    await ReactTestRenderer.act(async () => {
+      await firstRetry;
+    });
+
+    expect(mockSetUser).toHaveBeenCalledWith(user);
+    expect(mockSetSessionRestored).toHaveBeenLastCalledWith(true);
+    expect(presenter?.hasTemporaryError).toBe(false);
   });
 });

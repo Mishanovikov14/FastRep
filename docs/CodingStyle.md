@@ -16,6 +16,8 @@ Button/
 ```
 
 Do not use `index.ts` or `index.tsx` as a re-export barrel. Screen folders and exported screen components must end with `View`, not `Screen`.
+An implementation `index.tsx` is required by the component convention and is distinct
+from a forbidden re-export-only `index.ts`.
 
 ## Handlers
 

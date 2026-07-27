@@ -42,9 +42,15 @@ export interface ILogoutRequest {
 
 export type SessionRestoreResult =
   | {
-      isAuthorized: true;
+      status: 'authorized';
       user: IUser;
     }
   | {
-      isAuthorized: false;
+      status: 'unauthorized';
+    }
+  | {
+      message?: string;
+      status: 'temporary_error';
+      statusCode?: number;
+      type?: string;
     };

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { Button } from '@/UIKit/Button';
 import { Loader } from '@/UIKit/Loader';
 import { ScreenContainer } from '@/UIKit/ScreenContainer';
 import { Typography } from '@/UIKit/Typography';
@@ -11,12 +12,26 @@ import { getStyles } from './styles';
 export const SplashView = () => {
   const { colors, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(spacing), [spacing]);
-  const { isRestoring } = useSplashViewPresenter();
+  const { errorMessage, hasTemporaryError, isLoading, onRetry } =
+    useSplashViewPresenter({ t });
 
   return (
     <ScreenContainer containerStyle={styles.content}>
-      {isRestoring ? <Loader size="large" /> : null}
-      <Typography color={colors.textSecondary}>{t('auth.session.restoring')}</Typography>
+      {isLoading ? <Loader size="large" /> : null}
+      <Typography color={hasTemporaryError ? colors.error : colors.textSecondary}>
+        {hasTemporaryError ? t('common.error') : t('auth.session.restoring')}
+      </Typography>
+      {errorMessage ? (
+        <Typography color={colors.textSecondary}>{errorMessage}</Typography>
+      ) : null}
+      {hasTemporaryError ? (
+        <Button
+          disabled={isLoading}
+          loading={isLoading}
+          onPress={onRetry}
+          title={String(t('common.retry'))}
+        />
+      ) : null}
     </ScreenContainer>
   );
 };

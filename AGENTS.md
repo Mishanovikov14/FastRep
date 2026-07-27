@@ -143,6 +143,8 @@ Local barrel files are forbidden.
 
 Do not create `index.ts` or `index.tsx` files whose only purpose is re-exporting sibling files.
 An `index.tsx` containing the component implementation is required and is not a barrel.
+An implementation `index.tsx` and a re-export-only `index.ts` are different cases:
+keep the former and do not create the latter.
 
 Forbidden:
 

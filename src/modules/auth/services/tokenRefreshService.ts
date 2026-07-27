@@ -33,6 +33,8 @@ interface IRefreshOutcome {
 interface ITokenRefreshError extends Error {
   sessionSnapshot: ITokenSnapshot;
   shouldClearSession: boolean;
+  statusCode?: number;
+  type?: string;
 }
 
 const STALE_REFRESH_ERROR = new Error('The authentication session changed during refresh.');
@@ -41,8 +43,15 @@ const createTokenRefreshError = (
   message: string,
   shouldClearSession: boolean,
   sessionSnapshot: ITokenSnapshot,
+  type?: string,
+  statusCode?: number,
 ): ITokenRefreshError => {
-  return Object.assign(new Error(message), { sessionSnapshot, shouldClearSession });
+  return Object.assign(new Error(message), {
+    sessionSnapshot,
+    shouldClearSession,
+    statusCode,
+    type,
+  });
 };
 
 const isTokenRefreshError = (error: unknown): error is ITokenRefreshError => {
@@ -52,6 +61,30 @@ const isTokenRefreshError = (error: unknown): error is ITokenRefreshError => {
     'shouldClearSession' in error &&
     typeof error.shouldClearSession === 'boolean'
   );
+};
+
+export const isInvalidTokenRefreshError = (error: unknown): boolean => {
+  return isTokenRefreshError(error) && error.shouldClearSession;
+};
+
+export const getTokenRefreshErrorDetails = (
+  error: unknown,
+): {
+  message?: string;
+  statusCode?: number;
+  type?: string;
+} => {
+  if (!isTokenRefreshError(error)) {
+    return {
+      message: error instanceof Error ? error.message : undefined,
+    };
+  }
+
+  return {
+    message: error.message,
+    statusCode: error.statusCode,
+    type: error.type,
+  };
 };
 
 const isSameTokenPair = (
@@ -139,6 +172,8 @@ export const createTokenRefreshService = ({
         response.message || 'Unable to refresh the authentication session.',
         isInvalidRefreshResponse(response),
         snapshot,
+        response.type,
+        response.status,
       );
     }
 

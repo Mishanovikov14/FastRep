@@ -3,52 +3,92 @@ import { getMeWithoutRefresh } from '@/modules/auth/API/authApi';
 import type { SessionRestoreResult } from '@/types/auth';
 
 import { clearAuthSession } from './authStateService';
-import { refreshTokenPair } from './tokenRefreshService';
+import {
+  getTokenRefreshErrorDetails,
+  isInvalidTokenRefreshError,
+  refreshTokenPair,
+} from './tokenRefreshService';
+
+const getTemporaryErrorResult = (
+  message?: string,
+  type?: string,
+  statusCode?: number,
+): SessionRestoreResult => {
+  return {
+    message,
+    status: 'temporary_error',
+    statusCode,
+    type,
+  };
+};
 
 export const restoreAuthSession = async (): Promise<SessionRestoreResult> => {
   try {
     const tokens = await keychainStorage.getTokens();
 
     if (!tokens) {
-      return { isAuthorized: false };
+      return { status: 'unauthorized' };
     }
 
     const response = await getMeWithoutRefresh();
 
     if (!response.isError && response.data) {
       return {
-        isAuthorized: true,
+        status: 'authorized',
         user: response.data,
       };
     }
 
     if (response.status !== 401) {
-      return { isAuthorized: false };
+      return getTemporaryErrorResult(
+        response.message,
+        response.type,
+        response.status,
+      );
     }
 
     try {
       await refreshTokenPair();
-    } catch {
-      return { isAuthorized: false };
+    } catch (error: unknown) {
+      if (isInvalidTokenRefreshError(error)) {
+        return { status: 'unauthorized' };
+      }
+
+      const details = getTokenRefreshErrorDetails(error);
+
+      return getTemporaryErrorResult(
+        details.message,
+        details.type,
+        details.statusCode,
+      );
     }
 
     const retryResponse = await getMeWithoutRefresh();
 
     if (!retryResponse.isError && retryResponse.data) {
       return {
-        isAuthorized: true,
+        status: 'authorized',
         user: retryResponse.data,
       };
     }
 
     if (retryResponse.status === 401) {
       await clearAuthSession();
+
+      return { status: 'unauthorized' };
     }
 
-    return { isAuthorized: false };
+    return getTemporaryErrorResult(
+      retryResponse.message,
+      retryResponse.type,
+      retryResponse.status,
+    );
   } catch (error: unknown) {
     console.error('Unexpected session restoration failure', error);
 
-    return { isAuthorized: false };
+    return getTemporaryErrorResult(
+      error instanceof Error ? error.message : undefined,
+      'unexpected_error',
+    );
   }
 };
