@@ -3,17 +3,17 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
 
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
-import { toastService } from '@/libs/toast/toastService';
-import { login } from '@/modules/auth/API/authApi';
-import type { GuestStackParamList } from '@/navigation/types';
-import { useAuthStore } from '@/storage/authStore';
+import { login } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import type {
   IAuthenticationResponse,
   ILoginRequest,
   ITokenPair,
-  IUser,
-} from '@/types/auth';
+} from '@/entities/user/types/auth';
+import type { IUser } from '@/entities/user/types/user';
+import { toastService } from '@/libs/toast/toastService';
+import type { GuestStackParamList } from '@/navigation/types';
 
 import type { IPresenterInput, LoginFormErrors } from '../types';
 import { normalizeLoginRequest, validateLogin } from './loginValidation';
@@ -55,7 +55,7 @@ const getLoginErrorTranslationKey = ({
 
 export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
   const navigation = useNavigation<NativeStackNavigationProp<GuestStackParamList, 'Login'>>();
-  const setUser = useAuthStore((state) => state.setUser);
+  const setUser = useUserStore((state) => state.setUser);
   const isSubmittingRef = useRef(false);
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<LoginFormErrors>({});
@@ -84,7 +84,7 @@ export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
       };
       const user: IUser = authentication.user;
 
-      await keychainStorage.saveTokens(tokens);
+      await userTokenStorage.saveTokens(tokens);
       setUser(user);
     },
     [setUser],

@@ -3,19 +3,19 @@ import type { TFunction } from 'i18next';
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
+import { register } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
+import type { IAuthenticationResponse } from '@/entities/user/types/auth';
 import type { IResponse } from '@/libs/requester/IResponse';
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
 import { toastService } from '@/libs/toast/toastService';
-import { register } from '@/modules/auth/API/authApi';
 import { useRegistrationViewPresenter } from '@/modules/auth/ui/RegistrationView/presenters/useRegistrationViewPresenter';
-import { useAuthStore } from '@/storage/authStore';
-import type { IAuthenticationResponse } from '@/types/auth';
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
 }));
-jest.mock('@/libs/storage/KeychainStorage', () => ({
-  keychainStorage: {
+jest.mock('@/entities/user/services/userTokenStorage', () => ({
+  userTokenStorage: {
     clearTokens: jest.fn(),
     getTokens: jest.fn(),
     saveTokens: jest.fn(),
@@ -26,7 +26,7 @@ jest.mock('@/libs/toast/toastService', () => ({
     showError: jest.fn(),
   },
 }));
-jest.mock('@/modules/auth/API/authApi', () => ({
+jest.mock('@/entities/user/API/userApi', () => ({
   register: jest.fn(),
 }));
 
@@ -35,7 +35,7 @@ const t = ((key: string) => key) as unknown as TFunction;
 describe('useRegistrationViewPresenter', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    useAuthStore.getState().clearUser();
+    useUserStore.getState().clearUser();
   });
 
   it('blocks duplicate submits and completes the authenticated registration flow', async () => {
@@ -59,7 +59,7 @@ describe('useRegistrationViewPresenter', () => {
 
     jest.mocked(useNavigation).mockReturnValue(navigation);
     jest.mocked(register).mockReturnValue(responsePromise);
-    jest.mocked(keychainStorage.saveTokens).mockResolvedValue();
+    jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
 
     await ReactTestRenderer.act(async () => {
       ReactTestRenderer.create(<Harness />);
@@ -106,11 +106,11 @@ describe('useRegistrationViewPresenter', () => {
       await firstSubmit;
     });
 
-    expect(keychainStorage.saveTokens).toHaveBeenCalledWith({
+    expect(userTokenStorage.saveTokens).toHaveBeenCalledWith({
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
     });
-    expect(useAuthStore.getState()).toMatchObject({
+    expect(useUserStore.getState()).toMatchObject({
       isAuthorized: true,
       user: {
         email: 'alex@example.com',
@@ -140,7 +140,7 @@ describe('useRegistrationViewPresenter', () => {
       message: 'Email already exists',
       status: 409,
     });
-    jest.mocked(keychainStorage.saveTokens).mockResolvedValue();
+    jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
 
     await ReactTestRenderer.act(async () => {
       ReactTestRenderer.create(<Harness />);
@@ -157,8 +157,8 @@ describe('useRegistrationViewPresenter', () => {
       await presenter?.onRegister();
     });
 
-    expect(keychainStorage.saveTokens).not.toHaveBeenCalled();
-    expect(useAuthStore.getState()).toMatchObject({
+    expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
+    expect(useUserStore.getState()).toMatchObject({
       isAuthorized: false,
       user: null,
     });
@@ -194,6 +194,6 @@ describe('useRegistrationViewPresenter', () => {
 
     expect(navigation.navigate).toHaveBeenCalledWith('Login');
     expect(register).not.toHaveBeenCalled();
-    expect(keychainStorage.saveTokens).not.toHaveBeenCalled();
+    expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
   });
 });

@@ -9,12 +9,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Gradient } from '@/UIKit/Gradient';
 import { useUIContext } from '@/UIProvider/useUIContext';
+import { scaleVertical } from '@/utils/scaling';
 
 import { useKeyboardStickyLayout } from './presenters/useKeyboardStickyLayout';
 import { getStyles } from './styles';
 import type { IProps } from './types';
 
 export const ScreenContainer = ({
+  backgroundColor,
   children,
   containerStyle,
   contentContainerStyle,
@@ -28,9 +30,12 @@ export const ScreenContainer = ({
   withGradient = false,
 }: IProps) => {
   const { colors, spacing } = useUIContext();
-  const styles = useMemo(() => getStyles(colors), [colors]);
+  const styles = useMemo(
+    () => getStyles(colors, backgroundColor),
+    [backgroundColor, colors],
+  );
   const safeAreaInsets = useSafeAreaInsets();
-  const bottomOffset = spacing.xl;
+  const bottomOffset = scaleVertical(spacing.xl);
   const { extraKeyboardSpace, onStickyLayout, scrollBottomOffset, stickyOpenedOffset } =
     useKeyboardStickyLayout();
   const keyboardBottomOffset = footerComponent ? scrollBottomOffset : bottomOffset;

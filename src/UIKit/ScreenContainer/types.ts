@@ -4,6 +4,7 @@ import type { KeyboardAwareScrollViewRef } from 'react-native-keyboard-controlle
 import type { Edge } from 'react-native-safe-area-context';
 
 export interface IProps {
+  backgroundColor?: string;
   children?: ReactNode;
   containerStyle?: StyleProp<ViewStyle>;
   contentContainerStyle?: StyleProp<ViewStyle>;

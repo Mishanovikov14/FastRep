@@ -1,34 +1,33 @@
 import { StyleSheet } from 'react-native';
 
-import type { Colors, Radius, Spacing } from '@/UIProvider/theme/types';
+import type { Colors, Spacing } from '@/UIProvider/theme/types';
+import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
-export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
+export const getStyles = (colors: Colors, spacing: Spacing) => {
   const styles = StyleSheet.create({
-    card: {
-      alignSelf: 'center',
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-      borderRadius: radius.lg,
-      borderWidth: 1,
-      gap: spacing.xl,
-      maxWidth: 520,
-      padding: spacing.xl,
-      width: '100%',
-    },
-    content: {
-      justifyContent: 'center',
-      paddingBottom: spacing.xl,
-      paddingHorizontal: spacing.lg,
-      paddingTop: spacing.xl,
+    container: {
+      backgroundColor: colors.white,
+      flex: 1,
+      gap: scaleVertical(spacing.lg),
+      paddingHorizontal: scaleHorizontal(spacing.xl),
+      paddingTop: scaleVertical(72),
     },
     fields: {
-      gap: spacing.lg,
-    },
-    forgotPassword: {
-      alignSelf: 'flex-end',
+      gap: scaleVertical(spacing.lg),
     },
     header: {
-      gap: spacing.sm,
+      gap: scaleVertical(spacing.sm),
+      paddingTop: scaleVertical(24),
+    },
+    logo: {
+      alignSelf: 'center',
+      height: scaleVertical(80),
+      maxWidth: Math.min(scaleHorizontal(320), 320),
+      width: '82%',
+    },
+    signUpButton: {
+      marginVertical: scaleVertical(spacing.lg),
+      marginHorizontal: scaleHorizontal(spacing.lg),
     },
   });
 

@@ -1,27 +1,27 @@
+import { createTokenRefreshService } from '@/entities/user/services/tokenRefreshService';
+import type { ITokenPair } from '@/entities/user/types/auth';
+import type { ITokenSnapshot } from '@/entities/user/types/session';
 import type { IRequesterAuthState } from '@/libs/requester/IRequester';
 import type { IResponse } from '@/libs/requester/IResponse';
-import type { ITokenSnapshot } from '@/libs/storage/types';
-import { createTokenRefreshService } from '@/modules/auth/services/tokenRefreshService';
-import type { ITokenPair } from '@/types/auth';
 
 jest.mock('@/libs/requester/requester', () => ({
   configureRequesterAuth: jest.fn(),
 }));
 
-jest.mock('@/libs/storage/KeychainStorage', () => ({
-  keychainStorage: {
+jest.mock('@/entities/user/services/userTokenStorage', () => ({
+  userTokenStorage: {
     getTokenSnapshot: jest.fn(),
     saveTokensIfCurrent: jest.fn(),
   },
 }));
 
-jest.mock('@/modules/auth/API/authApi', () => ({
+jest.mock('@/entities/user/API/userApi', () => ({
   refresh: jest.fn(),
 }));
 
-jest.mock('@/modules/auth/services/authStateService', () => ({
-  clearAuthSession: jest.fn(),
-  clearAuthSessionIfCurrent: jest.fn(),
+jest.mock('@/entities/user/services/userStateService', () => ({
+  clearUserSession: jest.fn(),
+  clearUserSessionIfCurrent: jest.fn(),
 }));
 
 interface IDeferred<T> {

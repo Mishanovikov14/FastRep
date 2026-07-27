@@ -1,8 +1,7 @@
 import * as Keychain from 'react-native-keychain';
 
-import type { ITokenPair } from '@/types/auth';
-
-import type { ITokenSnapshot } from './types';
+import type { ITokenPair } from '@/entities/user/types/auth';
+import type { ITokenSnapshot } from '@/entities/user/types/session';
 
 const TOKEN_SERVICE = 'com.fastrep.auth.tokens';
 const TOKEN_USERNAME = 'fastrep';
@@ -32,7 +31,7 @@ const isTokenPair = (value: unknown): value is ITokenPair => {
   );
 };
 
-export class KeychainStorage {
+export class UserTokenStorage {
   private mutationQueue: Promise<void> = Promise.resolve();
 
   private mutationVersion = 0;
@@ -191,4 +190,4 @@ export class KeychainStorage {
   }
 }
 
-export const keychainStorage = new KeychainStorage();
+export const userTokenStorage = new UserTokenStorage();

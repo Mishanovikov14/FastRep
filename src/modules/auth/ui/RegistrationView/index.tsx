@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
 
 import { Button } from '@/UIKit/Button';
 import { Input } from '@/UIKit/Input';
@@ -11,8 +11,8 @@ import { useRegistrationViewPresenter } from './presenters/useRegistrationViewPr
 import { getStyles } from './styles';
 
 export const RegistrationView = () => {
-  const { colors, language, radius, spacing, t } = useUIContext();
-  const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
+  const { colors, language, spacing, t } = useUIContext();
+  const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
   const {
     confirmPassword,
     email,
@@ -33,14 +33,24 @@ export const RegistrationView = () => {
 
   return (
     <ScreenContainer
+      backgroundColor={colors.white}
       contentContainerStyle={styles.content}
       isKeyboardAvoiding
       scrollEnabled
     >
       <View style={styles.card}>
+        <Image
+          accessibilityLabel="FastRep"
+          resizeMode="contain"
+          source={require('@/assets/images/logo-horizontal.png')}
+          style={styles.logo}
+        />
+
         <View style={styles.header}>
-          <Typography variant="title">{t('auth.registration.title')}</Typography>
-          <Typography color={colors.textSecondary}>
+          <Typography align="center" variant="title">
+            {t('auth.registration.createAccount')}
+          </Typography>
+          <Typography align="center" color={colors.textSecondary}>
             {t('auth.registration.subtitle')}
           </Typography>
         </View>
@@ -111,6 +121,7 @@ export const RegistrationView = () => {
           <Button
             disabled={isLoading}
             onPress={onLogin}
+            size="small"
             title={String(t('auth.registration.logIn'))}
             variant="text"
           />

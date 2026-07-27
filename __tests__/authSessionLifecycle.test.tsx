@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
+import { useUserStore } from '@/entities/user/model/userStore';
+import { clearAuthenticatedResources } from '@/entities/user/services/authenticatedResourcesService';
+import type { IUser } from '@/entities/user/types/user';
 import { useAuthSessionLifecycle } from '@/hooks/useAuthSessionLifecycle';
-import { clearAuthenticatedResources } from '@/services/authenticatedResourcesService';
-import { useAuthStore } from '@/storage/authStore';
-import type { IUser } from '@/types/auth';
 
-jest.mock('@/services/authenticatedResourcesService', () => ({
+jest.mock('@/entities/user/services/authenticatedResourcesService', () => ({
   clearAuthenticatedResources: jest.fn().mockResolvedValue(undefined),
 }));
 
@@ -33,7 +33,7 @@ describe('useAuthSessionLifecycle', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     renderer = undefined;
-    useAuthStore.setState({
+    useUserStore.setState({
       isAuthorized: false,
       isSessionRestored: false,
       user: null,
@@ -43,7 +43,7 @@ describe('useAuthSessionLifecycle', () => {
   afterEach(() => {
     ReactTestRenderer.act(() => {
       renderer?.unmount();
-      useAuthStore.setState({
+      useUserStore.setState({
         isAuthorized: false,
         isSessionRestored: false,
         user: null,
@@ -59,28 +59,28 @@ describe('useAuthSessionLifecycle', () => {
     expect(clearAuthenticatedResources).not.toHaveBeenCalled();
 
     await ReactTestRenderer.act(async () => {
-      useAuthStore.getState().clearUser();
+      useUserStore.getState().clearUser();
     });
 
     expect(clearAuthenticatedResources).not.toHaveBeenCalled();
 
     await ReactTestRenderer.act(async () => {
-      useAuthStore.getState().setUser(user);
+      useUserStore.getState().setUser(user);
     });
     await ReactTestRenderer.act(async () => {
-      useAuthStore.getState().clearUser();
+      useUserStore.getState().clearUser();
     });
     await ReactTestRenderer.act(async () => {
-      useAuthStore.getState().clearUser();
+      useUserStore.getState().clearUser();
     });
 
     expect(clearAuthenticatedResources).toHaveBeenCalledTimes(1);
 
     await ReactTestRenderer.act(async () => {
-      useAuthStore.getState().setUser(user);
+      useUserStore.getState().setUser(user);
     });
     await ReactTestRenderer.act(async () => {
-      useAuthStore.getState().clearUser();
+      useUserStore.getState().clearUser();
     });
 
     expect(clearAuthenticatedResources).toHaveBeenCalledTimes(2);

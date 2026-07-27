@@ -1,16 +1,16 @@
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
 
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
+import { logout } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { clearUserSession } from '@/entities/user/services/userStateService';
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import { toastService } from '@/libs/toast/toastService';
-import { logout } from '@/modules/auth/API/authApi';
-import { clearAuthSession } from '@/modules/auth/services/authStateService';
-import { useAuthStore } from '@/storage/authStore';
 
 import type { IPresenterInput } from '../types';
 
 export const useHomeViewPresenter = ({ t }: IPresenterInput) => {
-  const user = useAuthStore((state) => state.user);
+  const user = useUserStore((state) => state.user);
   const isLoggingOutRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const { mutateAsync: mutateLogout } = useMutation({
@@ -27,7 +27,7 @@ export const useHomeViewPresenter = ({ t }: IPresenterInput) => {
     let hasRemoteError = false;
 
     try {
-      const tokens = await keychainStorage.getTokens();
+      const tokens = await userTokenStorage.getTokens();
 
       if (tokens) {
         const response = await mutateLogout(tokens.refreshToken);
@@ -39,7 +39,7 @@ export const useHomeViewPresenter = ({ t }: IPresenterInput) => {
       hasRemoteError = true;
     } finally {
       try {
-        await clearAuthSession();
+        await clearUserSession();
       } catch (error: unknown) {
         console.error('Unable to clear the local authentication session', error);
         hasRemoteError = true;

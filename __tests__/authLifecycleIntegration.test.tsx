@@ -1,19 +1,19 @@
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
+import { useUserStore } from '@/entities/user/model/userStore';
+import { clearAuthenticatedResources } from '@/entities/user/services/authenticatedResourcesService';
+import { clearUserSession } from '@/entities/user/services/userStateService';
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
+import type { IUser } from '@/entities/user/types/user';
 import { useAuthSessionLifecycle } from '@/hooks/useAuthSessionLifecycle';
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
-import { clearAuthSession } from '@/modules/auth/services/authStateService';
-import { clearAuthenticatedResources } from '@/services/authenticatedResourcesService';
-import { useAuthStore } from '@/storage/authStore';
-import type { IUser } from '@/types/auth';
 
-jest.mock('@/libs/storage/KeychainStorage', () => ({
-  keychainStorage: {
+jest.mock('@/entities/user/services/userTokenStorage', () => ({
+  userTokenStorage: {
     clearTokens: jest.fn().mockResolvedValue(undefined),
   },
 }));
-jest.mock('@/services/authenticatedResourcesService', () => ({
+jest.mock('@/entities/user/services/authenticatedResourcesService', () => ({
   clearAuthenticatedResources: jest.fn().mockResolvedValue(undefined),
 }));
 
@@ -40,7 +40,7 @@ describe('auth lifecycle integration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     renderer = undefined;
-    useAuthStore.setState({
+    useUserStore.setState({
       isAuthorized: true,
       isSessionRestored: true,
       user,
@@ -50,7 +50,7 @@ describe('auth lifecycle integration', () => {
   afterEach(() => {
     ReactTestRenderer.act(() => {
       renderer?.unmount();
-      useAuthStore.setState({
+      useUserStore.setState({
         isAuthorized: false,
         isSessionRestored: false,
         user: null,
@@ -64,12 +64,12 @@ describe('auth lifecycle integration', () => {
     });
 
     await ReactTestRenderer.act(async () => {
-      await clearAuthSession();
+      await clearUserSession();
     });
 
-    expect(keychainStorage.clearTokens).toHaveBeenCalledTimes(1);
+    expect(userTokenStorage.clearTokens).toHaveBeenCalledTimes(1);
     expect(clearAuthenticatedResources).toHaveBeenCalledTimes(1);
-    expect(useAuthStore.getState()).toMatchObject({
+    expect(useUserStore.getState()).toMatchObject({
       isAuthorized: false,
       isSessionRestored: true,
       user: null,

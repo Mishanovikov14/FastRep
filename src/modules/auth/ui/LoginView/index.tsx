@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { View } from 'react-native';
+import { Image, View } from 'react-native';
 
 import { Button } from '@/UIKit/Button';
 import { Input } from '@/UIKit/Input';
@@ -11,15 +11,14 @@ import { useLoginViewPresenter } from './presenters/useLoginViewPresenter';
 import { getStyles } from './styles';
 
 export const LoginView = () => {
-  const { colors, radius, spacing, t } = useUIContext();
-  const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
+  const { colors, spacing, t } = useUIContext();
+  const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
   const {
     email,
     emailError,
     isLoading,
     onChangeEmail,
     onChangePassword,
-    onPressForgotPassword,
     onPressRegistration,
     onSubmit,
     password,
@@ -27,11 +26,27 @@ export const LoginView = () => {
   } = useLoginViewPresenter({ t });
 
   return (
-    <ScreenContainer contentContainerStyle={styles.content} isKeyboardAvoiding scrollEnabled>
-      <View style={styles.card}>
+    <ScreenContainer
+      backgroundColor={colors.white}
+      edges={['top', 'bottom']}
+      isKeyboardAvoiding
+      scrollEnabled
+    >
+      <View style={styles.container}>
+        <Image
+          accessibilityLabel="FastRep"
+          resizeMode="contain"
+          source={require('@/assets/images/logo-horizontal.png')}
+          style={styles.logo}
+        />
+
         <View style={styles.header}>
-          <Typography variant="title">{t('auth.login.title')}</Typography>
-          <Typography color={colors.textSecondary}>{t('auth.login.description')}</Typography>
+          <Typography align="center" variant="title">
+            {t('auth.login.title')}
+          </Typography>
+          <Typography align="center" color={colors.textSecondary}>
+            {t('auth.login.description')}
+          </Typography>
         </View>
 
         <View style={styles.fields}>
@@ -64,15 +79,6 @@ export const LoginView = () => {
 
         <Button
           disabled={isLoading}
-          onPress={onPressForgotPassword}
-          size="small"
-          style={styles.forgotPassword}
-          title={String(t('auth.login.forgotPassword'))}
-          variant="text"
-        />
-
-        <Button
-          disabled={isLoading}
           fullWidth
           loading={isLoading}
           onPress={onSubmit}
@@ -80,14 +86,14 @@ export const LoginView = () => {
           title={String(t('auth.login.logIn'))}
         />
 
+      </View>
         <Button
           disabled={isLoading}
-          fullWidth
           onPress={onPressRegistration}
           title={String(t('auth.login.createAccount'))}
-          variant="secondary"
+          variant="text"
+          style={styles.signUpButton}
         />
-      </View>
     </ScreenContainer>
   );
 };

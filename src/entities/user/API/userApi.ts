@@ -1,5 +1,3 @@
-import type { IResponse } from '@/libs/requester/IResponse';
-import { requester } from '@/libs/requester/requester';
 import type {
   IAuthenticationResponse,
   ILoginRequest,
@@ -7,8 +5,10 @@ import type {
   IRefreshRequest,
   IRegisterRequest,
   ITokenPair,
-  IUser,
-} from '@/types/auth';
+} from '@/entities/user/types/auth';
+import type { IUser } from '@/entities/user/types/user';
+import type { IResponse } from '@/libs/requester/IResponse';
+import { requester } from '@/libs/requester/requester';
 
 const requestCurrentUser = (skipAuthRefresh: boolean): Promise<IResponse<IUser>> => {
   return requester.request<IUser>({

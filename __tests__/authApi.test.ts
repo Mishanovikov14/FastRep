@@ -1,11 +1,11 @@
-import { requester } from '@/libs/requester/requester';
 import {
   getMe,
   getMeWithoutRefresh,
   login,
   logout,
   refresh,
-} from '@/modules/auth/API/authApi';
+} from '@/entities/user/API/userApi';
+import { requester } from '@/libs/requester/requester';
 
 jest.mock('@/libs/requester/requester', () => ({
   requester: {

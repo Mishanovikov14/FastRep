@@ -1,8 +1,6 @@
 import axios from 'axios';
 import Config from 'react-native-config';
 
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
-
 import { AxiosRequester } from './AxiosRequester';
 import type { RequesterAuthCallbacks } from './IRequester';
 
@@ -17,18 +15,14 @@ export const axiosClient = axios.create({
 
 const authCallbacks: RequesterAuthCallbacks = {
   async getAuthState() {
-    const snapshot = await keychainStorage.getTokenSnapshot();
-
-    return {
-      accessToken: snapshot.tokens?.accessToken ?? null,
-      version: snapshot.version,
-    };
+    return null;
   },
 };
 
 export const configureRequesterAuth = (
-  callbacks: Pick<RequesterAuthCallbacks, 'refreshAuthState'>,
+  callbacks: RequesterAuthCallbacks,
 ): void => {
+  authCallbacks.getAuthState = callbacks.getAuthState;
   authCallbacks.refreshAuthState = callbacks.refreshAuthState;
 };
 

@@ -1,13 +1,13 @@
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
-import { getMeWithoutRefresh } from '@/modules/auth/API/authApi';
-import type { SessionRestoreResult } from '@/types/auth';
+import { getMeWithoutRefresh } from '@/entities/user/API/userApi';
+import type { SessionRestoreResult } from '@/entities/user/types/session';
 
-import { clearAuthSession } from './authStateService';
 import {
   getTokenRefreshErrorDetails,
   isInvalidTokenRefreshError,
   refreshTokenPair,
 } from './tokenRefreshService';
+import { clearUserSession } from './userStateService';
+import { userTokenStorage } from './userTokenStorage';
 
 const getTemporaryErrorResult = (
   message?: string,
@@ -22,9 +22,9 @@ const getTemporaryErrorResult = (
   };
 };
 
-export const restoreAuthSession = async (): Promise<SessionRestoreResult> => {
+export const restoreUserSession = async (): Promise<SessionRestoreResult> => {
   try {
-    const tokens = await keychainStorage.getTokens();
+    const tokens = await userTokenStorage.getTokens();
 
     if (!tokens) {
       return { status: 'unauthorized' };
@@ -73,7 +73,7 @@ export const restoreAuthSession = async (): Promise<SessionRestoreResult> => {
     }
 
     if (retryResponse.status === 401) {
-      await clearAuthSession();
+      await clearUserSession();
 
       return { status: 'unauthorized' };
     }

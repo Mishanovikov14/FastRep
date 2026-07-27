@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { restoreAuthSession } from '@/modules/auth/services/authSessionService';
-import { useAuthStore } from '@/storage/authStore';
-import type { SessionRestoreResult } from '@/types/auth';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { restoreUserSession } from '@/entities/user/services/userSessionService';
+import type { SessionRestoreResult } from '@/entities/user/types/session';
 
 import type { IPresenterInput, IUseSplashViewPresenterResult } from '../types';
 
@@ -28,9 +28,9 @@ const getTemporaryErrorMessage = (
 export const useSplashViewPresenter = ({
   t,
 }: IPresenterInput): IUseSplashViewPresenterResult => {
-  const clearUser = useAuthStore((state) => state.clearUser);
-  const setSessionRestored = useAuthStore((state) => state.setSessionRestored);
-  const setUser = useAuthStore((state) => state.setUser);
+  const clearUser = useUserStore((state) => state.clearUser);
+  const setSessionRestored = useUserStore((state) => state.setSessionRestored);
+  const setUser = useUserStore((state) => state.setUser);
   const hasStartedRef = useRef(false);
   const isRestoringRef = useRef(false);
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -47,7 +47,7 @@ export const useSplashViewPresenter = ({
     setSessionRestored(false);
 
     try {
-      const result = await restoreAuthSession();
+      const result = await restoreUserSession();
 
       switch (result.status) {
         case 'authorized':

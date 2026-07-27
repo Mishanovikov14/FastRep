@@ -1,11 +1,11 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import { useUserStore } from '@/entities/user/model/userStore';
 import { LoginView } from '@/modules/auth/ui/LoginView';
 import { RegistrationView } from '@/modules/auth/ui/RegistrationView';
 import { HomeView } from '@/modules/home/ui/HomeView';
 import { SplashView } from '@/modules/home/ui/SplashView';
-import { useAuthStore } from '@/storage/authStore';
 
 import { getRootNavigationState } from './getRootNavigationState';
 import type { AppStackParamList, GuestStackParamList, SplashStackParamList } from './types';
@@ -40,8 +40,8 @@ const SplashNavigation = () => {
 };
 
 export const RootNavigation = () => {
-  const isAuthorized = useAuthStore((state) => state.isAuthorized);
-  const isSessionRestored = useAuthStore((state) => state.isSessionRestored);
+  const isAuthorized = useUserStore((state) => state.isAuthorized);
+  const isSessionRestored = useUserStore((state) => state.isSessionRestored);
   const navigationState = getRootNavigationState({
     isAuthorized,
     isSessionRestored,

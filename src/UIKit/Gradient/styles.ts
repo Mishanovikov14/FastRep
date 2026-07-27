@@ -1,9 +1,11 @@
 import { StyleSheet } from 'react-native';
 
+import { scaleVertical } from '@/utils/scaling';
+
 export const getStyles = () => {
   const styles = StyleSheet.create({
     gradient: {
-      height: 319,
+      height: scaleVertical(319),
       left: 0,
       position: 'absolute',
       right: 0,

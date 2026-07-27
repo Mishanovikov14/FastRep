@@ -1,6 +1,6 @@
 import * as Keychain from 'react-native-keychain';
 
-import { KeychainStorage } from '@/libs/storage/KeychainStorage';
+import { UserTokenStorage } from '@/entities/user/services/userTokenStorage';
 
 jest.mock('react-native-keychain', () => ({
   ACCESSIBLE: {
@@ -14,11 +14,11 @@ jest.mock('react-native-keychain', () => ({
   setGenericPassword: jest.fn(),
 }));
 
-describe('KeychainStorage', () => {
-  let storage: KeychainStorage;
+describe('UserTokenStorage', () => {
+  let storage: UserTokenStorage;
 
   beforeEach(() => {
-    storage = new KeychainStorage();
+    storage = new UserTokenStorage();
     jest.clearAllMocks();
     jest.mocked(Keychain.resetGenericPassword).mockResolvedValue(true);
     jest.mocked(Keychain.setGenericPassword).mockResolvedValue({

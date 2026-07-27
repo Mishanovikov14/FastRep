@@ -33,9 +33,9 @@ Do not add Redux, MobX, Expo runtime packages, duplicate storage libraries, or d
 
 ```text
 src/
-  API/
   assets/
   constants/
+  entities/
   hooks/
   libs/
     requester/
@@ -44,8 +44,6 @@ src/
   localization/
   modules/
   navigation/
-  services/
-  storage/
   theme/
   types/
   UIKit/
@@ -57,17 +55,26 @@ src/
 
 Responsibilities:
 
-- `modules/` — product features and screens.
+- `modules/` — UI and presenters only.
+- `entities/` — domain data, API, state, services, models, and domain types.
 - `UIKit/` — reusable visual components only.
 - `UIProvider/` — theme and localization context.
-- `libs/` — technical infrastructure.
-- `storage/` — Zustand stores and application state.
-- `services/` — application-level services.
+- `libs/` — generic technical infrastructure.
 - `localization/` — i18next configuration, resources, language resolution.
 - `hooks/` — reusable hooks.
 - `utils/` — pure utilities.
-- `types/` — global shared types.
+- `types/` — truly application-global technical types that cannot belong to an entity.
 - `constants/` — shared constants.
+
+Dependency direction is `modules → entities → libs`.
+
+- Modules may import entities and libs, but must not contain domain APIs, domain services, or domain stores.
+- Entities may import libs and must never import modules.
+- Generic libs must not import modules and should not depend on entities.
+- UIKit must not depend on entities or modules.
+- Navigation may read entity state and render modules.
+- Authentication and the current-user lifecycle belong in `entities/user`.
+- Inspect the relevant entity folder first for everything related to a domain object.
 
 Do not create duplicate requester, storage, localization, theme, or toast implementations.
 
@@ -178,9 +185,10 @@ Move behavior into presenters or focused hooks.
 
 ## 7. Presenters
 
-Presenters may contain handlers, API calls, React Query, Zustand, navigation, validation orchestration, derived state, effects, request error handling, and Reanimated shared values/styles.
+Presenters may contain handlers, coordinate entity APIs and entity models, use React Query, Zustand, navigation, validation orchestration, derived state, effects, request error handling, and Reanimated shared values/styles.
 
 Presenters must not contain JSX, styles, theme colors, `useUiContext`, `keyExtractor`, or render functions.
+Reusable domain, token, and session logic belongs in the relevant entity rather than in presenters.
 
 Use `on` naming, not `handle`.
 
@@ -226,8 +234,9 @@ Do not update success state before checking the request result.
 
 - Use one MMKV instance behind `libs/storage`.
 - Do not access MMKV directly throughout the app.
+- Domain Zustand stores belong inside the relevant entity, not in a generic global `src/storage` folder.
 - Do not store access or refresh tokens in MMKV.
-- Tokens must use Keychain.
+- User tokens must use the Keychain-backed storage owned by `entities/user`.
 - Do not log out immediately on every `401`.
 - Refresh-token logic must attempt session renewal before clearing the session.
 
@@ -239,7 +248,9 @@ Do not update success state before checking the request result.
 - Use named exports.
 - Use `import type` for type-only imports.
 - Avoid circular dependencies.
-- Shared exported types belong in `types.ts`, `types/`, or `enums/`.
+- Domain types belong inside the relevant entity.
+- `src/types` is reserved for truly application-global technical types that cannot belong to an entity.
+- Component-local shared types belong in the component's `types.ts`.
 - Small local non-exported types may stay in their implementation file.
 - Do not use `any`; use `unknown` and narrowing.
 
@@ -256,20 +267,20 @@ Do not update success state before checking the request result.
 
 ---
 
-## 13. Quality checks
+## 13. Verification policy
 
-Before finishing:
+Do not run lint, TypeScript, tests, Android builds, iOS builds, CocoaPods, Gradle, E2E, CI, or other verification commands unless the user explicitly asks for verification.
 
-```bash
-npm run lint
-npm test -- --runInBand
-npx tsc --noEmit
-```
-
-For native infrastructure changes also verify iOS build, Android build, CocoaPods when needed, no Reanimated/Worklets warnings, and no Nitro Modules linking errors.
+During active development, make the requested code changes only. Run a full verification pass only when the user explicitly asks to run checks, prepare for PR or merge, verify the project, or prepare a release. Do not infer permission from task size.
 
 ---
 
 ## 14. Final checklist
 
-Confirm folder structure, separate styles/types, clean UI, named const components, no local barrels, no re-export chains, handled request errors, Keychain token storage, correct aliases/imports, passing checks, and no unrelated changes.
+Confirm folder structure, entity boundaries, separate styles/types, clean UI, named const components, no local barrels, no re-export chains, handled request errors, Keychain token storage, correct aliases/imports, and no unrelated changes. Confirm verification was run only when explicitly requested.
+
+---
+
+## 15. Governance
+
+`AGENTS.md` is project governance. Do not modify it in ordinary feature or bug-fix tasks. Modify it only when the user explicitly requests an architecture or governance rule change.

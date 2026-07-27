@@ -1,14 +1,14 @@
+import { refresh } from '@/entities/user/API/userApi';
+import type { ITokenPair } from '@/entities/user/types/auth';
+import type { ITokenSnapshot } from '@/entities/user/types/session';
 import type { IRequesterAuthState } from '@/libs/requester/IRequester';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { configureRequesterAuth } from '@/libs/requester/requester';
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
-import type { ITokenSnapshot } from '@/libs/storage/types';
 import { toastService } from '@/libs/toast/toastService';
 import { i18n } from '@/localization/i18n';
-import { refresh } from '@/modules/auth/API/authApi';
-import type { ITokenPair } from '@/types/auth';
 
-import { clearAuthSessionIfCurrent } from './authStateService';
+import { clearUserSessionIfCurrent } from './userStateService';
+import { userTokenStorage } from './userTokenStorage';
 
 interface ITokenRefreshDependencies {
   clearSession(snapshot: ITokenSnapshot): Promise<boolean>;
@@ -305,8 +305,8 @@ export const createTokenRefreshService = ({
 };
 
 const tokenRefreshService = createTokenRefreshService({
-  clearSession: clearAuthSessionIfCurrent,
-  getTokenSnapshot: () => keychainStorage.getTokenSnapshot(),
+  clearSession: clearUserSessionIfCurrent,
+  getTokenSnapshot: () => userTokenStorage.getTokenSnapshot(),
   onSessionExpired: () => {
     toastService.showError(
       String(i18n.t('common.error')),
@@ -315,7 +315,7 @@ const tokenRefreshService = createTokenRefreshService({
   },
   refreshTokens: refresh,
   saveTokensIfCurrent: (snapshot, tokens) =>
-    keychainStorage.saveTokensIfCurrent(snapshot, tokens),
+    userTokenStorage.saveTokensIfCurrent(snapshot, tokens),
 });
 
 let isRequesterConfigured = false;
@@ -327,6 +327,14 @@ export const initializeTokenRefreshService = (): void => {
 
   isRequesterConfigured = true;
   configureRequesterAuth({
+    getAuthState: async () => {
+      const snapshot = await userTokenStorage.getTokenSnapshot();
+
+      return {
+        accessToken: snapshot.tokens?.accessToken ?? null,
+        version: snapshot.version,
+      };
+    },
     refreshAuthState: async (failedAuthState) => {
       if (!failedAuthState) {
         return null;
@@ -336,7 +344,7 @@ export const initializeTokenRefreshService = (): void => {
         expectedAuthState: failedAuthState,
         notifySessionExpired: true,
       });
-      const snapshot = await keychainStorage.getTokenSnapshot();
+      const snapshot = await userTokenStorage.getTokenSnapshot();
 
       if (!isSameTokenPair(snapshot.tokens, tokens)) {
         return null;
