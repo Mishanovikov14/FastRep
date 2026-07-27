@@ -13,14 +13,19 @@ const readProjectFile = (relativePath: string): string => {
 
 describe('password-recovery architecture and startup', () => {
   it('configures production releases with the FastRep production API URL', () => {
+    expect(readProjectFile('.env').trim()).toBe(
+      'API_URL=https://api.fastrep.app',
+    );
     expect(readProjectFile('.env.production').trim()).toBe(
       'API_URL=https://api.fastrep.app',
     );
     expect(readProjectFile('android/app/build.gradle')).toContain(
       'release: ".env.production"',
     );
-    expect(readProjectFile('ios/FastRep.xcodeproj/project.pbxproj')).toContain(
-      'ENVFILE = .env.production;',
+    expect(
+      readProjectFile('ios/FastRep.xcodeproj/project.pbxproj'),
+    ).not.toContain(
+      'ENVFILE =',
     );
   });
 

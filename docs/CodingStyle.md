@@ -25,7 +25,8 @@ Use `on`, not `handle`. Avoid inline handlers in JSX.
 
 ## Imports
 
-Use `@` alias, named exports, `import type`, sorted imports, and avoid circular dependencies.
+Use `@` alias, named exports, `import type`, and avoid circular dependencies.
+Import order is not enforced.
 
 ## Types
 

@@ -2,6 +2,7 @@ import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, RawAxiosHeaders 
 import { AxiosHeaders } from 'axios';
 
 import { axiosClient, AxiosRequester } from '@/libs/requester';
+import { resolveApiBaseUrl } from '@/libs/requester/requester';
 
 jest.mock('@/localization/i18n', () => ({
   i18n: {
@@ -25,7 +26,20 @@ const createClient = () => {
 
 describe('AxiosRequester', () => {
   it('uses the configured API URL', () => {
-    expect(axiosClient.defaults.baseURL).toBe('http://localhost:3000');
+    expect(axiosClient.defaults.baseURL).toBe('https://api.fastrep.app');
+    expect(axiosClient.getUri({ url: '/auth/login' })).toBe(
+      'https://api.fastrep.app/auth/login',
+    );
+  });
+
+  it('normalizes the configured API URL without a localhost fallback', () => {
+    expect(resolveApiBaseUrl(' https://api.fastrep.app/ ', true)).toBe(
+      'https://api.fastrep.app',
+    );
+    expect(() => resolveApiBaseUrl(undefined, true)).toThrow(
+      'API_URL is required.',
+    );
+    expect(resolveApiBaseUrl(undefined, false)).toBeUndefined();
   });
 
   it('maps a successful response to IResponse<T>', async () => {

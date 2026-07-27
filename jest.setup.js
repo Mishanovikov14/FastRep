@@ -21,7 +21,7 @@ jest.mock('react-native-mmkv', () => {
   };
 });
 jest.mock('react-native-config', () => ({
-  API_URL: 'http://localhost:3000',
+  API_URL: 'https://api.fastrep.app',
 }));
 jest.mock('react-native-device-info', () =>
   require('react-native-device-info/jest/react-native-device-info-mock'),
