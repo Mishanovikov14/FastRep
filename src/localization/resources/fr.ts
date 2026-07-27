@@ -2,6 +2,19 @@ import type { TranslationResources } from './types';
 
 export const fr: TranslationResources = {
   auth: {
+    forgotPassword: {
+      codeSent:
+        'Si un compte existe pour cet e-mail, nous avons envoyé un code de vérification.',
+      email: 'E-mail',
+      explanation:
+        'Saisissez votre e-mail pour recevoir un code de vérification à six chiffres.',
+      sendCode: 'Envoyer le code',
+      title: 'Mot de passe oublié',
+      validation: {
+        emailInvalid: 'Saisissez une adresse e-mail valide.',
+        emailRequired: "L'adresse e-mail est requise.",
+      },
+    },
     login: {
       createAccount: 'Créer un compte',
       description: 'Connectez-vous pour continuer à utiliser FastRep.',
@@ -10,8 +23,6 @@ export const fr: TranslationResources = {
       invalidCredentials: "L'adresse e-mail ou le mot de passe est incorrect.",
       logIn: 'Se connecter',
       password: 'Mot de passe',
-      passwordRecoveryComingSoon:
-        'La récupération du mot de passe sera bientôt disponible.',
       title: 'Bon retour',
       validation: {
         emailInvalid: 'Saisissez une adresse e-mail valide.',
@@ -38,6 +49,48 @@ export const fr: TranslationResources = {
         fullNameMax: 'Le nom complet ne doit pas dépasser 80 caractères.',
         fullNameMin: 'Le nom complet doit contenir au moins 2 caractères.',
         fullNameRequired: 'Le nom complet est requis.',
+        passwordMax: 'Le mot de passe ne doit pas dépasser 128 caractères.',
+        passwordMin: 'Le mot de passe doit contenir au moins 8 caractères.',
+        passwordRequired: 'Le mot de passe est requis.',
+        passwordsMismatch: 'Les mots de passe ne correspondent pas.',
+      },
+    },
+    otp: {
+      codeResent:
+        'Si un compte existe pour cet e-mail, nous avons envoyé un nouveau code.',
+      codeSentTo: 'Code envoyé à {{email}}',
+      explanation: 'Saisissez le code à six chiffres reçu par e-mail.',
+      invalidCodeFormat: 'Saisissez exactement six chiffres.',
+      resendCode: 'Renvoyer le code',
+      resendIn: 'Renvoyer dans {{seconds}} s',
+      title: 'Saisir le code de vérification',
+      verificationCode: 'Code de vérification',
+    },
+    recovery: {
+      back: 'Retour',
+      backToLogin: 'Retour à la connexion',
+      invalidOrExpiredCode: 'Le code de vérification est invalide ou expiré.',
+      networkError:
+        'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
+      rateLimited: 'Trop de demandes. Veuillez patienter avant de réessayer.',
+      serverUnavailable:
+        'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
+      timeoutError: "Le délai d'attente de la requête a été dépassé.",
+      tooManyAttempts:
+        'Trop de tentatives infructueuses. Demandez un nouveau code.',
+      usedCode: 'Ce code a déjà été utilisé. Demandez un nouveau code.',
+    },
+    resetPassword: {
+      confirmNewPassword: 'Confirmer le nouveau mot de passe',
+      explanation: 'Choisissez un nouveau mot de passe pour votre compte FastRep.',
+      newPassword: 'Nouveau mot de passe',
+      resetPassword: 'Réinitialiser le mot de passe',
+      success:
+        'Votre mot de passe a été réinitialisé. Connectez-vous avec le nouveau.',
+      title: 'Réinitialiser le mot de passe',
+      validation: {
+        confirmPasswordRequired: 'Confirmez votre nouveau mot de passe.',
+        passwordMax: 'Le mot de passe ne doit pas dépasser 128 caractères.',
         passwordMin: 'Le mot de passe doit contenir au moins 8 caractères.',
         passwordRequired: 'Le mot de passe est requis.',
         passwordsMismatch: 'Les mots de passe ne correspondent pas.',

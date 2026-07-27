@@ -2,6 +2,19 @@ import type { TranslationResources } from './types';
 
 export const uk: TranslationResources = {
   auth: {
+    forgotPassword: {
+      codeSent:
+        'Якщо обліковий запис із цією поштою існує, ми надіслали код підтвердження.',
+      email: 'Електронна пошта',
+      explanation:
+        'Введіть електронну пошту, щоб отримати шестизначний код підтвердження.',
+      sendCode: 'Надіслати код',
+      title: 'Забули пароль',
+      validation: {
+        emailInvalid: 'Введіть коректну адресу електронної пошти.',
+        emailRequired: 'Електронна пошта обов’язкова.',
+      },
+    },
     login: {
       createAccount: 'Створити обліковий запис',
       description: 'Увійдіть, щоб продовжити користуватися FastRep.',
@@ -10,7 +23,6 @@ export const uk: TranslationResources = {
       invalidCredentials: 'Електронну пошту або пароль введено неправильно.',
       logIn: 'Увійти',
       password: 'Пароль',
-      passwordRecoveryComingSoon: 'Відновлення пароля незабаром стане доступним.',
       title: 'З поверненням',
       validation: {
         emailInvalid: 'Введіть коректну адресу електронної пошти.',
@@ -37,6 +49,45 @@ export const uk: TranslationResources = {
         fullNameMax: "Повне ім'я не може перевищувати 80 символів.",
         fullNameMin: "Повне ім'я має містити щонайменше 2 символи.",
         fullNameRequired: "Повне ім'я обов’язкове.",
+        passwordMax: 'Пароль не може містити більше ніж 128 символів.',
+        passwordMin: 'Пароль має містити щонайменше 8 символів.',
+        passwordRequired: 'Пароль обов’язковий.',
+        passwordsMismatch: 'Паролі не збігаються.',
+      },
+    },
+    otp: {
+      codeResent:
+        'Якщо обліковий запис із цією поштою існує, ми надіслали новий код.',
+      codeSentTo: 'Код надіслано на {{email}}',
+      explanation: 'Введіть шестизначний код із листа.',
+      invalidCodeFormat: 'Введіть рівно шість цифр.',
+      resendCode: 'Надіслати код повторно',
+      resendIn: 'Повторне надсилання через {{seconds}} с',
+      title: 'Введіть код підтвердження',
+      verificationCode: 'Код підтвердження',
+    },
+    recovery: {
+      back: 'Назад',
+      backToLogin: 'Повернутися до входу',
+      invalidOrExpiredCode: 'Код підтвердження неправильний або прострочений.',
+      networkError:
+        'Немає з’єднання з інтернетом. Перевірте з’єднання та повторіть спробу.',
+      rateLimited: 'Забагато запитів. Зачекайте перед повторною спробою.',
+      serverUnavailable: 'Сервер тимчасово недоступний. Спробуйте пізніше.',
+      timeoutError: 'Час очікування запиту минув. Повторіть спробу.',
+      tooManyAttempts: 'Забагато невдалих спроб. Запросіть новий код.',
+      usedCode: 'Цей код уже використано. Запросіть новий код.',
+    },
+    resetPassword: {
+      confirmNewPassword: 'Підтвердьте новий пароль',
+      explanation: 'Оберіть новий пароль для облікового запису FastRep.',
+      newPassword: 'Новий пароль',
+      resetPassword: 'Скинути пароль',
+      success: 'Пароль скинуто. Увійдіть за допомогою нового пароля.',
+      title: 'Скинути пароль',
+      validation: {
+        confirmPasswordRequired: 'Підтвердьте новий пароль.',
+        passwordMax: 'Пароль не може містити більше ніж 128 символів.',
         passwordMin: 'Пароль має містити щонайменше 8 символів.',
         passwordRequired: 'Пароль обов’язковий.',
         passwordsMismatch: 'Паролі не збігаються.',

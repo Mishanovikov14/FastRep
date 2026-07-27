@@ -2,6 +2,19 @@ import type { TranslationResources } from './types';
 
 export const en: TranslationResources = {
   auth: {
+    forgotPassword: {
+      codeSent:
+        'If an account exists for this email, we sent a verification code.',
+      email: 'Email',
+      explanation:
+        'Enter your email address and we will send you a six-digit verification code.',
+      sendCode: 'Send code',
+      title: 'Forgot password',
+      validation: {
+        emailInvalid: 'Enter a valid email address.',
+        emailRequired: 'Email is required.',
+      },
+    },
     login: {
       createAccount: 'Create account',
       description: 'Log in to continue using FastRep.',
@@ -10,7 +23,6 @@ export const en: TranslationResources = {
       invalidCredentials: 'The email or password is incorrect.',
       logIn: 'Log in',
       password: 'Password',
-      passwordRecoveryComingSoon: 'Password recovery will be available soon.',
       title: 'Welcome back',
       validation: {
         emailInvalid: 'Enter a valid email address.',
@@ -37,6 +49,46 @@ export const en: TranslationResources = {
         fullNameMax: 'Full name must be no more than 80 characters.',
         fullNameMin: 'Full name must contain at least 2 characters.',
         fullNameRequired: 'Full name is required.',
+        passwordMax: 'Password must contain no more than 128 characters.',
+        passwordMin: 'Password must contain at least 8 characters.',
+        passwordRequired: 'Password is required.',
+        passwordsMismatch: 'Passwords do not match.',
+      },
+    },
+    otp: {
+      codeResent:
+        'If an account exists for this email, we sent a new verification code.',
+      codeSentTo: 'Code sent to {{email}}',
+      explanation: 'Enter the six-digit code from your email.',
+      invalidCodeFormat: 'Enter exactly six digits.',
+      resendCode: 'Resend code',
+      resendIn: 'Resend in {{seconds}}s',
+      title: 'Enter verification code',
+      verificationCode: 'Verification code',
+    },
+    recovery: {
+      back: 'Back',
+      backToLogin: 'Back to login',
+      invalidOrExpiredCode: 'The verification code is invalid or expired.',
+      networkError: 'No internet connection. Check your connection and try again.',
+      rateLimited: 'Too many requests. Please wait before trying again.',
+      serverUnavailable:
+        'The server is temporarily unavailable. Please try again later.',
+      timeoutError: 'The request timed out. Please try again.',
+      tooManyAttempts:
+        'Too many unsuccessful attempts. Request a new verification code.',
+      usedCode: 'This verification code has already been used. Request a new code.',
+    },
+    resetPassword: {
+      confirmNewPassword: 'Confirm new password',
+      explanation: 'Choose a new password for your FastRep account.',
+      newPassword: 'New password',
+      resetPassword: 'Reset password',
+      success: 'Your password was reset. Log in with your new password.',
+      title: 'Reset password',
+      validation: {
+        confirmPasswordRequired: 'Confirm your new password.',
+        passwordMax: 'Password must contain no more than 128 characters.',
         passwordMin: 'Password must contain at least 8 characters.',
         passwordRequired: 'Password is required.',
         passwordsMismatch: 'Passwords do not match.',

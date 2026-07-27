@@ -140,11 +140,8 @@ export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
   }, [navigation]);
 
   const onPressForgotPassword = useCallback(() => {
-    toastService.showInfo(
-      String(t('common.info')),
-      String(t('auth.login.passwordRecoveryComingSoon')),
-    );
-  }, [t]);
+    navigation.navigate('ForgotPassword');
+  }, [navigation]);
 
   return {
     email,

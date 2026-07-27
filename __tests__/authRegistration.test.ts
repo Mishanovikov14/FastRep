@@ -123,6 +123,21 @@ describe('registration', () => {
     expect(errors).toEqual({});
   });
 
+  it('uses the backend password maximum', () => {
+    const password = 'a'.repeat(129);
+    const errors = validateRegistration(
+      {
+        confirmPassword: password,
+        email: 'alex@example.com',
+        fullName: 'Alex Morgan',
+        password,
+      },
+      t,
+    );
+
+    expect(errors.password).toBe('auth.registration.validation.passwordMax');
+  });
+
   it('stores and clears only authenticated user state', () => {
     useUserStore.getState().setUser(user);
 

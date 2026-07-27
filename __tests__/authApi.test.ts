@@ -1,9 +1,11 @@
 import {
+  forgotPassword,
   getMe,
   getMeWithoutRefresh,
   login,
   logout,
   refresh,
+  resetPassword,
 } from '@/entities/user/API/userApi';
 import { requester } from '@/libs/requester/requester';
 
@@ -47,6 +49,34 @@ describe('auth API', () => {
       requiresAuth: false,
       skipAuthRefresh: true,
       url: '/auth/refresh',
+    });
+  });
+
+  it('keeps both password-recovery endpoints outside auth attachment and refresh', async () => {
+    await forgotPassword({ email: 'alex@example.com' });
+    await resetPassword({
+      code: '012345',
+      email: 'alex@example.com',
+      newPassword: 'new-password',
+    });
+
+    expect(requester.request).toHaveBeenNthCalledWith(1, {
+      data: { email: 'alex@example.com' },
+      method: 'POST',
+      requiresAuth: false,
+      skipAuthRefresh: true,
+      url: '/auth/forgot-password',
+    });
+    expect(requester.request).toHaveBeenNthCalledWith(2, {
+      data: {
+        code: '012345',
+        email: 'alex@example.com',
+        newPassword: 'new-password',
+      },
+      method: 'POST',
+      requiresAuth: false,
+      skipAuthRefresh: true,
+      url: '/auth/reset-password',
     });
   });
 

@@ -1,5 +1,16 @@
 export interface TranslationResources {
   auth: {
+    forgotPassword: {
+      codeSent: string;
+      email: string;
+      explanation: string;
+      sendCode: string;
+      title: string;
+      validation: {
+        emailInvalid: string;
+        emailRequired: string;
+      };
+    };
     login: {
       createAccount: string;
       description: string;
@@ -8,7 +19,6 @@ export interface TranslationResources {
       invalidCredentials: string;
       logIn: string;
       password: string;
-      passwordRecoveryComingSoon: string;
       title: string;
       validation: {
         emailInvalid: string;
@@ -35,6 +45,43 @@ export interface TranslationResources {
         fullNameMax: string;
         fullNameMin: string;
         fullNameRequired: string;
+        passwordMax: string;
+        passwordMin: string;
+        passwordRequired: string;
+        passwordsMismatch: string;
+      };
+    };
+    otp: {
+      codeResent: string;
+      codeSentTo: string;
+      explanation: string;
+      invalidCodeFormat: string;
+      resendCode: string;
+      resendIn: string;
+      title: string;
+      verificationCode: string;
+    };
+    recovery: {
+      back: string;
+      backToLogin: string;
+      invalidOrExpiredCode: string;
+      networkError: string;
+      rateLimited: string;
+      serverUnavailable: string;
+      timeoutError: string;
+      tooManyAttempts: string;
+      usedCode: string;
+    };
+    resetPassword: {
+      confirmNewPassword: string;
+      explanation: string;
+      newPassword: string;
+      resetPassword: string;
+      success: string;
+      title: string;
+      validation: {
+        confirmPasswordRequired: string;
+        passwordMax: string;
         passwordMin: string;
         passwordRequired: string;
         passwordsMismatch: string;

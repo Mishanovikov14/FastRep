@@ -1,8 +1,8 @@
 import { getMeWithoutRefresh } from '@/entities/user/API/userApi';
+import { refreshTokenPair } from '@/entities/user/services/tokenRefreshService';
 import { restoreUserSession } from '@/entities/user/services/userSessionService';
 import { clearUserSession } from '@/entities/user/services/userStateService';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
-import { refreshTokenPair } from '@/entities/user/services/tokenRefreshService';
 import type { ITokenPair } from '@/entities/user/types/auth';
 import type { IUser } from '@/entities/user/types/user';
 

@@ -1,9 +1,11 @@
 import type {
   IAuthenticationResponse,
+  IForgotPasswordRequest,
   ILoginRequest,
   ILogoutRequest,
   IRefreshRequest,
   IRegisterRequest,
+  IResetPasswordRequest,
   ITokenPair,
 } from '@/entities/user/types/auth';
 import type { IUser } from '@/entities/user/types/user';
@@ -35,6 +37,30 @@ export const login = (request: ILoginRequest): Promise<IResponse<IAuthentication
     method: 'POST',
     requiresAuth: false,
     url: '/auth/login',
+  });
+};
+
+export const forgotPassword = (
+  request: IForgotPasswordRequest,
+): Promise<IResponse<void>> => {
+  return requester.request<void>({
+    data: request,
+    method: 'POST',
+    requiresAuth: false,
+    skipAuthRefresh: true,
+    url: '/auth/forgot-password',
+  });
+};
+
+export const resetPassword = (
+  request: IResetPasswordRequest,
+): Promise<IResponse<void>> => {
+  return requester.request<void>({
+    data: request,
+    method: 'POST',
+    requiresAuth: false,
+    skipAuthRefresh: true,
+    url: '/auth/reset-password',
   });
 };
 
