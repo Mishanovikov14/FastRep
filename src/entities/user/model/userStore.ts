@@ -1,18 +1,18 @@
 import { create } from 'zustand';
 
-import type { IUser } from '@/types/auth';
+import type { IUser } from '@/entities/user/types/user';
 
-interface AuthState {
+interface UserState {
   clearUser(): void;
   isAuthorized: boolean;
   isSessionRestored: boolean;
-  resetAuth(): void;
+  resetUser(): void;
   setSessionRestored(value: boolean): void;
   setUser(user: IUser): void;
   user: IUser | null;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useUserStore = create<UserState>((set) => ({
   clearUser: () => {
     set({
       isAuthorized: false,
@@ -21,7 +21,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   isAuthorized: false,
   isSessionRestored: false,
-  resetAuth: () => {
+  resetUser: () => {
     set({
       isAuthorized: false,
       isSessionRestored: true,

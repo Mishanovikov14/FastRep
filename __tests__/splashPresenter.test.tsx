@@ -2,13 +2,14 @@ import type { TFunction } from 'i18next';
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
-import { restoreAuthSession } from '@/modules/auth/services/authSessionService';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { restoreUserSession } from '@/entities/user/services/userSessionService';
+import type { SessionRestoreResult } from '@/entities/user/types/session';
+import type { IUser } from '@/entities/user/types/user';
 import { useSplashViewPresenter } from '@/modules/home/ui/SplashView/presenters/useSplashViewPresenter';
-import { useAuthStore } from '@/storage/authStore';
-import type { IUser,SessionRestoreResult } from '@/types/auth';
 
-jest.mock('@/modules/auth/services/authSessionService', () => ({
-  restoreAuthSession: jest.fn(),
+jest.mock('@/entities/user/services/userSessionService', () => ({
+  restoreUserSession: jest.fn(),
 }));
 
 interface IDeferred<T> {
@@ -40,9 +41,9 @@ const user: IUser = {
   updatedAt: '2026-07-26T10:00:00.000Z',
 };
 const originalActions = {
-  clearUser: useAuthStore.getState().clearUser,
-  setSessionRestored: useAuthStore.getState().setSessionRestored,
-  setUser: useAuthStore.getState().setUser,
+  clearUser: useUserStore.getState().clearUser,
+  setSessionRestored: useUserStore.getState().setSessionRestored,
+  setUser: useUserStore.getState().setUser,
 };
 const mockClearUser = jest.fn();
 const mockSetSessionRestored = jest.fn();
@@ -66,7 +67,7 @@ describe('useSplashViewPresenter', () => {
     jest.clearAllMocks();
     presenter = undefined;
     renderer = undefined;
-    useAuthStore.setState({
+    useUserStore.setState({
       clearUser: mockClearUser,
       isAuthorized: false,
       isSessionRestored: false,
@@ -79,7 +80,7 @@ describe('useSplashViewPresenter', () => {
   afterEach(() => {
     ReactTestRenderer.act(() => {
       renderer?.unmount();
-      useAuthStore.setState({
+      useUserStore.setState({
         ...originalActions,
         isAuthorized: false,
         isSessionRestored: false,
@@ -89,7 +90,7 @@ describe('useSplashViewPresenter', () => {
   });
 
   it('updates the user and completes authorized restoration once under Strict Mode', async () => {
-    jest.mocked(restoreAuthSession).mockResolvedValue({
+    jest.mocked(restoreUserSession).mockResolvedValue({
       status: 'authorized',
       user,
     });
@@ -103,7 +104,7 @@ describe('useSplashViewPresenter', () => {
       await waitForAsyncWork();
     });
 
-    expect(restoreAuthSession).toHaveBeenCalledTimes(1);
+    expect(restoreUserSession).toHaveBeenCalledTimes(1);
     expect(mockSetUser).toHaveBeenCalledWith(user);
     expect(mockClearUser).not.toHaveBeenCalled();
     expect(mockSetSessionRestored).toHaveBeenLastCalledWith(true);
@@ -111,7 +112,7 @@ describe('useSplashViewPresenter', () => {
   });
 
   it('clears the user and completes restoration for an unauthorized session', async () => {
-    jest.mocked(restoreAuthSession).mockResolvedValue({
+    jest.mocked(restoreUserSession).mockResolvedValue({
       status: 'unauthorized',
     });
 
@@ -126,7 +127,7 @@ describe('useSplashViewPresenter', () => {
   });
 
   it('keeps restoration unresolved and exposes Retry after a temporary error', async () => {
-    jest.mocked(restoreAuthSession).mockResolvedValue({
+    jest.mocked(restoreUserSession).mockResolvedValue({
       message: 'Service unavailable',
       status: 'temporary_error',
       statusCode: 503,
@@ -148,7 +149,7 @@ describe('useSplashViewPresenter', () => {
   });
 
   it('prevents duplicate Retry calls and completes a successful Retry', async () => {
-    jest.mocked(restoreAuthSession).mockResolvedValueOnce({
+    jest.mocked(restoreUserSession).mockResolvedValueOnce({
       status: 'temporary_error',
       type: 'network_error',
     });
@@ -159,7 +160,7 @@ describe('useSplashViewPresenter', () => {
     });
 
     const retryDeferred = createDeferred<SessionRestoreResult>();
-    jest.mocked(restoreAuthSession).mockReturnValueOnce(retryDeferred.promise);
+    jest.mocked(restoreUserSession).mockReturnValueOnce(retryDeferred.promise);
 
     let firstRetry: Promise<void> | undefined;
     let duplicateRetry: Promise<void> | undefined;
@@ -170,7 +171,7 @@ describe('useSplashViewPresenter', () => {
       await duplicateRetry;
     });
 
-    expect(restoreAuthSession).toHaveBeenCalledTimes(2);
+    expect(restoreUserSession).toHaveBeenCalledTimes(2);
 
     retryDeferred.resolve({
       status: 'authorized',

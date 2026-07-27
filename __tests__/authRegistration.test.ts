@@ -1,10 +1,10 @@
 import type { TFunction } from 'i18next';
 
+import { register } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
+import type { IUser } from '@/entities/user/types/user';
 import { requester } from '@/libs/requester/requester';
-import { register } from '@/modules/auth/API/authApi';
 import { validateRegistration } from '@/modules/auth/ui/RegistrationView/presenters/registrationValidation';
-import { useAuthStore } from '@/storage/authStore';
-import type { IUser } from '@/types/auth';
 
 jest.mock('@/libs/requester/requester', () => ({
   requester: {
@@ -28,7 +28,7 @@ const user: IUser = {
 describe('registration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    useAuthStore.getState().clearUser();
+    useUserStore.getState().clearUser();
   });
 
   it('sends the exact backend registration contract through the shared requester', async () => {
@@ -124,16 +124,16 @@ describe('registration', () => {
   });
 
   it('stores and clears only authenticated user state', () => {
-    useAuthStore.getState().setUser(user);
+    useUserStore.getState().setUser(user);
 
-    expect(useAuthStore.getState()).toMatchObject({
+    expect(useUserStore.getState()).toMatchObject({
       isAuthorized: true,
       user,
     });
 
-    useAuthStore.getState().clearUser();
+    useUserStore.getState().clearUser();
 
-    expect(useAuthStore.getState()).toMatchObject({
+    expect(useUserStore.getState()).toMatchObject({
       isAuthorized: false,
       user: null,
     });

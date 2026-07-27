@@ -4,16 +4,16 @@ import type { TFunction } from 'i18next';
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
-import type { IResponse } from '@/libs/requester/IResponse';
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
-import { toastService } from '@/libs/toast/toastService';
-import { useLoginViewPresenter } from '@/modules/auth/ui/LoginView/presenters/useLoginViewPresenter';
-import { useAuthStore } from '@/storage/authStore';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import type {
   IAuthenticationResponse,
   ILoginRequest,
-  IUser,
-} from '@/types/auth';
+} from '@/entities/user/types/auth';
+import type { IUser } from '@/entities/user/types/user';
+import type { IResponse } from '@/libs/requester/IResponse';
+import { toastService } from '@/libs/toast/toastService';
+import { useLoginViewPresenter } from '@/modules/auth/ui/LoginView/presenters/useLoginViewPresenter';
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
@@ -21,8 +21,8 @@ jest.mock('@react-navigation/native', () => ({
 jest.mock('@tanstack/react-query', () => ({
   useMutation: jest.fn(),
 }));
-jest.mock('@/libs/storage/KeychainStorage', () => ({
-  keychainStorage: {
+jest.mock('@/entities/user/services/userTokenStorage', () => ({
+  userTokenStorage: {
     clearTokens: jest.fn(),
     getTokens: jest.fn(),
     saveTokens: jest.fn(),
@@ -34,7 +34,7 @@ jest.mock('@/libs/toast/toastService', () => ({
     showInfo: jest.fn(),
   },
 }));
-jest.mock('@/modules/auth/API/authApi', () => ({
+jest.mock('@/entities/user/API/userApi', () => ({
   login: jest.fn(),
 }));
 
@@ -54,7 +54,7 @@ const authentication: IAuthenticationResponse = {
   refreshToken: 'refresh-token',
   user,
 };
-const originalSetUser = useAuthStore.getState().setUser;
+const originalSetUser = useUserStore.getState().setUser;
 const mockMutateAsync = jest.fn();
 const mockSetUser = jest.fn();
 const waitForAsyncWork = () =>
@@ -79,7 +79,7 @@ describe('useLoginViewPresenter', () => {
     jest.clearAllMocks();
     presenter = undefined;
     renderer = undefined;
-    useAuthStore.setState({
+    useUserStore.setState({
       isAuthorized: false,
       isSessionRestored: false,
       setUser: mockSetUser,
@@ -95,7 +95,7 @@ describe('useLoginViewPresenter', () => {
   afterEach(() => {
     ReactTestRenderer.act(() => {
       renderer?.unmount();
-      useAuthStore.setState({
+      useUserStore.setState({
         isAuthorized: false,
         isSessionRestored: false,
         setUser: originalSetUser,
@@ -113,7 +113,7 @@ describe('useLoginViewPresenter', () => {
       resolveResponse = resolve;
     });
 
-    jest.mocked(keychainStorage.saveTokens).mockImplementation(async () => {
+    jest.mocked(userTokenStorage.saveTokens).mockImplementation(async () => {
       events.push('tokens');
     });
     mockSetUser.mockImplementation((nextUser: IUser) => {
@@ -153,13 +153,13 @@ describe('useLoginViewPresenter', () => {
       await waitForAsyncWork();
     });
 
-    expect(keychainStorage.saveTokens).toHaveBeenCalledWith({
+    expect(userTokenStorage.saveTokens).toHaveBeenCalledWith({
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
     });
     expect(mockSetUser).toHaveBeenCalledWith(user);
     expect(events).toEqual(['tokens', 'user']);
-    expect(useAuthStore.getState()).toMatchObject({
+    expect(useUserStore.getState()).toMatchObject({
       isAuthorized: true,
       user,
     });
@@ -186,9 +186,9 @@ describe('useLoginViewPresenter', () => {
       await waitForAsyncWork();
     });
 
-    expect(keychainStorage.saveTokens).not.toHaveBeenCalled();
+    expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
     expect(mockSetUser).not.toHaveBeenCalled();
-    expect(useAuthStore.getState()).toMatchObject({
+    expect(useUserStore.getState()).toMatchObject({
       isAuthorized: false,
       user: null,
     });

@@ -1,15 +1,6 @@
 import type { SupportedLanguage } from '@/localization/types';
 
-export interface IUser {
-  createdAt: string;
-  email: string;
-  fullName: string;
-  id: string;
-  isPremium: boolean;
-  language: SupportedLanguage;
-  photoUrl: string | null;
-  updatedAt: string;
-}
+import type { IUser } from './user';
 
 export interface ITokenPair {
   accessToken: string;
@@ -39,18 +30,3 @@ export interface IRefreshRequest {
 export interface ILogoutRequest {
   refreshToken: string;
 }
-
-export type SessionRestoreResult =
-  | {
-      status: 'authorized';
-      user: IUser;
-    }
-  | {
-      status: 'unauthorized';
-    }
-  | {
-      message?: string;
-      status: 'temporary_error';
-      statusCode?: number;
-      type?: string;
-    };

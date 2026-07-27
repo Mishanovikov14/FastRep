@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-import { clearAuthenticatedResources } from '@/services/authenticatedResourcesService';
-import { useAuthStore } from '@/storage/authStore';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { clearAuthenticatedResources } from '@/entities/user/services/authenticatedResourcesService';
 
 export const useAuthSessionLifecycle = (): void => {
-  const isAuthorized = useAuthStore((state) => state.isAuthorized);
+  const isAuthorized = useUserStore((state) => state.isAuthorized);
   const previousIsAuthorizedRef = useRef(isAuthorized);
 
   useEffect(() => {

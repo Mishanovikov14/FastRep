@@ -1,5 +1,5 @@
+import { clearAuthenticatedResources } from '@/entities/user/services/authenticatedResourcesService';
 import { queryClient } from '@/libs/query/QueryClient';
-import { clearAuthenticatedResources } from '@/services/authenticatedResourcesService';
 
 jest.mock('@/libs/query/QueryClient', () => ({
   queryClient: {

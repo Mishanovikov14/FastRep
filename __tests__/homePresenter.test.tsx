@@ -3,19 +3,19 @@ import type { TFunction } from 'i18next';
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
+import { clearUserSession } from '@/entities/user/services/userStateService';
+import { useUserStore } from '@/entities/user/model/userStore';
+import type { IUser } from '@/entities/user/types/user';
 import type { IResponse } from '@/libs/requester/IResponse';
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
 import { toastService } from '@/libs/toast/toastService';
-import { clearAuthSession } from '@/modules/auth/services/authStateService';
 import { useHomeViewPresenter } from '@/modules/home/ui/HomeView/presenters/useHomeViewPresenter';
-import { useAuthStore } from '@/storage/authStore';
-import type { IUser } from '@/types/auth';
 
 jest.mock('@tanstack/react-query', () => ({
   useMutation: jest.fn(),
 }));
-jest.mock('@/libs/storage/KeychainStorage', () => ({
-  keychainStorage: {
+jest.mock('@/entities/user/services/userTokenStorage', () => ({
+  userTokenStorage: {
     clearTokens: jest.fn(),
     getTokens: jest.fn(),
     saveTokens: jest.fn(),
@@ -26,11 +26,11 @@ jest.mock('@/libs/toast/toastService', () => ({
     showError: jest.fn(),
   },
 }));
-jest.mock('@/modules/auth/API/authApi', () => ({
+jest.mock('@/entities/user/API/userApi', () => ({
   logout: jest.fn(),
 }));
-jest.mock('@/modules/auth/services/authStateService', () => ({
-  clearAuthSession: jest.fn(),
+jest.mock('@/entities/user/services/userStateService', () => ({
+  clearUserSession: jest.fn(),
 }));
 
 const t = ((key: string) => key) as unknown as TFunction;
@@ -60,7 +60,7 @@ describe('useHomeViewPresenter', () => {
     jest.clearAllMocks();
     presenter = undefined;
     renderer = undefined;
-    useAuthStore.setState({
+    useUserStore.setState({
       isAuthorized: true,
       isSessionRestored: true,
       user,
@@ -69,17 +69,17 @@ describe('useHomeViewPresenter', () => {
       isPending: false,
       mutateAsync: mockMutateAsync,
     } as never);
-    jest.mocked(keychainStorage.getTokens).mockResolvedValue({
+    jest.mocked(userTokenStorage.getTokens).mockResolvedValue({
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
     });
-    jest.mocked(clearAuthSession).mockResolvedValue();
+    jest.mocked(clearUserSession).mockResolvedValue();
   });
 
   afterEach(() => {
     ReactTestRenderer.act(() => {
       renderer?.unmount();
-      useAuthStore.setState({
+      useUserStore.setState({
         isAuthorized: false,
         isSessionRestored: false,
         user: null,
@@ -109,7 +109,7 @@ describe('useHomeViewPresenter', () => {
 
     await duplicateLogout;
 
-    expect(keychainStorage.getTokens).toHaveBeenCalledTimes(1);
+    expect(userTokenStorage.getTokens).toHaveBeenCalledTimes(1);
     expect(mockMutateAsync).toHaveBeenCalledTimes(1);
     expect(mockMutateAsync).toHaveBeenCalledWith('refresh-token');
 
@@ -123,7 +123,7 @@ describe('useHomeViewPresenter', () => {
       await firstLogout;
     });
 
-    expect(clearAuthSession).toHaveBeenCalledTimes(1);
+    expect(clearUserSession).toHaveBeenCalledTimes(1);
     expect(toastService.showError).not.toHaveBeenCalled();
   });
 
@@ -143,7 +143,7 @@ describe('useHomeViewPresenter', () => {
     });
 
     expect(mockMutateAsync).toHaveBeenCalledWith('refresh-token');
-    expect(clearAuthSession).toHaveBeenCalledTimes(1);
+    expect(clearUserSession).toHaveBeenCalledTimes(1);
     expect(toastService.showError).toHaveBeenCalledWith(
       'common.error',
       'home.logoutError',

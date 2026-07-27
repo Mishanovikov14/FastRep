@@ -1,6 +1,6 @@
 import type { TFunction } from 'i18next';
 
-import type { ILoginRequest } from '@/types/auth';
+import type { ILoginRequest } from '@/entities/user/types/auth';
 
 import type { LoginFormErrors, LoginFormValues } from '../types';
 

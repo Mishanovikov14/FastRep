@@ -1,5 +1,5 @@
 import { AppProviders } from '@/AppProviders';
-import { initializeTokenRefreshService } from '@/modules/auth/services/tokenRefreshService';
+import { initializeTokenRefreshService } from '@/entities/user/services/tokenRefreshService';
 import { RootNavigation } from '@/navigation/RootNavigation';
 
 initializeTokenRefreshService();

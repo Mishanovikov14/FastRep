@@ -2,22 +2,22 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useRef, useState } from 'react';
 
-import { keychainStorage } from '@/libs/storage/KeychainStorage';
+import { register } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
+import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import { toastService } from '@/libs/toast/toastService';
-import { register } from '@/modules/auth/API/authApi';
 import type {
   IPresenterInput,
   RegistrationFormErrors,
 } from '@/modules/auth/ui/RegistrationView/types';
 import type { GuestStackParamList } from '@/navigation/types';
-import { useAuthStore } from '@/storage/authStore';
 
 import { validateRegistration } from './registrationValidation';
 
 export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<GuestStackParamList, 'Registration'>>();
-  const setUser = useAuthStore((state) => state.setUser);
+  const setUser = useUserStore((state) => state.setUser);
   const isSubmittingRef = useRef(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -95,7 +95,7 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
 
       const { accessToken, refreshToken, user } = response.data;
 
-      await keychainStorage.saveTokens({
+      await userTokenStorage.saveTokens({
         accessToken,
         refreshToken,
       });
