@@ -2,7 +2,10 @@ import { StyleSheet } from 'react-native';
 
 import type { Colors } from '@/UIProvider/theme/types';
 
-export const getStyles = (colors: Colors) => {
+export const getStyles = (
+  colors: Colors,
+  backgroundColor: string = colors.background,
+) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -11,7 +14,7 @@ export const getStyles = (colors: Colors) => {
       flexGrow: 1,
     },
     mainContainer: {
-      backgroundColor: colors.background,
+      backgroundColor,
       flex: 1,
     },
     scroll: {

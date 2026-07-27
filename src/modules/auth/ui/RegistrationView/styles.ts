@@ -30,7 +30,7 @@ export const getStyles = (colors: Colors, spacing: Spacing) => {
     },
     logo: {
       alignSelf: 'center',
-      aspectRatio: 1160 / 330,
+      height: scaleVertical(80),
       maxWidth: Math.min(scaleHorizontal(320), 320),
       width: '82%',
     },

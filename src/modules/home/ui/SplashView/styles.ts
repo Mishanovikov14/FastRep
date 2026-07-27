@@ -13,7 +13,7 @@ export const getStyles = (colors: Colors, spacing: Spacing) => {
       paddingHorizontal: scaleHorizontal(spacing.xl),
     },
     logo: {
-      aspectRatio: 1160 / 330,
+      height: scaleVertical(88),
       maxWidth: Math.min(scaleHorizontal(340), 340),
       width: '90%',
     },

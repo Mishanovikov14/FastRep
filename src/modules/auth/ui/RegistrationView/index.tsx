@@ -33,6 +33,7 @@ export const RegistrationView = () => {
 
   return (
     <ScreenContainer
+      backgroundColor={colors.white}
       contentContainerStyle={styles.content}
       isKeyboardAvoiding
       scrollEnabled

@@ -17,7 +17,10 @@ export const SplashView = () => {
     useSplashViewPresenter({ t });
 
   return (
-    <ScreenContainer containerStyle={styles.content}>
+    <ScreenContainer
+      backgroundColor={colors.white}
+      containerStyle={styles.content}
+    >
       <Image
         accessibilityLabel="FastRep"
         resizeMode="contain"

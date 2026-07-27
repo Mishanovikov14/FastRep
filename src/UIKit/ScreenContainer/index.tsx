@@ -16,6 +16,7 @@ import { getStyles } from './styles';
 import type { IProps } from './types';
 
 export const ScreenContainer = ({
+  backgroundColor,
   children,
   containerStyle,
   contentContainerStyle,
@@ -29,7 +30,10 @@ export const ScreenContainer = ({
   withGradient = false,
 }: IProps) => {
   const { colors, spacing } = useUIContext();
-  const styles = useMemo(() => getStyles(colors), [colors]);
+  const styles = useMemo(
+    () => getStyles(colors, backgroundColor),
+    [backgroundColor, colors],
+  );
   const safeAreaInsets = useSafeAreaInsets();
   const bottomOffset = scaleVertical(spacing.xl);
   const { extraKeyboardSpace, onStickyLayout, scrollBottomOffset, stickyOpenedOffset } =

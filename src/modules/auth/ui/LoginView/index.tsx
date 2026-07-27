@@ -26,8 +26,13 @@ export const LoginView = () => {
   } = useLoginViewPresenter({ t });
 
   return (
-    <ScreenContainer edges={['top', 'bottom']} contentContainerStyle={styles.content} isKeyboardAvoiding scrollEnabled>
-      <View style={styles.card}>
+    <ScreenContainer
+      backgroundColor={colors.white}
+      edges={['top', 'bottom']}
+      isKeyboardAvoiding
+      scrollEnabled
+    >
+      <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"
           resizeMode="contain"
@@ -81,13 +86,14 @@ export const LoginView = () => {
           title={String(t('auth.login.logIn'))}
         />
 
+      </View>
         <Button
           disabled={isLoading}
           onPress={onPressRegistration}
           title={String(t('auth.login.createAccount'))}
           variant="text"
+          style={styles.signUpButton}
         />
-      </View>
     </ScreenContainer>
   );
 };

@@ -5,29 +5,29 @@ import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, spacing: Spacing) => {
   const styles = StyleSheet.create({
-    card: {
-      alignSelf: 'center',
-      gap: scaleVertical(spacing.xl),
-      maxWidth: Math.min(scaleHorizontal(440), 440),
-      width: '100%',
-    },
-    content: {
+    container: {
       backgroundColor: colors.white,
-      justifyContent: 'center',
+      flex: 1,
+      gap: scaleVertical(spacing.lg),
       paddingHorizontal: scaleHorizontal(spacing.xl),
-      paddingVertical: scaleVertical(spacing.xxl),
+      paddingTop: scaleVertical(72),
     },
     fields: {
       gap: scaleVertical(spacing.lg),
     },
     header: {
       gap: scaleVertical(spacing.sm),
+      paddingTop: scaleVertical(24),
     },
     logo: {
       alignSelf: 'center',
-      aspectRatio: 1160 / 330,
+      height: scaleVertical(80),
       maxWidth: Math.min(scaleHorizontal(320), 320),
       width: '82%',
+    },
+    signUpButton: {
+      marginVertical: scaleVertical(spacing.lg),
+      marginHorizontal: scaleHorizontal(spacing.lg),
     },
   });
 
