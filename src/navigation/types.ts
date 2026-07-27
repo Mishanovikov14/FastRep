@@ -1,5 +1,12 @@
 export type AppStackParamList = {
-  Home: undefined;
+  CreateReport: undefined;
+  EditReport: {
+    reportId: string;
+  };
+  ReportDetails: {
+    reportId: string;
+  };
+  ReportsList: undefined;
 };
 
 export type GuestStackParamList = {

@@ -7,8 +7,11 @@ import { LoginView } from '@/modules/auth/ui/LoginView';
 import { OtpVerificationView } from '@/modules/auth/ui/OtpVerificationView';
 import { RegistrationView } from '@/modules/auth/ui/RegistrationView';
 import { ResetPasswordView } from '@/modules/auth/ui/ResetPasswordView';
-import { HomeView } from '@/modules/home/ui/HomeView';
 import { SplashView } from '@/modules/home/ui/SplashView';
+import { CreateReportView } from '@/modules/reports/ui/CreateReportView';
+import { EditReportView } from '@/modules/reports/ui/EditReportView';
+import { ReportDetailsView } from '@/modules/reports/ui/ReportDetailsView';
+import { ReportsListView } from '@/modules/reports/ui/ReportsListView';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getRootNavigationState } from './getRootNavigationState';
@@ -21,7 +24,10 @@ const SplashStack = createNativeStackNavigator<SplashStackParamList>();
 const AppNavigation = () => {
   return (
     <AppStack.Navigator screenOptions={{ headerShown: false }}>
-      <AppStack.Screen component={HomeView} name="Home" />
+      <AppStack.Screen component={ReportsListView} name="ReportsList" />
+      <AppStack.Screen component={CreateReportView} name="CreateReport" />
+      <AppStack.Screen component={ReportDetailsView} name="ReportDetails" />
+      <AppStack.Screen component={EditReportView} name="EditReport" />
     </AppStack.Navigator>
   );
 };

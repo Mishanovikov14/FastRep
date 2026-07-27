@@ -108,6 +108,7 @@ export const fr: TranslationResources = {
     },
   },
   common: {
+    back: 'Retour',
     cancel: 'Annuler',
     close: 'Fermer',
     continue: 'Continuer',
@@ -132,6 +133,70 @@ export const fr: TranslationResources = {
     premiumActive: 'Actif',
     premiumInactive: 'Inactif',
     title: 'Accueil',
+  },
+  reports: {
+    card: {
+      created: 'Créé le {{date}}',
+      updated: 'Mis à jour le {{date}}',
+    },
+    create: {
+      action: 'Créer un rapport',
+      success: 'Rapport créé.',
+      title: 'Créer un rapport',
+    },
+    delete: {
+      action: 'Supprimer le rapport',
+      alreadyDeleted: 'Ce rapport a déjà été supprimé.',
+      confirmation: 'Cette action est irréversible. Le rapport sera définitivement supprimé.',
+      success: 'Rapport supprimé.',
+      title: 'Supprimer le rapport ?',
+    },
+    details: {
+      createdAt: 'Créé',
+      errorDescription: 'Impossible de charger ce rapport. Veuillez réessayer.',
+      errorTitle: 'Impossible de charger le rapport',
+      noNotes: 'Aucune note',
+      notFoundDescription: 'Ce rapport a peut-être été supprimé ou n’est plus disponible.',
+      notFoundTitle: 'Rapport introuvable',
+      title: 'Détails du rapport',
+      updatedAt: 'Mis à jour',
+    },
+    edit: {
+      action: 'Modifier le rapport',
+      success: 'Rapport mis à jour.',
+      title: 'Modifier le rapport',
+    },
+    errors: {
+      network: 'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
+      notFound: 'Le rapport est introuvable.',
+      server: 'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
+      timeout: 'La demande a expiré. Veuillez réessayer.',
+      validation: 'Vérifiez les informations du rapport et réessayez.',
+    },
+    form: {
+      notes: 'Notes',
+      notesPlaceholder: 'Ajoutez des informations utiles',
+      title: 'Titre',
+      titlePlaceholder: 'Titre du rapport',
+    },
+    list: {
+      emptyDescription: 'Créez votre premier rapport pour suivre sa progression et ses notes au même endroit.',
+      emptyTitle: 'Aucun rapport',
+      errorDescription: 'Impossible de charger vos rapports. Vérifiez votre connexion et réessayez.',
+      errorTitle: 'Impossible de charger les rapports',
+      title: 'Rapports',
+    },
+    status: {
+      draft: 'Brouillon',
+      failed: 'Échec',
+      processing: 'En traitement',
+      ready: 'Prêt',
+    },
+    validation: {
+      notesMax: 'Les notes ne doivent pas dépasser 50 000 caractères.',
+      titleMax: 'Le titre ne doit pas dépasser 120 caractères.',
+      titleRequired: 'Le titre est obligatoire.',
+    },
   },
   languages: {
     english: 'Anglais',

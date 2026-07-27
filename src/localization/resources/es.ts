@@ -107,6 +107,7 @@ export const es: TranslationResources = {
     },
   },
   common: {
+    back: 'Atrás',
     cancel: 'Cancelar',
     close: 'Cerrar',
     continue: 'Continuar',
@@ -131,6 +132,70 @@ export const es: TranslationResources = {
     premiumActive: 'Activo',
     premiumInactive: 'Inactivo',
     title: 'Inicio',
+  },
+  reports: {
+    card: {
+      created: 'Creado el {{date}}',
+      updated: 'Actualizado el {{date}}',
+    },
+    create: {
+      action: 'Crear informe',
+      success: 'Informe creado.',
+      title: 'Crear informe',
+    },
+    delete: {
+      action: 'Eliminar informe',
+      alreadyDeleted: 'Este informe ya se ha eliminado.',
+      confirmation: 'Esta acción no se puede deshacer. El informe se eliminará permanentemente.',
+      success: 'Informe eliminado.',
+      title: '¿Eliminar informe?',
+    },
+    details: {
+      createdAt: 'Creado',
+      errorDescription: 'No se pudo cargar este informe. Inténtalo de nuevo.',
+      errorTitle: 'No se pudo cargar el informe',
+      noNotes: 'Sin notas',
+      notFoundDescription: 'Es posible que este informe se haya eliminado o ya no esté disponible.',
+      notFoundTitle: 'Informe no encontrado',
+      title: 'Detalles del informe',
+      updatedAt: 'Actualizado',
+    },
+    edit: {
+      action: 'Editar informe',
+      success: 'Informe actualizado.',
+      title: 'Editar informe',
+    },
+    errors: {
+      network: 'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
+      notFound: 'No se encontró el informe.',
+      server: 'El servidor no está disponible temporalmente. Inténtalo más tarde.',
+      timeout: 'La solicitud agotó el tiempo de espera. Inténtalo de nuevo.',
+      validation: 'Comprueba los datos del informe e inténtalo de nuevo.',
+    },
+    form: {
+      notes: 'Notas',
+      notesPlaceholder: 'Añade información útil',
+      title: 'Título',
+      titlePlaceholder: 'Título del informe',
+    },
+    list: {
+      emptyDescription: 'Crea tu primer informe para guardar su progreso y sus notas en un solo lugar.',
+      emptyTitle: 'Aún no hay informes',
+      errorDescription: 'No se pudieron cargar tus informes. Comprueba la conexión e inténtalo de nuevo.',
+      errorTitle: 'No se pudieron cargar los informes',
+      title: 'Informes',
+    },
+    status: {
+      draft: 'Borrador',
+      failed: 'Fallido',
+      processing: 'Procesando',
+      ready: 'Listo',
+    },
+    validation: {
+      notesMax: 'Las notas no pueden superar los 50.000 caracteres.',
+      titleMax: 'El título no puede superar los 120 caracteres.',
+      titleRequired: 'El título es obligatorio.',
+    },
   },
   languages: {
     english: 'Inglés',
