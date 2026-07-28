@@ -4,23 +4,23 @@ import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
 import type { IReport } from '@/entities/report/types/report';
-import { queryClient } from '@/libs/query/QueryClient';
-import { useReportsListQuery } from '@/modules/reports/presenters/reportQueries';
+import {
+  refreshReportsFirstPage,
+  useReportsListQuery,
+} from '@/modules/reports/presenters/reportQueries';
 import { useReportsListViewPresenter } from '@/modules/reports/ui/ReportsListView/presenters/useReportsListViewPresenter';
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
 }));
 jest.mock('@/modules/reports/presenters/reportQueries', () => ({
-  REPORTS_PAGE_LIMIT: 20,
+  refreshReportsFirstPage: jest.fn(),
   useReportsListQuery: jest.fn(),
 }));
-jest.mock('@/modules/home/ui/HomeView/presenters/useHomeViewPresenter', () => ({
-  useHomeViewPresenter: () => ({
-    isLoading: false,
-    onLogout: jest.fn(),
-    user: null,
-  }),
+jest.mock('@/libs/toast/toastService', () => ({
+  toastService: {
+    showError: jest.fn(),
+  },
 }));
 
 const t = ((key: string) => key) as unknown as TFunction;
@@ -67,6 +67,17 @@ describe('useReportsListViewPresenter', () => {
     jest.clearAllMocks();
     presenter = undefined;
     jest.mocked(useNavigation).mockReturnValue(navigation as never);
+    jest.mocked(refreshReportsFirstPage).mockResolvedValue({
+      data: {
+        data: [report],
+        limit: 20,
+        page: 1,
+        total: 1,
+        totalPages: 1,
+      },
+      isError: false,
+      message: '',
+    });
     mockQuery();
   });
 
@@ -154,9 +165,7 @@ describe('useReportsListViewPresenter', () => {
     expect(refetch).toHaveBeenCalledTimes(1);
   });
 
-  it('resets infinite pagination to page one on refresh', async () => {
-    const resetQueries = jest.spyOn(queryClient, 'resetQueries').mockResolvedValue();
-
+  it('keeps cached data while refreshing only the first page', async () => {
     await ReactTestRenderer.act(async () => {
       renderer = ReactTestRenderer.create(<Harness />);
     });
@@ -165,10 +174,6 @@ describe('useReportsListViewPresenter', () => {
       await presenter?.onRefresh();
     });
 
-    expect(resetQueries).toHaveBeenCalledWith({
-      exact: true,
-      queryKey: ['reports', 'list', { limit: 20 }],
-    });
-    resetQueries.mockRestore();
+    expect(refreshReportsFirstPage).toHaveBeenCalledTimes(1);
   });
 });

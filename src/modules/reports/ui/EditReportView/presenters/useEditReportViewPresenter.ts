@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { TFunction } from 'i18next';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
@@ -15,11 +16,14 @@ import {
   useUpdateReportMutation,
 } from '@/modules/reports/presenters/reportQueries';
 
-import type { IPresenterInput } from '../types';
-
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'EditReport'>;
 
-export const useEditReportViewPresenter = ({ reportId, t }: IPresenterInput) => {
+interface IInput {
+  reportId: string;
+  t: TFunction;
+}
+
+export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
   const navigation = useNavigation<Navigation>();
   const reportQuery = useReportDetailsQuery(reportId);
   const mutation = useUpdateReportMutation(reportId);
@@ -49,10 +53,6 @@ export const useEditReportViewPresenter = ({ reportId, t }: IPresenterInput) => 
     setNotes(value);
     setErrors((current) => ({ ...current, notes: undefined }));
   }, []);
-
-  const onBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
 
   const onRetry = useCallback(async () => {
     await reportQuery.refetch();
@@ -113,7 +113,6 @@ export const useEditReportViewPresenter = ({ reportId, t }: IPresenterInput) => 
     isLoading: reportQuery.isPending,
     isSubmitting: mutation.isPending,
     notes,
-    onBack,
     onChangeNotes,
     onChangeTitle,
     onRetry,

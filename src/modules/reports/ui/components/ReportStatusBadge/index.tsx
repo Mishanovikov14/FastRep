@@ -6,7 +6,10 @@ import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getStyles } from './styles';
-import type { IProps } from './types';
+
+interface IProps {
+  status: ReportStatus;
+}
 
 const statusTranslationKeys: Record<ReportStatus, string> = {
   DRAFT: 'reports.status.draft',

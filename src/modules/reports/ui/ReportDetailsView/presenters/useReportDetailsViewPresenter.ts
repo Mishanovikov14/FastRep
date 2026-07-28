@@ -1,25 +1,43 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useCallback, useState } from 'react';
+import type { TFunction } from 'i18next';
+import { useCallback, useMemo } from 'react';
 
 import { ReportRequestError } from '@/entities/report/model/ReportRequestError';
+import type { SupportedLanguage } from '@/localization/types';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
 import {
+  removeReportDetailsCache,
   useDeleteReportMutation,
   useReportDetailsQuery,
 } from '@/modules/reports/presenters/reportQueries';
 import { getReportErrorMessage } from '@/modules/reports/presenters/reportErrors';
-
-import type { IPresenterInput } from '../types';
+import { useCustomAlert } from '@/UIKit/CustomAlert/presenters/useCustomAlert';
+import type { ICustomAlertAction } from '@/UIKit/CustomAlert/types';
+import { formatLocalizedDate } from '@/utils/formatLocalizedDate';
 
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'ReportDetails'>;
 
-export const useReportDetailsViewPresenter = ({ reportId, t }: IPresenterInput) => {
+interface IInput {
+  language: SupportedLanguage;
+  reportId: string;
+  t: TFunction;
+}
+
+export const useReportDetailsViewPresenter = ({
+  language,
+  reportId,
+  t,
+}: IInput) => {
   const navigation = useNavigation<Navigation>();
   const query = useReportDetailsQuery(reportId);
   const deleteMutation = useDeleteReportMutation(reportId);
-  const [isDeleteConfirmationVisible, setIsDeleteConfirmationVisible] = useState(false);
+  const {
+    isVisible: isDeleteConfirmationVisible,
+    onHide: onHideDeleteAlert,
+    onShow: onShowDeleteAlert,
+  } = useCustomAlert();
 
   const onBack = useCallback(() => {
     navigation.goBack();
@@ -38,14 +56,14 @@ export const useReportDetailsViewPresenter = ({ reportId, t }: IPresenterInput) 
   }, [query]);
 
   const onShowDeleteConfirmation = useCallback(() => {
-    setIsDeleteConfirmationVisible(true);
-  }, []);
+    onShowDeleteAlert();
+  }, [onShowDeleteAlert]);
 
   const onHideDeleteConfirmation = useCallback(() => {
     if (!deleteMutation.isPending) {
-      setIsDeleteConfirmationVisible(false);
+      onHideDeleteAlert();
     }
-  }, [deleteMutation.isPending]);
+  }, [deleteMutation.isPending, onHideDeleteAlert]);
 
   const onDelete = useCallback(async () => {
     if (deleteMutation.isPending) {
@@ -63,14 +81,15 @@ export const useReportDetailsViewPresenter = ({ reportId, t }: IPresenterInput) 
         return;
       }
 
-      setIsDeleteConfirmationVisible(false);
+      onHideDeleteAlert();
       toastService.showSuccess(
         String(t('common.success')),
         String(
           t(response.status === 404 ? 'reports.delete.alreadyDeleted' : 'reports.delete.success'),
         ),
       );
-      navigation.popTo('ReportsList');
+      navigation.popTo('Tabs', { screen: 'Reports' });
+      removeReportDetailsCache(reportId);
     } catch (error: unknown) {
       console.error('Unexpected report deletion failure', error);
       toastService.showError(
@@ -78,12 +97,52 @@ export const useReportDetailsViewPresenter = ({ reportId, t }: IPresenterInput) 
         String(t('common.somethingWentWrong')),
       );
     }
-  }, [deleteMutation, navigation, t]);
+  }, [deleteMutation, navigation, onHideDeleteAlert, reportId, t]);
 
   const isNotFound =
     query.error instanceof ReportRequestError && query.error.status === 404;
+  const deleteActions = useMemo<ICustomAlertAction[]>(
+    () => [
+      {
+        disabled: deleteMutation.isPending,
+        key: 'cancel',
+        onPress: onHideDeleteConfirmation,
+        title: String(t('common.cancel')),
+        variant: 'secondary',
+      },
+      {
+        key: 'delete',
+        loading: deleteMutation.isPending,
+        onPress: onDelete,
+        title: String(t('reports.delete.action')),
+        variant: 'danger',
+      },
+    ],
+    [
+      deleteMutation.isPending,
+      onDelete,
+      onHideDeleteConfirmation,
+      t,
+    ],
+  );
+  const createdAtLabel = useMemo(
+    () =>
+      query.data
+        ? formatLocalizedDate(query.data.createdAt, language)
+        : undefined,
+    [language, query.data],
+  );
+  const updatedAtLabel = useMemo(
+    () =>
+      query.data
+        ? formatLocalizedDate(query.data.updatedAt, language)
+        : undefined,
+    [language, query.data],
+  );
 
   return {
+    createdAtLabel,
+    deleteActions,
     isDeleteConfirmationVisible,
     isDeleting: deleteMutation.isPending,
     isError: query.isError && !isNotFound,
@@ -98,5 +157,6 @@ export const useReportDetailsViewPresenter = ({ reportId, t }: IPresenterInput) 
     onRetry,
     onShowDeleteConfirmation,
     report: query.data,
+    updatedAtLabel,
   };
 };

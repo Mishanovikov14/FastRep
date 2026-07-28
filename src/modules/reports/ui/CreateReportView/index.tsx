@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { ReportForm } from '@/modules/reports/ui/components/ReportForm';
-import { ReportsHeader } from '@/modules/reports/ui/components/ReportsHeader';
+import { Header } from '@/UIKit/Header';
 import { ScreenContainer } from '@/UIKit/ScreenContainer';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
@@ -15,7 +15,6 @@ export const CreateReportView = () => {
     errors,
     isSubmitting,
     notes,
-    onBack,
     onChangeNotes,
     onChangeTitle,
     onSubmit,
@@ -25,8 +24,9 @@ export const CreateReportView = () => {
   return (
     <ScreenContainer
       contentContainerStyle={styles.content}
+      edges={['bottom']}
       headerComponent={
-        <ReportsHeader onBack={onBack} title={String(t('reports.create.title'))} />
+        <Header showBackButton title={String(t('reports.create.title'))} />
       }
       isKeyboardAvoiding
       scrollEnabled

@@ -85,6 +85,49 @@ ReportDetailsView/useReportDetailsViewPresenter.ts
 Only query hooks, mutation hooks, and orchestration genuinely shared by
 multiple screens may live in a clearly shared module or entity location.
 
+All meaningful component behavior belongs in that presenter, including
+navigation and fallback navigation, event handlers, `useCallback` callbacks,
+press-state style functions, state orchestration, effects, data
+transformation, validation, and behavior-derived values.
+
+Keep `index.tsx` focused on JSX, directly used theme/context values,
+`useMemo(getStyles(...))`, prop forwarding, simple conditional rendering,
+`keyExtractor`, and only tiny library-required callbacks whose extraction would
+reduce readability.
+
+Good:
+
+```tsx
+const { getBackButtonStyle, onPressBack } = useHeaderPresenter({
+  backButtonPressedStyle: styles.backButtonPressed,
+  backButtonStyle: styles.backButton,
+  onBackPress,
+});
+
+return <Pressable onPress={onPressBack} style={getBackButtonStyle} />;
+```
+
+Bad:
+
+```tsx
+const onPressBack = useCallback(() => {
+  onBackPress ? onBackPress() : navigation.goBack();
+}, [navigation, onBackPress]);
+
+const getBackButtonStyle = useCallback(
+  ({ pressed }) => [styles.backButton, pressed && styles.backButtonPressed],
+  [styles],
+);
+```
+
+Presenter inputs should be minimal. Pass the two required style values for a
+pressed-state callback, not the complete styles object. Presenters do not
+return JSX, theme objects, or unused component internals.
+
+Do not create fake presenters that only return props or move a trivial line.
+Visual-only components stay presenter-free; components and screens with real
+behavior require presenters.
+
 ## UI placement
 
 Keep a one-screen component under that screen:

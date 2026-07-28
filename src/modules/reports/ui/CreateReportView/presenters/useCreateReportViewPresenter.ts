@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { TFunction } from 'i18next';
 import { useCallback, useRef, useState } from 'react';
 
 import {
@@ -12,11 +13,13 @@ import type { AppStackParamList } from '@/navigation/types';
 import { getReportErrorMessage, getReportFieldErrors } from '@/modules/reports/presenters/reportErrors';
 import { useCreateReportMutation } from '@/modules/reports/presenters/reportQueries';
 
-import type { IPresenterInput } from '../types';
-
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'CreateReport'>;
 
-export const useCreateReportViewPresenter = ({ t }: IPresenterInput) => {
+interface IInput {
+  t: TFunction;
+}
+
+export const useCreateReportViewPresenter = ({ t }: IInput) => {
   const navigation = useNavigation<Navigation>();
   const mutation = useCreateReportMutation();
   const isSubmittingRef = useRef(false);
@@ -33,10 +36,6 @@ export const useCreateReportViewPresenter = ({ t }: IPresenterInput) => {
     setNotes(value);
     setErrors((current) => ({ ...current, notes: undefined }));
   }, []);
-
-  const onBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
 
   const onSubmit = useCallback(async () => {
     if (isSubmittingRef.current) {
@@ -91,7 +90,6 @@ export const useCreateReportViewPresenter = ({ t }: IPresenterInput) => {
     errors,
     isSubmitting: mutation.isPending,
     notes,
-    onBack,
     onChangeNotes,
     onChangeTitle,
     onSubmit,
