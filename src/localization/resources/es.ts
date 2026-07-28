@@ -121,17 +121,11 @@ export const es: TranslationResources = {
     success: 'Éxito',
     yes: 'Sí',
   },
-  home: {
-    email: 'Correo electrónico',
-    fullName: 'Nombre completo',
-    language: 'Idioma',
+  profile: {
     logout: 'Cerrar sesión',
     logoutError:
       'Has cerrado sesión en este dispositivo, pero no se pudo notificar al servidor.',
-    premium: 'Premium',
-    premiumActive: 'Activo',
-    premiumInactive: 'Inactivo',
-    title: 'Inicio',
+    title: 'Perfil',
   },
   reports: {
     card: {

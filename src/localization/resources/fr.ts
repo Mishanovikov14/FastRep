@@ -122,17 +122,11 @@ export const fr: TranslationResources = {
     success: 'Succès',
     yes: 'Oui',
   },
-  home: {
-    email: 'E-mail',
-    fullName: 'Nom complet',
-    language: 'Langue',
+  profile: {
     logout: 'Se déconnecter',
     logoutError:
       "Vous avez été déconnecté sur cet appareil, mais le serveur n'a pas pu être averti.",
-    premium: 'Premium',
-    premiumActive: 'Actif',
-    premiumInactive: 'Inactif',
-    title: 'Accueil',
+    title: 'Profil',
   },
   reports: {
     card: {

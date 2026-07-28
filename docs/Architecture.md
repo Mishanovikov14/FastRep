@@ -59,6 +59,15 @@ ReportDetailsView/
 Do not put that presenter in `modules/reports/presenters/`, directly beside
 `index.tsx`, or in another generic presenter folder.
 
+The owner presenter contains meaningful presentation behavior: navigation,
+event handling, effects, local state orchestration, data transformation,
+behavioral derivation, and query or mutation coordination. The owner's
+`index.tsx` remains focused on rendering, theme values used directly by JSX,
+styles, prop forwarding, and simple conditional UI.
+
+A purely visual component remains presenter-free. Do not create a presenter
+that only echoes props or hides a trivial expression.
+
 Shared React Query hooks, mutation hooks, or orchestration used by multiple
 screens are different: they may live in a clearly shared reports module
 location. Reusable domain behavior belongs in `entities/reports`; it must not

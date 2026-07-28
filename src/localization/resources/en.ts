@@ -118,17 +118,11 @@ export const en: TranslationResources = {
     success: 'Success',
     yes: 'Yes',
   },
-  home: {
-    email: 'Email',
-    fullName: 'Full name',
-    language: 'Language',
+  profile: {
     logout: 'Log out',
     logoutError:
       "You were logged out on this device, but we couldn't notify the server.",
-    premium: 'Premium',
-    premiumActive: 'Active',
-    premiumInactive: 'Inactive',
-    title: 'Home',
+    title: 'Profile',
   },
   reports: {
     card: {

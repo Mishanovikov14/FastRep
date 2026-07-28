@@ -111,15 +111,9 @@ export interface TranslationResources {
     success: string;
     yes: string;
   };
-  home: {
-    email: string;
-    fullName: string;
-    language: string;
+  profile: {
     logout: string;
     logoutError: string;
-    premium: string;
-    premiumActive: string;
-    premiumInactive: string;
     title: string;
   };
   reports: {

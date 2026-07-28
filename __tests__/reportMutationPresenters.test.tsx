@@ -7,6 +7,7 @@ import { ReportRequestError } from '@/entities/report/model/ReportRequestError';
 import type { IReport } from '@/entities/report/types/report';
 import { toastService } from '@/libs/toast/toastService';
 import {
+  removeReportDetailsCache,
   useCreateReportMutation,
   useDeleteReportMutation,
   useReportDetailsQuery,
@@ -20,6 +21,7 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
 }));
 jest.mock('@/modules/reports/presenters/reportQueries', () => ({
+  removeReportDetailsCache: jest.fn(),
   useCreateReportMutation: jest.fn(),
   useDeleteReportMutation: jest.fn(),
   useReportDetailsQuery: jest.fn(),
@@ -30,6 +32,9 @@ jest.mock('@/libs/toast/toastService', () => ({
     showError: jest.fn(),
     showSuccess: jest.fn(),
   },
+}));
+jest.mock('@/utils/formatLocalizedDate', () => ({
+  formatLocalizedDate: jest.fn(() => '27 Jul 2026, 10:00'),
 }));
 
 const t = ((key: string) => key) as unknown as TFunction;
@@ -190,7 +195,11 @@ describe('report mutation presenters', () => {
     });
 
     const Harness = () => {
-      presenter = useReportDetailsViewPresenter({ reportId: report.id, t });
+      presenter = useReportDetailsViewPresenter({
+        language: 'en',
+        reportId: report.id,
+        t,
+      });
 
       return null;
     };
@@ -207,7 +216,10 @@ describe('report mutation presenters', () => {
     });
 
     expect(deleteMutate).toHaveBeenCalledTimes(1);
-    expect(navigation.popTo).toHaveBeenCalledWith('ReportsList');
+    expect(navigation.popTo).toHaveBeenCalledWith('Tabs', {
+      screen: 'Reports',
+    });
+    expect(removeReportDetailsCache).toHaveBeenCalledWith('report-1');
     expect(toastService.showSuccess).toHaveBeenCalledWith(
       'common.success',
       'reports.delete.success',
@@ -230,7 +242,11 @@ describe('report mutation presenters', () => {
     } as never);
 
     const Harness = () => {
-      presenter = useReportDetailsViewPresenter({ reportId: report.id, t });
+      presenter = useReportDetailsViewPresenter({
+        language: 'en',
+        reportId: report.id,
+        t,
+      });
 
       return null;
     };

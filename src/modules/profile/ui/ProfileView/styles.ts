@@ -5,16 +5,15 @@ import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (spacing: Spacing) => {
   const styles = StyleSheet.create({
-    header: {
-      alignItems: 'center',
-      flexDirection: 'row',
-      gap: scaleHorizontal(spacing.sm),
-      paddingBottom: scaleVertical(spacing.md),
-      paddingHorizontal: scaleHorizontal(spacing.lg),
-      paddingTop: scaleVertical(spacing.md),
+    button: {
+      alignSelf: 'center',
+      maxWidth: 520,
+      width: '100%',
     },
-    title: {
-      flex: 1,
+    content: {
+      justifyContent: 'center',
+      paddingHorizontal: scaleHorizontal(spacing.lg),
+      paddingVertical: scaleVertical(spacing.xl),
     },
   });
 

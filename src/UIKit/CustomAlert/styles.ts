@@ -7,6 +7,7 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
   const styles = StyleSheet.create({
     actions: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       gap: scaleHorizontal(spacing.sm),
       justifyContent: 'flex-end',
     },
@@ -26,7 +27,7 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       marginHorizontal: scaleHorizontal(spacing.lg),
       maxWidth: 520,
       padding: scaleHorizontal(spacing.xl),
-      width: '100%',
+      width: '90%',
     },
     container: {
       alignItems: 'center',

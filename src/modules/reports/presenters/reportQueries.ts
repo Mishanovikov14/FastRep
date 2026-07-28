@@ -79,19 +79,29 @@ const prependReportToList = (
   }
 
   const firstPage = data.pages[0];
-  const nextTotal = firstPage.total + 1;
+  const existingReports = data.pages.flatMap((page) => page.data);
+  const alreadyContainsReport = existingReports.some((item) => item.id === report.id);
+  const nextReports = [
+    report,
+    ...existingReports.filter((item) => item.id !== report.id),
+  ];
+  const nextTotal = firstPage.total + (alreadyContainsReport ? 0 : 1);
+  let pageOffset = 0;
 
   return {
     ...data,
-    pages: data.pages.map((page, index) => ({
-      ...page,
-      data:
-        index === 0
-          ? [report, ...page.data.filter((item) => item.id !== report.id)].slice(0, page.limit)
-          : page.data.filter((item) => item.id !== report.id),
-      total: nextTotal,
-      totalPages: Math.ceil(nextTotal / page.limit),
-    })),
+    pages: data.pages.map((page) => {
+      const pageData = nextReports.slice(pageOffset, pageOffset + page.limit);
+
+      pageOffset += page.limit;
+
+      return {
+        ...page,
+        data: pageData,
+        total: nextTotal,
+        totalPages: Math.ceil(nextTotal / page.limit),
+      };
+    }),
   };
 };
 
@@ -112,15 +122,25 @@ const removeReportFromList = (
   }
 
   const nextTotal = Math.max(0, data.pages[0].total - 1);
+  const nextReports = data.pages
+    .flatMap((page) => page.data)
+    .filter((report) => report.id !== reportId);
+  let pageOffset = 0;
 
   return {
     ...data,
-    pages: data.pages.map((page) => ({
-      ...page,
-      data: page.data.filter((report) => report.id !== reportId),
-      total: nextTotal,
-      totalPages: Math.ceil(nextTotal / page.limit),
-    })),
+    pages: data.pages.map((page) => {
+      const pageData = nextReports.slice(pageOffset, pageOffset + page.limit);
+
+      pageOffset += page.limit;
+
+      return {
+        ...page,
+        data: pageData,
+        total: nextTotal,
+        totalPages: Math.ceil(nextTotal / page.limit),
+      };
+    }),
   };
 };
 
@@ -174,14 +194,17 @@ export const useReportDetailsQuery = (reportId: string) => {
 export const useCreateReportMutation = () => {
   return useMutation({
     mutationFn: (request: ICreateReportRequest) => createReport(request),
-    onSuccess: async (response) => {
+    onSuccess: (response) => {
       if (response.isError || !response.data) {
         return;
       }
 
       queryClient.setQueryData(reportsQueryKeys.detail(response.data.id), response.data);
       setReportAcrossLists((data) => prependReportToList(data, response.data as IReport));
-      await queryClient.invalidateQueries({ queryKey: reportsQueryKeys.lists() });
+      void queryClient.invalidateQueries({
+        queryKey: reportsQueryKeys.lists(),
+        refetchType: 'none',
+      });
     },
   });
 };
@@ -189,17 +212,21 @@ export const useCreateReportMutation = () => {
 export const useUpdateReportMutation = (reportId: string) => {
   return useMutation({
     mutationFn: (request: IUpdateReportRequest) => updateReport(reportId, request),
-    onSuccess: async (response) => {
+    onSuccess: (response) => {
       if (response.isError || !response.data) {
         return;
       }
 
       queryClient.setQueryData(reportsQueryKeys.detail(reportId), response.data);
       setReportAcrossLists((data) => updateReportInList(data, response.data as IReport));
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: reportsQueryKeys.detail(reportId) }),
-        queryClient.invalidateQueries({ queryKey: reportsQueryKeys.lists() }),
-      ]);
+      void queryClient.invalidateQueries({
+        queryKey: reportsQueryKeys.detail(reportId),
+        refetchType: 'none',
+      });
+      void queryClient.invalidateQueries({
+        queryKey: reportsQueryKeys.lists(),
+        refetchType: 'none',
+      });
     },
   });
 };
@@ -207,14 +234,44 @@ export const useUpdateReportMutation = (reportId: string) => {
 export const useDeleteReportMutation = (reportId: string) => {
   return useMutation({
     mutationFn: () => deleteReport(reportId),
-    onSuccess: async (response) => {
+    onSuccess: (response) => {
       if (response.isError && response.status !== 404) {
         return;
       }
 
-      queryClient.removeQueries({ queryKey: reportsQueryKeys.detail(reportId) });
       setReportAcrossLists((data) => removeReportFromList(data, reportId));
-      await queryClient.invalidateQueries({ queryKey: reportsQueryKeys.lists() });
+      void queryClient.invalidateQueries({
+        queryKey: reportsQueryKeys.lists(),
+        refetchType: 'none',
+      });
     },
+  });
+};
+
+export const refreshReportsFirstPage = async (): Promise<
+  IResponse<IPaginatedReports>
+> => {
+  const response = await getReports({
+    limit: REPORTS_PAGE_LIMIT,
+    page: 1,
+  });
+
+  if (!response.isError && response.data) {
+    queryClient.setQueryData<InfiniteData<IPaginatedReports>>(
+      reportsQueryKeys.list(REPORTS_PAGE_LIMIT),
+      {
+        pageParams: [1],
+        pages: [response.data],
+      },
+    );
+  }
+
+  return response;
+};
+
+export const removeReportDetailsCache = (reportId: string): void => {
+  queryClient.removeQueries({
+    exact: true,
+    queryKey: reportsQueryKeys.detail(reportId),
   });
 };

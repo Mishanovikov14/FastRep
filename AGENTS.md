@@ -195,11 +195,23 @@ Only deliberate top-level library APIs may keep a barrel. Do not create `src/UIK
 
 ## 6. UI components must stay clean
 
-UI components may render JSX, use `useUiContext`, create theme-dependent styles with `useMemo`, define `keyExtractor`, and contain callbacks required by library APIs.
+UI components may render JSX, use `useUiContext`, create theme-dependent styles
+with `useMemo`, forward props, render simple conditions, define `keyExtractor`,
+and contain very small callbacks required by library APIs when extraction would
+reduce readability.
 
 UI components must not contain API calls, business logic, storage access, token logic, request error handling, complex calculations, data transformation pipelines, Reanimated calculations, or temporary test logic.
 
-Move behavior into presenters or focused hooks.
+All meaningful component behavior belongs in the owning component's presenter.
+Move navigation and fallback navigation, event handlers, `useCallback`
+callbacks, press-state style functions, local state orchestration, effects,
+derived behavioral values, library interaction, behavior-derived accessibility
+values, data transformation, validation, and query or mutation orchestration
+out of `index.tsx`.
+
+A visual-only component does not need a presenter. Do not create a fake
+presenter that returns props unchanged or moves one trivial line. A presenter
+is required when a component or screen contains real behavior or orchestration.
 
 ### Component ownership
 
@@ -235,7 +247,12 @@ entity dependencies, or a generic icon registry.
 
 Presenters may contain handlers, coordinate entity APIs and entity models, use React Query, Zustand, navigation, validation orchestration, derived state, effects, request error handling, and Reanimated shared values/styles.
 
-Presenters must not contain JSX, styles, theme colors, `useUiContext`, `keyExtractor`, or render functions.
+Presenters must not contain JSX, `useUiContext`, `keyExtractor`, or render
+functions. Inputs and outputs must be minimal and explicit. Do not pass an
+entire styles or theme object when the presenter needs only one or two values.
+A presenter may accept specific style values to build a library-required
+pressed-state callback, but it must not own visual styling or return raw theme
+objects or colors unless strictly necessary.
 Reusable domain, token, and session logic belongs in the relevant entity rather than in presenters.
 
 If a screen or component owns a presenter, it must be nested in that owner's
@@ -254,6 +271,21 @@ screens may live in a clearly shared module or entity location.
 
 Good: `ReportDetailsView/presenters/useReportDetailsViewPresenter.ts`.
 Bad: `modules/reports/presenters/useReportDetailsViewPresenter.ts`.
+
+Good:
+
+```tsx
+const { getBackButtonStyle, onPressBack } = useHeaderPresenter({
+  backButtonPressedStyle: styles.backButtonPressed,
+  backButtonStyle: styles.backButton,
+  onBackPress,
+});
+
+return <Pressable onPress={onPressBack} style={getBackButtonStyle} />;
+```
+
+Bad: keeping `navigation.goBack()`, a callback fallback chain, or a
+`useCallback` press-state style function inside `Header/index.tsx`.
 
 Use `on` naming, not `handle`.
 
@@ -406,7 +438,13 @@ During active development, make the requested code changes only. Run a full veri
 
 ## 16. Final checklist
 
-Confirm folder structure, entity boundaries, local props placement, presenter ownership, icon ownership, component reuse level, a single shared screen shell, separate styles, clean UI, named const components, no local barrels, no re-export chains, handled request errors, Keychain token storage, correct aliases/imports, and no unrelated changes. Confirm verification was run only when explicitly requested.
+Confirm folder structure, entity boundaries, local props placement, meaningful
+behavior in owning presenters, no fake presenters, minimal presenter inputs,
+icon ownership, component reuse level, a single shared screen shell, separate
+styles, clean UI, named const components, no local barrels, no re-export
+chains, handled request errors, Keychain token storage, correct aliases/imports,
+and no unrelated changes. Confirm verification was run only when explicitly
+requested.
 
 ---
 

@@ -118,17 +118,11 @@ export const uk: TranslationResources = {
     success: 'Успішно',
     yes: 'Так',
   },
-  home: {
-    email: 'Електронна пошта',
-    fullName: "Повне ім'я",
-    language: 'Мова',
+  profile: {
     logout: 'Вийти',
     logoutError:
       'Ви вийшли з облікового запису на цьому пристрої, але повідомити сервер не вдалося.',
-    premium: 'Преміум',
-    premiumActive: 'Активний',
-    premiumInactive: 'Неактивний',
-    title: 'Головна',
+    title: 'Профіль',
   },
   reports: {
     card: {

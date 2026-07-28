@@ -124,17 +124,11 @@ export const de: TranslationResources = {
     success: 'Erfolg',
     yes: 'Ja',
   },
-  home: {
-    email: 'E-Mail',
-    fullName: 'Vollständiger Name',
-    language: 'Sprache',
+  profile: {
     logout: 'Abmelden',
     logoutError:
       'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
-    premium: 'Premium',
-    premiumActive: 'Aktiv',
-    premiumInactive: 'Inaktiv',
-    title: 'Startseite',
+    title: 'Profil',
   },
   reports: {
     card: {
