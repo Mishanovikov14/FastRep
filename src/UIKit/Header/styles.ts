@@ -6,11 +6,7 @@ import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 const HEADER_CONTENT_HEIGHT = 56;
 const SIDE_SLOT_WIDTH = 64;
 
-export const getStyles = (
-  colors: Colors,
-  spacing: Spacing,
-  topInset: number,
-) => {
+export const getStyles = (colors: Colors, spacing: Spacing, topInset: number) => {
   const styles = StyleSheet.create({
     backButton: {
       alignItems: 'center',

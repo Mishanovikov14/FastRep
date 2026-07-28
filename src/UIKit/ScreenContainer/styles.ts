@@ -2,10 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import type { Colors } from '@/UIProvider/theme/types';
 
-export const getStyles = (
-  colors: Colors,
-  backgroundColor: string = colors.background,
-) => {
+export const getStyles = (colors: Colors, backgroundColor: string = colors.background) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,

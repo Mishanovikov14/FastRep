@@ -95,11 +95,7 @@ export const FoundationShowcaseView = () => {
       <View style={styles.surface}>
         <Typography variant="heading">Toast</Typography>
         <Button onPress={onPressShowSuccess} title={String(t('showcase.showSuccess'))} />
-        <Button
-          onPress={onPressShowError}
-          title={String(t('showcase.showError'))}
-          variant="danger"
-        />
+        <Button onPress={onPressShowError} title={String(t('showcase.showError'))} variant="danger" />
         <Button onPress={onPressShowInfo} title={String(t('common.info'))} variant="secondary" />
       </View>
 
@@ -127,8 +123,8 @@ export const FoundationShowcaseView = () => {
         </Typography>
         <Typography>{apiUrl}</Typography>
         <Typography color={colors.textSecondary} variant="caption">
-          No public health endpoint is defined, so no product API request is sent from this
-          showcase. Request normalization and headers are covered by unit tests.
+          No public health endpoint is defined, so no product API request is sent from this showcase. Request
+          normalization and headers are covered by unit tests.
         </Typography>
       </View>
     </ScreenContainer>

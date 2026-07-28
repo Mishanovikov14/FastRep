@@ -11,9 +11,7 @@ export const clearUserSession = async (): Promise<void> => {
   }
 };
 
-export const clearUserSessionIfCurrent = async (
-  snapshot: ITokenSnapshot,
-): Promise<boolean> => {
+export const clearUserSessionIfCurrent = async (snapshot: ITokenSnapshot): Promise<boolean> => {
   let wasCleared: boolean;
 
   try {

@@ -8,9 +8,7 @@ import type {
 import type { IResponse } from '@/libs/requester/IResponse';
 import { requester } from '@/libs/requester/requester';
 
-export const createReport = (
-  request: ICreateReportRequest,
-): Promise<IResponse<IReport>> => {
+export const createReport = (request: ICreateReportRequest): Promise<IResponse<IReport>> => {
   return requester.request<IReport>({
     data: request,
     method: 'POST',
@@ -18,10 +16,7 @@ export const createReport = (
   });
 };
 
-export const getReports = ({
-  limit,
-  page,
-}: IReportsListRequest): Promise<IResponse<IPaginatedReports>> => {
+export const getReports = ({ limit, page }: IReportsListRequest): Promise<IResponse<IPaginatedReports>> => {
   return requester.request<IPaginatedReports>({
     method: 'GET',
     params: {
@@ -39,10 +34,7 @@ export const getReportById = (id: string): Promise<IResponse<IReport>> => {
   });
 };
 
-export const updateReport = (
-  id: string,
-  request: IUpdateReportRequest,
-): Promise<IResponse<IReport>> => {
+export const updateReport = (id: string, request: IUpdateReportRequest): Promise<IResponse<IReport>> => {
   const data: IUpdateReportRequest = {
     ...(request.notes !== undefined ? { notes: request.notes } : {}),
     ...(request.title !== undefined ? { title: request.title } : {}),

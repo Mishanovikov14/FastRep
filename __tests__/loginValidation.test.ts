@@ -1,17 +1,11 @@
 import type { TFunction } from 'i18next';
 
-import {
-  normalizeLoginRequest,
-  validateLogin,
-} from '@/modules/auth/ui/LoginView/presenters/loginValidation';
+import { normalizeLoginRequest, validateLogin } from '@/modules/auth/ui/LoginView/presenters/loginValidation';
 import type { LoginFormValues } from '@/modules/auth/ui/LoginView/types';
 
 const t = ((key: string) => key) as unknown as TFunction;
 
-const getFieldError = (
-  values: LoginFormValues,
-  field: keyof LoginFormValues,
-): string | undefined => {
+const getFieldError = (values: LoginFormValues, field: keyof LoginFormValues): string | undefined => {
   return validateLogin(values, t)[field];
 };
 
@@ -41,9 +35,9 @@ describe('login validation', () => {
     expect(getFieldError({ email: 'alex@example.com', password: 'short' }, 'password')).toBe(
       'auth.login.validation.passwordMin',
     );
-    expect(
-      getFieldError({ email: 'alex@example.com', password: 'a'.repeat(129) }, 'password'),
-    ).toBe('auth.login.validation.passwordMax');
+    expect(getFieldError({ email: 'alex@example.com', password: 'a'.repeat(129) }, 'password')).toBe(
+      'auth.login.validation.passwordMax',
+    );
   });
 
   it('accepts valid values at the password boundaries', () => {

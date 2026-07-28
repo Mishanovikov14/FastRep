@@ -7,10 +7,7 @@ import type { ForgotPasswordFormErrors, ForgotPasswordFormValues } from '../type
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_EMAIL_LENGTH = 254;
 
-export const validateForgotPassword = (
-  values: ForgotPasswordFormValues,
-  t: TFunction,
-): ForgotPasswordFormErrors => {
+export const validateForgotPassword = (values: ForgotPasswordFormValues, t: TFunction): ForgotPasswordFormErrors => {
   const email = values.email.trim();
 
   if (!email) {
@@ -28,9 +25,7 @@ export const validateForgotPassword = (
   return {};
 };
 
-export const normalizeForgotPasswordRequest = (
-  values: ForgotPasswordFormValues,
-): IForgotPasswordRequest => {
+export const normalizeForgotPasswordRequest = (values: ForgotPasswordFormValues): IForgotPasswordRequest => {
   return {
     email: values.email.trim().toLowerCase(),
   };

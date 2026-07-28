@@ -25,9 +25,7 @@ const getTemporaryErrorMessage = (
   return String(t('auth.session.genericError'));
 };
 
-export const useSplashViewPresenter = ({
-  t,
-}: IPresenterInput): IUseSplashViewPresenterResult => {
+export const useSplashViewPresenter = ({ t }: IPresenterInput): IUseSplashViewPresenterResult => {
   const clearUser = useUserStore((state) => state.clearUser);
   const setSessionRestored = useUserStore((state) => state.setSessionRestored);
   const setUser = useUserStore((state) => state.setUser);

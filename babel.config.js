@@ -8,16 +8,7 @@ module.exports = {
         alias: {
           '@': './src',
         },
-        extensions: [
-          '.ios.ts',
-          '.android.ts',
-          '.ts',
-          '.ios.tsx',
-          '.android.tsx',
-          '.tsx',
-          '.js',
-          '.jsx',
-        ],
+        extensions: ['.ios.ts', '.android.ts', '.ts', '.ios.tsx', '.android.tsx', '.tsx', '.js', '.jsx'],
       },
     ],
     'react-native-worklets/plugin',

@@ -1,10 +1,7 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
-import {
-  REPORT_NOTES_MAX_LENGTH,
-  REPORT_TITLE_MAX_LENGTH,
-} from '@/entities/report/model/reportValidation';
+import { REPORT_NOTES_MAX_LENGTH, REPORT_TITLE_MAX_LENGTH } from '@/entities/report/model/reportValidation';
 import { Button } from '@/UIKit/Button';
 import { Input } from '@/UIKit/Input';
 import { useUIContext } from '@/UIProvider/useUIContext';
@@ -61,13 +58,7 @@ export const ReportForm = ({
         style={styles.notes}
         value={notes}
       />
-      <Button
-        disabled={isSubmitting}
-        fullWidth
-        loading={isSubmitting}
-        onPress={onSubmit}
-        title={submitTitle}
-      />
+      <Button disabled={isSubmitting} fullWidth loading={isSubmitting} onPress={onSubmit} title={submitTitle} />
     </View>
   );
 };

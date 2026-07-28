@@ -11,6 +11,12 @@ export interface IAuthenticationResponse extends ITokenPair {
   user: IUser;
 }
 
+export interface IRegistrationPendingResponse {
+  email: string;
+  resendAvailableInSeconds: number;
+  verificationRequired: true;
+}
+
 export interface ILoginRequest {
   email: string;
   password: string;
@@ -25,6 +31,15 @@ export interface IRegisterRequest {
   fullName: string;
   language: SupportedLanguage;
   password: string;
+}
+
+export interface IResendRegistrationCodeRequest {
+  email: string;
+}
+
+export interface IVerifyRegistrationRequest {
+  code: string;
+  email: string;
 }
 
 export interface IResetPasswordRequest {

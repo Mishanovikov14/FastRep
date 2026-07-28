@@ -13,24 +13,11 @@ import { getStyles } from './styles';
 export const ResetPasswordView = () => {
   const { colors, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
-  const {
-    confirmPassword,
-    errors,
-    isLoading,
-    onBack,
-    onChangeConfirmPassword,
-    onChangePassword,
-    onSubmit,
-    password,
-  } = useResetPasswordViewPresenter({ t });
+  const { confirmPassword, errors, isLoading, onBack, onChangeConfirmPassword, onChangePassword, onSubmit, password } =
+    useResetPasswordViewPresenter({ t });
 
   return (
-    <ScreenContainer
-      backgroundColor={colors.white}
-      edges={['top', 'bottom']}
-      isKeyboardAvoiding
-      scrollEnabled
-    >
+    <ScreenContainer backgroundColor={colors.white} edges={['top', 'bottom']} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"
@@ -87,12 +74,7 @@ export const ResetPasswordView = () => {
             size="large"
             title={String(t('auth.resetPassword.resetPassword'))}
           />
-          <Button
-            disabled={isLoading}
-            onPress={onBack}
-            title={String(t('auth.recovery.back'))}
-            variant="text"
-          />
+          <Button disabled={isLoading} onPress={onBack} title={String(t('auth.recovery.back'))} variant="text" />
         </View>
       </View>
     </ScreenContainer>

@@ -32,11 +32,7 @@ export const RegistrationView = () => {
   });
 
   return (
-    <ScreenContainer
-      backgroundColor={colors.white}
-      isKeyboardAvoiding
-      scrollEnabled
-    >
+    <ScreenContainer backgroundColor={colors.white} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"

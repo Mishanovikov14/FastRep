@@ -13,14 +13,10 @@ import { getStyles } from './styles';
 export const SplashView = () => {
   const { colors, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
-  const { errorMessage, hasTemporaryError, isLoading, onRetry } =
-    useSplashViewPresenter({ t });
+  const { errorMessage, hasTemporaryError, isLoading, onRetry } = useSplashViewPresenter({ t });
 
   return (
-    <ScreenContainer
-      backgroundColor={colors.white}
-      containerStyle={styles.content}
-    >
+    <ScreenContainer backgroundColor={colors.white} containerStyle={styles.content}>
       <Image
         accessibilityLabel="FastRep"
         resizeMode="contain"
@@ -35,12 +31,7 @@ export const SplashView = () => {
           </Typography>
         ) : null}
         {hasTemporaryError ? (
-          <Button
-            disabled={isLoading}
-            loading={isLoading}
-            onPress={onRetry}
-            title={String(t('common.retry'))}
-          />
+          <Button disabled={isLoading} loading={isLoading} onPress={onRetry} title={String(t('common.retry'))} />
         ) : null}
       </View>
     </ScreenContainer>

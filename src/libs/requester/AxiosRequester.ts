@@ -5,12 +5,7 @@ import { getUniqueId, getVersion } from 'react-native-device-info';
 
 import { i18n } from '@/localization/i18n';
 
-import type {
-  IRequestConfig,
-  IRequester,
-  IRequesterAuthState,
-  RequesterAuthCallbacks,
-} from './IRequester';
+import type { IRequestConfig, IRequester, IRequesterAuthState, RequesterAuthCallbacks } from './IRequester';
 import type { IResponse } from './IResponse';
 import { normalizeRequestError } from './RequestError';
 
@@ -20,13 +15,8 @@ const DEFAULT_AUTH_CALLBACKS: RequesterAuthCallbacks = {
   },
 };
 
-const isSameAuthState = (
-  left: IRequesterAuthState | null,
-  right: IRequesterAuthState,
-): boolean => {
-  return (
-    left?.accessToken === right.accessToken && left.version === right.version
-  );
+const isSameAuthState = (left: IRequesterAuthState | null, right: IRequesterAuthState): boolean => {
+  return left?.accessToken === right.accessToken && left.version === right.version;
 };
 
 export class AxiosRequester implements IRequester {
@@ -71,10 +61,7 @@ export class AxiosRequester implements IRequester {
         authStateForRequest = null;
       }
 
-      if (
-        requiredAuthState &&
-        !isSameAuthState(authStateForRequest, requiredAuthState)
-      ) {
+      if (requiredAuthState && !isSameAuthState(authStateForRequest, requiredAuthState)) {
         if (authFailureResponse) {
           return authFailureResponse;
         }
@@ -121,19 +108,13 @@ export class AxiosRequester implements IRequester {
       }
 
       try {
-        const refreshedAuthState =
-          await this.authCallbacks.refreshAuthState(authStateForRequest);
+        const refreshedAuthState = await this.authCallbacks.refreshAuthState(authStateForRequest);
 
         if (!refreshedAuthState) {
           return normalizedError;
         }
 
-        return this.performRequest<T>(
-          config,
-          true,
-          refreshedAuthState,
-          normalizedError,
-        );
+        return this.performRequest<T>(config, true, refreshedAuthState, normalizedError);
       } catch {
         return normalizedError;
       }

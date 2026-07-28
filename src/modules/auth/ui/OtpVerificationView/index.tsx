@@ -27,12 +27,7 @@ export const OtpVerificationView = () => {
   } = useOtpVerificationViewPresenter({ t });
 
   return (
-    <ScreenContainer
-      backgroundColor={colors.white}
-      edges={['top', 'bottom']}
-      isKeyboardAvoiding
-      scrollEnabled
-    >
+    <ScreenContainer backgroundColor={colors.white} edges={['top', 'bottom']} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"
@@ -82,12 +77,7 @@ export const OtpVerificationView = () => {
             title={resendLabel}
             variant="text"
           />
-          <Button
-            disabled={isResending}
-            onPress={onBack}
-            title={String(t('auth.recovery.back'))}
-            variant="text"
-          />
+          <Button disabled={isResending} onPress={onBack} title={String(t('auth.recovery.back'))} variant="text" />
         </View>
       </View>
     </ScreenContainer>

@@ -1,9 +1,4 @@
-import {
-  createReport,
-  deleteReport,
-  getReports,
-  updateReport,
-} from '@/entities/report/API/reportsApi';
+import { createReport, deleteReport, getReports, updateReport } from '@/entities/report/API/reportsApi';
 import { requester } from '@/libs/requester/requester';
 
 jest.mock('@/libs/requester/requester', () => ({
@@ -44,14 +39,11 @@ describe('reports API', () => {
   });
 
   it('never includes status in an update payload', async () => {
-    await updateReport(
-      'report-1',
-      {
-        notes: 'Updated notes',
-        status: 'READY',
-        title: 'Updated title',
-      } as never,
-    );
+    await updateReport('report-1', {
+      notes: 'Updated notes',
+      status: 'READY',
+      title: 'Updated title',
+    } as never);
 
     expect(requester.request).toHaveBeenCalledWith({
       data: {

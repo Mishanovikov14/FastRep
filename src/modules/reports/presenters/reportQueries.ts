@@ -1,17 +1,7 @@
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import type { InfiniteData } from '@tanstack/react-query';
 
-import {
-  createReport,
-  deleteReport,
-  getReportById,
-  getReports,
-  updateReport,
-} from '@/entities/report/API/reportsApi';
+import { createReport, deleteReport, getReportById, getReports, updateReport } from '@/entities/report/API/reportsApi';
 import { ReportRequestError } from '@/entities/report/model/ReportRequestError';
 import { reportsQueryKeys } from '@/entities/report/model/reportQueryKeys';
 import type {
@@ -81,10 +71,7 @@ const prependReportToList = (
   const firstPage = data.pages[0];
   const existingReports = data.pages.flatMap((page) => page.data);
   const alreadyContainsReport = existingReports.some((item) => item.id === report.id);
-  const nextReports = [
-    report,
-    ...existingReports.filter((item) => item.id !== report.id),
-  ];
+  const nextReports = [report, ...existingReports.filter((item) => item.id !== report.id)];
   const nextTotal = firstPage.total + (alreadyContainsReport ? 0 : 1);
   let pageOffset = 0;
 
@@ -113,18 +100,14 @@ const removeReportFromList = (
     return data;
   }
 
-  const containsReport = data.pages.some((page) =>
-    page.data.some((report) => report.id === reportId),
-  );
+  const containsReport = data.pages.some((page) => page.data.some((report) => report.id === reportId));
 
   if (!containsReport) {
     return data;
   }
 
   const nextTotal = Math.max(0, data.pages[0].total - 1);
-  const nextReports = data.pages
-    .flatMap((page) => page.data)
-    .filter((report) => report.id !== reportId);
+  const nextReports = data.pages.flatMap((page) => page.data).filter((report) => report.id !== reportId);
   let pageOffset = 0;
 
   return {
@@ -145,14 +128,9 @@ const removeReportFromList = (
 };
 
 const setReportAcrossLists = (
-  updater: (
-    data: InfiniteData<IPaginatedReports> | undefined,
-  ) => InfiniteData<IPaginatedReports> | undefined,
+  updater: (data: InfiniteData<IPaginatedReports> | undefined) => InfiniteData<IPaginatedReports> | undefined,
 ): void => {
-  queryClient.setQueriesData<InfiniteData<IPaginatedReports>>(
-    { queryKey: reportsQueryKeys.lists() },
-    updater,
-  );
+  queryClient.setQueriesData<InfiniteData<IPaginatedReports>>({ queryKey: reportsQueryKeys.lists() }, updater);
 };
 
 export const useReportsListQuery = () => {
@@ -163,8 +141,7 @@ export const useReportsListQuery = () => {
     ReturnType<typeof reportsQueryKeys.list>,
     number
   >({
-    getNextPageParam: (lastPage) =>
-      lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined,
+    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages ? lastPage.page + 1 : undefined),
     initialPageParam: 1,
     queryFn: async ({ pageParam }) => {
       const response = await getReports({
@@ -248,22 +225,17 @@ export const useDeleteReportMutation = (reportId: string) => {
   });
 };
 
-export const refreshReportsFirstPage = async (): Promise<
-  IResponse<IPaginatedReports>
-> => {
+export const refreshReportsFirstPage = async (): Promise<IResponse<IPaginatedReports>> => {
   const response = await getReports({
     limit: REPORTS_PAGE_LIMIT,
     page: 1,
   });
 
   if (!response.isError && response.data) {
-    queryClient.setQueryData<InfiniteData<IPaginatedReports>>(
-      reportsQueryKeys.list(REPORTS_PAGE_LIMIT),
-      {
-        pageParams: [1],
-        pages: [response.data],
-      },
-    );
+    queryClient.setQueryData<InfiniteData<IPaginatedReports>>(reportsQueryKeys.list(REPORTS_PAGE_LIMIT), {
+      pageParams: [1],
+      pages: [response.data],
+    });
   }
 
   return response;

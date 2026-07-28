@@ -39,8 +39,7 @@ export const Button = ({
     ];
   };
 
-  const foregroundColor =
-    variant === 'primary' || variant === 'danger' ? colors.textOnPrimary : colors.primary;
+  const foregroundColor = variant === 'primary' || variant === 'danger' ? colors.textOnPrimary : colors.primary;
 
   return (
     <Pressable

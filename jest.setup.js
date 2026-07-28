@@ -23,9 +23,7 @@ jest.mock('react-native-mmkv', () => {
 jest.mock('react-native-config', () => ({
   API_URL: 'https://api.fastrep.app',
 }));
-jest.mock('react-native-device-info', () =>
-  require('react-native-device-info/jest/react-native-device-info-mock'),
-);
+jest.mock('react-native-device-info', () => require('react-native-device-info/jest/react-native-device-info-mock'));
 jest.mock('react-native-localize', () => ({
   getLocales: () => [
     {
@@ -38,17 +36,11 @@ jest.mock('react-native-localize', () => ({
 }));
 jest.mock('react-native-keyboard-controller', () => {
   const React = require('react');
-  const {
-    KeyboardAvoidingView,
-    ScrollView,
-    View,
-  } = require('react-native');
+  const { KeyboardAvoidingView, ScrollView, View } = require('react-native');
 
   return {
     KeyboardAvoidingView,
-    KeyboardAwareScrollView: React.forwardRef((props, ref) =>
-      React.createElement(ScrollView, { ...props, ref }),
-    ),
+    KeyboardAwareScrollView: React.forwardRef((props, ref) => React.createElement(ScrollView, { ...props, ref })),
     KeyboardProvider: ({ children }) => children,
     KeyboardStickyView: View,
   };

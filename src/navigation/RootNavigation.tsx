@@ -10,6 +10,7 @@ import { ForgotPasswordView } from '@/modules/auth/ui/ForgotPasswordView';
 import { LoginView } from '@/modules/auth/ui/LoginView';
 import { OtpVerificationView } from '@/modules/auth/ui/OtpVerificationView';
 import { RegistrationView } from '@/modules/auth/ui/RegistrationView';
+import { RegistrationVerificationView } from '@/modules/auth/ui/RegistrationVerificationView';
 import { ResetPasswordView } from '@/modules/auth/ui/ResetPasswordView';
 import { SplashView } from '@/modules/home/ui/SplashView';
 import { ProfileView } from '@/modules/profile/ui/ProfileView';
@@ -21,12 +22,7 @@ import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getRootNavigationState } from './getRootNavigationState';
 import { getStyles } from './styles';
-import type {
-  AppStackParamList,
-  AppTabsParamList,
-  GuestStackParamList,
-  SplashStackParamList,
-} from './types';
+import type { AppStackParamList, AppTabsParamList, GuestStackParamList, SplashStackParamList } from './types';
 
 const AppStack = createNativeStackNavigator<AppStackParamList>();
 const AppTabs = createBottomTabNavigator<AppTabsParamList>();
@@ -48,10 +44,7 @@ const ProfileTabIcon = ({ color, size }: ITabBarIconProps) => {
 
 const AppTabsNavigation = () => {
   const { colors, fonts, spacing, t } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, fonts, spacing),
-    [colors, fonts, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, fonts, spacing), [colors, fonts, spacing]);
 
   return (
     <AppTabs.Navigator
@@ -101,6 +94,7 @@ const GuestNavigation = () => {
     <GuestStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
       <GuestStack.Screen component={LoginView} name="Login" />
       <GuestStack.Screen component={RegistrationView} name="Registration" />
+      <GuestStack.Screen component={RegistrationVerificationView} name="RegistrationVerification" />
       <GuestStack.Screen component={ForgotPasswordView} name="ForgotPassword" />
       <GuestStack.Screen component={OtpVerificationView} name="OtpVerification" />
       <GuestStack.Screen component={ResetPasswordView} name="ResetPassword" />
@@ -136,7 +130,5 @@ export const RootNavigation = () => {
     }
   };
 
-  return (
-    <NavigationContainer>{renderNavigation()}</NavigationContainer>
-  );
+  return <NavigationContainer>{renderNavigation()}</NavigationContainer>;
 };

@@ -27,18 +27,12 @@ const createClient = () => {
 describe('AxiosRequester', () => {
   it('uses the configured API URL', () => {
     expect(axiosClient.defaults.baseURL).toBe('https://api.fastrep.app');
-    expect(axiosClient.getUri({ url: '/auth/login' })).toBe(
-      'https://api.fastrep.app/auth/login',
-    );
+    expect(axiosClient.getUri({ url: '/auth/login' })).toBe('https://api.fastrep.app/auth/login');
   });
 
   it('normalizes the configured API URL without a localhost fallback', () => {
-    expect(resolveApiBaseUrl(' https://api.fastrep.app/ ', true)).toBe(
-      'https://api.fastrep.app',
-    );
-    expect(() => resolveApiBaseUrl(undefined, true)).toThrow(
-      'API_URL is required.',
-    );
+    expect(resolveApiBaseUrl(' https://api.fastrep.app/ ', true)).toBe('https://api.fastrep.app');
+    expect(() => resolveApiBaseUrl(undefined, true)).toThrow('API_URL is required.');
     expect(resolveApiBaseUrl(undefined, false)).toBeUndefined();
   });
 
@@ -87,6 +81,31 @@ describe('AxiosRequester', () => {
       message: 'Validation failed',
       status: 422,
       type: 'validation_error',
+    });
+  });
+
+  it('preserves registration cooldown metadata from backend errors', async () => {
+    const { client, request } = createClient();
+    request.mockRejectedValue({
+      isAxiosError: true,
+      message: 'Request failed',
+      response: {
+        data: {
+          code: 'REGISTRATION_CODE_COOLDOWN',
+          message: 'Please wait before requesting another registration code',
+          retryAfterSeconds: 42,
+        },
+        status: 429,
+      },
+    });
+
+    const result = await new AxiosRequester(client).request({ url: '/auth/resend-registration-code' });
+
+    expect(result).toMatchObject({
+      code: 'REGISTRATION_CODE_COOLDOWN',
+      isError: true,
+      retryAfterSeconds: 42,
+      status: 429,
     });
   });
 

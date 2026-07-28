@@ -3,11 +3,9 @@ import type { TranslationResources } from './types';
 export const de: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent:
-        'Falls ein Konto für diese E-Mail existiert, wurde ein Bestätigungscode gesendet.',
+      codeSent: 'Falls ein Konto für diese E-Mail existiert, wurde ein Bestätigungscode gesendet.',
       email: 'E-Mail',
-      explanation:
-        'Geben Sie Ihre E-Mail ein, um einen sechsstelligen Bestätigungscode zu erhalten.',
+      explanation: 'Geben Sie Ihre E-Mail ein, um einen sechsstelligen Bestätigungscode zu erhalten.',
       sendCode: 'Code senden',
       title: 'Passwort vergessen',
       validation: {
@@ -55,9 +53,28 @@ export const de: TranslationResources = {
         passwordsMismatch: 'Die Passwörter stimmen nicht überein.',
       },
     },
+    registrationVerification: {
+      accountAlreadyExists: 'Ein Konto mit dieser E-Mail existiert bereits. Kehren Sie zur Anmeldung zurück.',
+      codeAccessibilityLabel: 'Sechsstelliger Bestätigungscode für die Registrierung',
+      codeResent: 'Ein neuer Bestätigungscode wurde gesendet.',
+      confirm: 'E-Mail bestätigen',
+      correctDetails: 'Registrierungsdaten korrigieren',
+      description: 'Geben Sie den sechsstelligen Code ein, den wir an Ihre E-Mail gesendet haben.',
+      emailDestination: 'Code gesendet an {{email}}',
+      expiredRegistration: 'Diese Registrierung ist abgelaufen. Kehren Sie zurück und erstellen Sie Ihr Konto erneut.',
+      genericError: 'Ihre E-Mail konnte nicht bestätigt werden. Bitte versuchen Sie es erneut.',
+      invalidCode: 'Der Bestätigungscode ist ungültig oder abgelaufen.',
+      invalidCodeFormat: 'Geben Sie genau sechs Ziffern ein.',
+      networkError: 'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      rateLimited: 'Zu viele Versuche. Bitte warten Sie vor dem nächsten Versuch.',
+      resend: 'Code erneut senden',
+      resendIn: 'Code erneut senden in {{time}}',
+      serverUnavailable: 'Der Server ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.',
+      timeoutError: 'Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.',
+      title: 'E-Mail bestätigen',
+    },
     otp: {
-      codeResent:
-        'Falls ein Konto für diese E-Mail existiert, wurde ein neuer Code gesendet.',
+      codeResent: 'Falls ein Konto für diese E-Mail existiert, wurde ein neuer Code gesendet.',
       codeSentTo: 'Code gesendet an {{email}}',
       explanation: 'Geben Sie den sechsstelligen Code aus Ihrer E-Mail ein.',
       invalidCodeFormat: 'Geben Sie genau sechs Ziffern ein.',
@@ -70,14 +87,11 @@ export const de: TranslationResources = {
       back: 'Zurück',
       backToLogin: 'Zurück zur Anmeldung',
       invalidOrExpiredCode: 'Der Bestätigungscode ist ungültig oder abgelaufen.',
-      networkError:
-        'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      networkError: 'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
       rateLimited: 'Zu viele Anfragen. Bitte warten Sie vor dem nächsten Versuch.',
-      serverUnavailable:
-        'Der Server ist vorübergehend nicht verfügbar. Versuchen Sie es später erneut.',
+      serverUnavailable: 'Der Server ist vorübergehend nicht verfügbar. Versuchen Sie es später erneut.',
       timeoutError: 'Die Zeitüberschreitung für die Anfrage wurde erreicht.',
-      tooManyAttempts:
-        'Zu viele fehlgeschlagene Versuche. Fordern Sie einen neuen Code an.',
+      tooManyAttempts: 'Zu viele fehlgeschlagene Versuche. Fordern Sie einen neuen Code an.',
       usedCode: 'Dieser Code wurde bereits verwendet. Fordern Sie einen neuen an.',
     },
     resetPassword: {
@@ -85,8 +99,7 @@ export const de: TranslationResources = {
       explanation: 'Wählen Sie ein neues Passwort für Ihr FastRep-Konto.',
       newPassword: 'Neues Passwort',
       resetPassword: 'Passwort zurücksetzen',
-      success:
-        'Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an.',
+      success: 'Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an.',
       title: 'Passwort zurücksetzen',
       validation: {
         confirmPasswordRequired: 'Bestätigen Sie Ihr neues Passwort.',
@@ -98,15 +111,11 @@ export const de: TranslationResources = {
     },
     session: {
       expired: 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.',
-      genericError:
-        'Die Authentifizierung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.',
-      networkUnavailable:
-        'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      genericError: 'Die Authentifizierung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.',
+      networkUnavailable: 'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
       restoring: 'Ihre Sitzung wird wiederhergestellt…',
-      serverError:
-        'Der Server ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.',
-      timeout:
-        'Die Zeitüberschreitung für die Anfrage wurde erreicht. Bitte versuchen Sie es erneut.',
+      serverError: 'Der Server ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.',
+      timeout: 'Die Zeitüberschreitung für die Anfrage wurde erreicht. Bitte versuchen Sie es erneut.',
     },
   },
   common: {
@@ -126,8 +135,7 @@ export const de: TranslationResources = {
   },
   profile: {
     logout: 'Abmelden',
-    logoutError:
-      'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
+    logoutError: 'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
     title: 'Profil',
   },
   reports: {
@@ -137,14 +145,14 @@ export const de: TranslationResources = {
     },
     create: {
       action: 'Bericht erstellen',
-      success: 'Bericht erstellt.',
+      success: 'Bericht erfolgreich erstellt.',
       title: 'Bericht erstellen',
     },
     delete: {
-      action: 'Bericht löschen',
-      alreadyDeleted: 'Dieser Bericht wurde bereits gelöscht.',
+      action: 'Löschen',
+      alreadyDeleted: 'Bericht wurde bereits gelöscht.',
       confirmation: 'Diese Aktion kann nicht rückgängig gemacht werden. Der Bericht wird dauerhaft gelöscht.',
-      success: 'Bericht gelöscht.',
+      success: 'Bericht erfolgreich gelöscht.',
       title: 'Bericht löschen?',
     },
     details: {
@@ -158,8 +166,8 @@ export const de: TranslationResources = {
       updatedAt: 'Aktualisiert',
     },
     edit: {
-      action: 'Bericht bearbeiten',
-      success: 'Bericht aktualisiert.',
+      action: 'Bearbeiten',
+      success: 'Bericht erfolgreich aktualisiert.',
       title: 'Bericht bearbeiten',
     },
     errors: {

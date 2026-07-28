@@ -18,21 +18,11 @@ export const EditReportView = () => {
   const route = useRoute<RouteProp<AppStackParamList, 'EditReport'>>();
   const { colors, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(spacing), [spacing]);
-  const {
-    errors,
-    isError,
-    isLoading,
-    isSubmitting,
-    notes,
-    onChangeNotes,
-    onChangeTitle,
-    onRetry,
-    onSubmit,
-    title,
-  } = useEditReportViewPresenter({
-    reportId: route.params.reportId,
-    t,
-  });
+  const { errors, isError, isLoading, isSubmitting, notes, onChangeNotes, onChangeTitle, onRetry, onSubmit, title } =
+    useEditReportViewPresenter({
+      reportId: route.params.reportId,
+      t,
+    });
   const isFormVisible = !isLoading && !isError;
 
   return (
@@ -40,9 +30,7 @@ export const EditReportView = () => {
       containerStyle={isFormVisible ? undefined : styles.centered}
       contentContainerStyle={isFormVisible ? styles.content : undefined}
       edges={['bottom']}
-      headerComponent={
-        <Header showBackButton title={String(t('reports.edit.title'))} />
-      }
+      headerComponent={<Header showBackButton title={String(t('reports.edit.title'))} />}
       isKeyboardAvoiding={isFormVisible}
       scrollEnabled={isFormVisible}
     >
@@ -62,21 +50,13 @@ export const EditReportView = () => {
         <ReportForm
           isSubmitting={isSubmitting}
           notes={notes}
-          notesError={
-            errors.notes
-              ? String(t(`reports.validation.${errors.notes}`))
-              : undefined
-          }
+          notesError={errors.notes ? String(t(`reports.validation.${errors.notes}`)) : undefined}
           onChangeNotes={onChangeNotes}
           onChangeTitle={onChangeTitle}
           onSubmit={onSubmit}
           submitTitle={String(t('common.save'))}
           title={title}
-          titleError={
-            errors.title
-              ? String(t(`reports.validation.${errors.title}`))
-              : undefined
-          }
+          titleError={errors.title ? String(t(`reports.validation.${errors.title}`)) : undefined}
         />
       )}
     </ScreenContainer>

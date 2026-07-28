@@ -51,6 +51,26 @@ export interface TranslationResources {
         passwordsMismatch: string;
       };
     };
+    registrationVerification: {
+      accountAlreadyExists: string;
+      codeAccessibilityLabel: string;
+      codeResent: string;
+      confirm: string;
+      correctDetails: string;
+      description: string;
+      emailDestination: string;
+      expiredRegistration: string;
+      genericError: string;
+      invalidCode: string;
+      invalidCodeFormat: string;
+      networkError: string;
+      rateLimited: string;
+      resend: string;
+      resendIn: string;
+      serverUnavailable: string;
+      timeoutError: string;
+      title: string;
+    };
     otp: {
       codeResent: string;
       codeSentTo: string;

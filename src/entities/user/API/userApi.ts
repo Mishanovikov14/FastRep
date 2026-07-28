@@ -5,8 +5,11 @@ import type {
   ILogoutRequest,
   IRefreshRequest,
   IRegisterRequest,
+  IRegistrationPendingResponse,
+  IResendRegistrationCodeRequest,
   IResetPasswordRequest,
   ITokenPair,
+  IVerifyRegistrationRequest,
 } from '@/entities/user/types/auth';
 import type { IUser } from '@/entities/user/types/user';
 import type { IResponse } from '@/libs/requester/IResponse';
@@ -20,14 +23,34 @@ const requestCurrentUser = (skipAuthRefresh: boolean): Promise<IResponse<IUser>>
   });
 };
 
-export const register = (
-  request: IRegisterRequest,
+export const register = (request: IRegisterRequest): Promise<IResponse<IRegistrationPendingResponse>> => {
+  return requester.request<IRegistrationPendingResponse>({
+    data: request,
+    method: 'POST',
+    requiresAuth: false,
+    url: '/auth/register',
+  });
+};
+
+export const verifyRegistration = (
+  request: IVerifyRegistrationRequest,
 ): Promise<IResponse<IAuthenticationResponse>> => {
   return requester.request<IAuthenticationResponse>({
     data: request,
     method: 'POST',
     requiresAuth: false,
-    url: '/auth/register',
+    url: '/auth/verify-registration',
+  });
+};
+
+export const resendRegistrationCode = (
+  request: IResendRegistrationCodeRequest,
+): Promise<IResponse<void>> => {
+  return requester.request<void>({
+    data: request,
+    method: 'POST',
+    requiresAuth: false,
+    url: '/auth/resend-registration-code',
   });
 };
 
@@ -40,9 +63,7 @@ export const login = (request: ILoginRequest): Promise<IResponse<IAuthentication
   });
 };
 
-export const forgotPassword = (
-  request: IForgotPasswordRequest,
-): Promise<IResponse<void>> => {
+export const forgotPassword = (request: IForgotPasswordRequest): Promise<IResponse<void>> => {
   return requester.request<void>({
     data: request,
     method: 'POST',
@@ -52,9 +73,7 @@ export const forgotPassword = (
   });
 };
 
-export const resetPassword = (
-  request: IResetPasswordRequest,
-): Promise<IResponse<void>> => {
+export const resetPassword = (request: IResetPasswordRequest): Promise<IResponse<void>> => {
   return requester.request<void>({
     data: request,
     method: 'POST',

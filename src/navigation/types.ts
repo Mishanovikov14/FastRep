@@ -23,6 +23,10 @@ export type GuestStackParamList = {
     email: string;
   };
   Registration: undefined;
+  RegistrationVerification: {
+    email: string;
+    resendAvailableInSeconds: number;
+  };
   ResetPassword: {
     code: string;
     email: string;

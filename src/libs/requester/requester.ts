@@ -4,10 +4,7 @@ import Config from 'react-native-config';
 import { AxiosRequester } from './AxiosRequester';
 import type { RequesterAuthCallbacks } from './IRequester';
 
-export const resolveApiBaseUrl = (
-  apiUrl: string | undefined,
-  isDevelopment: boolean,
-): string | undefined => {
+export const resolveApiBaseUrl = (apiUrl: string | undefined, isDevelopment: boolean): string | undefined => {
   const normalizedApiUrl = apiUrl?.trim().replace(/\/+$/, '');
 
   if (!normalizedApiUrl && isDevelopment) {
@@ -32,9 +29,7 @@ const authCallbacks: RequesterAuthCallbacks = {
   },
 };
 
-export const configureRequesterAuth = (
-  callbacks: RequesterAuthCallbacks,
-): void => {
+export const configureRequesterAuth = (callbacks: RequesterAuthCallbacks): void => {
   authCallbacks.getAuthState = callbacks.getAuthState;
   authCallbacks.refreshAuthState = callbacks.refreshAuthState;
 };

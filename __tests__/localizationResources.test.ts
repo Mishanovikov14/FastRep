@@ -8,10 +8,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null;
 };
 
-const collectStringEntries = (
-  value: unknown,
-  prefix = '',
-): Array<{ key: string; value: string }> => {
+const collectStringEntries = (value: unknown, prefix = ''): Array<{ key: string; value: string }> => {
   if (typeof value === 'string') {
     return [{ key: prefix, value }];
   }
@@ -42,9 +39,7 @@ describe('localization resources', () => {
   });
 
   it.each(Object.entries(resources))('%s contains no empty visible strings', (_, resource) => {
-    const emptyEntries = collectStringEntries(resource).filter(
-      ({ value }) => value.trim().length === 0,
-    );
+    const emptyEntries = collectStringEntries(resource).filter(({ value }) => value.trim().length === 0);
 
     expect(emptyEntries).toEqual([]);
   });

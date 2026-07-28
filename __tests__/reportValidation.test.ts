@@ -32,9 +32,7 @@ describe('report validation', () => {
   });
 
   it('trims create and update values and omits empty create notes', () => {
-    expect(
-      normalizeCreateReportRequest({ notes: '   ', title: '  Title  ' }),
-    ).toEqual({ title: 'Title' });
+    expect(normalizeCreateReportRequest({ notes: '   ', title: '  Title  ' })).toEqual({ title: 'Title' });
     expect(
       normalizeUpdateReportRequest({
         notes: '  Updated notes  ',

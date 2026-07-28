@@ -6,10 +6,7 @@ import 'dayjs/locale/uk';
 
 import type { SupportedLanguage } from '@/localization/types';
 
-export const formatLocalizedDate = (
-  value: string,
-  language: SupportedLanguage,
-): string => {
+export const formatLocalizedDate = (value: string, language: SupportedLanguage): string => {
   const date = dayjs(value);
 
   if (!date.isValid()) {

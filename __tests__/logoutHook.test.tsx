@@ -144,9 +144,6 @@ describe('useLogout', () => {
 
     expect(mockMutateAsync).toHaveBeenCalledWith('refresh-token');
     expect(clearUserSession).toHaveBeenCalledTimes(1);
-    expect(toastService.showError).toHaveBeenCalledWith(
-      'common.error',
-      'profile.logoutError',
-    );
+    expect(toastService.showError).toHaveBeenCalledWith('common.error', 'profile.logoutError');
   });
 });

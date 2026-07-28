@@ -131,10 +131,7 @@ describe('useOtpVerificationViewPresenter', () => {
       isResendDisabled: true,
       resendSeconds: 60,
     });
-    expect(toastService.showSuccess).toHaveBeenCalledWith(
-      'common.success',
-      'auth.otp.codeResent',
-    );
+    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'auth.otp.codeResent');
 
     ReactTestRenderer.act(() => {
       jest.advanceTimersByTime(1_000);

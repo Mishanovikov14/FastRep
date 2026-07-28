@@ -22,10 +22,7 @@ const keyExtractor = (report: IReport) => report.id;
 export const ReportsListView = () => {
   const { colors, spacing, t } = useUIContext();
   const { bottom } = useSafeAreaInsets();
-  const styles = useMemo(
-    () => getStyles(colors, spacing, bottom),
-    [bottom, colors, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, spacing, bottom), [bottom, colors, spacing]);
   const {
     errorMessage,
     isError,
@@ -41,9 +38,7 @@ export const ReportsListView = () => {
   } = useReportsListViewPresenter({ t });
 
   const renderItem = ({ item }: ListRenderItemInfo<IReport>) => {
-    return (
-      <ReportCard onPress={onOpenReport} report={item} />
-    );
+    return <ReportCard onPress={onOpenReport} report={item} />;
   };
   const renderFooter = () => {
     return isLoadingNextPage ? (
@@ -57,13 +52,7 @@ export const ReportsListView = () => {
       <View style={styles.empty}>
         <EmptyState
           description={String(t('reports.list.emptyDescription'))}
-          image={
-            <ReportsIcon
-              color={colors.primary}
-              height={96}
-              width={96}
-            />
-          }
+          image={<ReportsIcon color={colors.primary} height={96} width={96} />}
           title={String(t('reports.list.emptyTitle'))}
         />
       </View>

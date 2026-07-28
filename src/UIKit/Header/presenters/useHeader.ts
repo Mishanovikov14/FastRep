@@ -1,14 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
-import type {
-  NavigationProp,
-  ParamListBase,
-} from '@react-navigation/native';
+import type { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useCallback } from 'react';
-import type {
-  PressableStateCallbackType,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import type { PressableStateCallbackType, StyleProp, ViewStyle } from 'react-native';
 
 interface IInput {
   backButtonPressedStyle: StyleProp<ViewStyle>;
@@ -16,11 +9,7 @@ interface IInput {
   onBackPress?(): void;
 }
 
-export const useHeaderPresenter = ({
-  backButtonPressedStyle,
-  backButtonStyle,
-  onBackPress,
-}: IInput) => {
+export const useHeader = ({ backButtonPressedStyle, backButtonStyle, onBackPress }: IInput) => {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
 
   const onPressBack = useCallback(() => {

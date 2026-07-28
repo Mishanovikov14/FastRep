@@ -1,8 +1,5 @@
 import { useUserStore } from '@/entities/user/model/userStore';
-import {
-  clearUserSession,
-  clearUserSessionIfCurrent,
-} from '@/entities/user/services/userStateService';
+import { clearUserSession, clearUserSessionIfCurrent } from '@/entities/user/services/userStateService';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import type { ITokenSnapshot } from '@/entities/user/types/session';
 import type { IUser } from '@/entities/user/types/user';
@@ -57,9 +54,7 @@ describe('clearUserSession', () => {
   });
 
   it('still clears authenticated state when Keychain reports an error', async () => {
-    jest
-      .mocked(userTokenStorage.clearTokens)
-      .mockRejectedValue(new Error('Keychain unavailable'));
+    jest.mocked(userTokenStorage.clearTokens).mockRejectedValue(new Error('Keychain unavailable'));
 
     await expect(clearUserSession()).rejects.toThrow('Keychain unavailable');
 
@@ -95,13 +90,9 @@ describe('clearUserSession', () => {
   });
 
   it('resets local state when an accepted conditional Keychain clear fails natively', async () => {
-    jest
-      .mocked(userTokenStorage.clearTokensIfCurrent)
-      .mockRejectedValue(new Error('Keychain unavailable'));
+    jest.mocked(userTokenStorage.clearTokensIfCurrent).mockRejectedValue(new Error('Keychain unavailable'));
 
-    await expect(clearUserSessionIfCurrent(snapshot)).rejects.toThrow(
-      'Keychain unavailable',
-    );
+    await expect(clearUserSessionIfCurrent(snapshot)).rejects.toThrow('Keychain unavailable');
 
     expect(useUserStore.getState()).toMatchObject({
       isAuthorized: false,

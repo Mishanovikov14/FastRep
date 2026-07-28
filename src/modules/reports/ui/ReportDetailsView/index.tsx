@@ -19,10 +19,7 @@ import { getStyles } from './styles';
 export const ReportDetailsView = () => {
   const route = useRoute<RouteProp<AppStackParamList, 'ReportDetails'>>();
   const { colors, language, radius, spacing, t } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, radius, spacing),
-    [colors, radius, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const {
     createdAtLabel,
     deleteActions,
@@ -44,8 +41,7 @@ export const ReportDetailsView = () => {
     reportId: route.params.reportId,
     t,
   });
-  const isContentVisible =
-    !isLoading && !isNotFound && !isError && Boolean(report);
+  const isContentVisible = !isLoading && !isNotFound && !isError && Boolean(report);
 
   return (
     <>
@@ -53,16 +49,10 @@ export const ReportDetailsView = () => {
         containerStyle={isContentVisible ? undefined : styles.centered}
         contentContainerStyle={isContentVisible ? styles.content : undefined}
         edges={['bottom']}
-        headerComponent={
-          <Header showBackButton title={String(t('reports.details.title'))} />
-        }
+        headerComponent={<Header showBackButton title={String(t('reports.details.title'))} />}
         refreshControl={
           isContentVisible ? (
-            <RefreshControl
-              onRefresh={onRefresh}
-              refreshing={isRefreshing}
-              tintColor={colors.primary}
-            />
+            <RefreshControl onRefresh={onRefresh} refreshing={isRefreshing} tintColor={colors.primary} />
           ) : undefined
         }
         scrollEnabled={isContentVisible}
@@ -72,18 +62,10 @@ export const ReportDetailsView = () => {
         ) : isNotFound || isError || !report ? (
           <>
             <Typography align="center" variant="heading">
-              {t(
-                isNotFound
-                  ? 'reports.details.notFoundTitle'
-                  : 'reports.details.errorTitle',
-              )}
+              {t(isNotFound ? 'reports.details.notFoundTitle' : 'reports.details.errorTitle')}
             </Typography>
             <Typography align="center" color={colors.textSecondary}>
-              {t(
-                isNotFound
-                  ? 'reports.details.notFoundDescription'
-                  : 'reports.details.errorDescription',
-              )}
+              {t(isNotFound ? 'reports.details.notFoundDescription' : 'reports.details.errorDescription')}
             </Typography>
             {isNotFound ? (
               <Button onPress={onBack} title={String(t('common.back'))} />
@@ -120,11 +102,13 @@ export const ReportDetailsView = () => {
             <View style={styles.actions}>
               <Button
                 onPress={onEdit}
+                style={styles.action}
                 title={String(t('reports.edit.action'))}
                 variant="secondary"
               />
               <Button
                 onPress={onShowDeleteConfirmation}
+                style={styles.action}
                 title={String(t('reports.delete.action'))}
                 variant="danger"
               />

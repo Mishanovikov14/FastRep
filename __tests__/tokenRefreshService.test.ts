@@ -69,26 +69,22 @@ const successfulRefresh: IResponse<ITokenPair> = {
 
 const createDependencies = () => {
   let snapshot: ITokenSnapshot = initialSnapshot;
-  const clearSession = jest
-    .fn<Promise<boolean>, [ITokenSnapshot]>()
-    .mockResolvedValue(true);
+  const clearSession = jest.fn<Promise<boolean>, [ITokenSnapshot]>().mockResolvedValue(true);
   const getTokenSnapshot = jest.fn(async () => snapshot);
   const onSessionExpired = jest.fn();
   const refreshTokens = jest.fn<Promise<IResponse<ITokenPair>>, [string]>();
-  const saveTokensIfCurrent = jest.fn(
-    async (expectedSnapshot: ITokenSnapshot, tokens: ITokenPair) => {
-      if (expectedSnapshot.version !== snapshot.version) {
-        return false;
-      }
+  const saveTokensIfCurrent = jest.fn(async (expectedSnapshot: ITokenSnapshot, tokens: ITokenPair) => {
+    if (expectedSnapshot.version !== snapshot.version) {
+      return false;
+    }
 
-      snapshot = {
-        tokens,
-        version: snapshot.version + 1,
-      };
+    snapshot = {
+      tokens,
+      version: snapshot.version + 1,
+    };
 
-      return true;
-    },
-  );
+    return true;
+  });
 
   return {
     clearSession,
@@ -123,10 +119,7 @@ describe('createTokenRefreshService', () => {
     expect(dependencies.refreshTokens).toHaveBeenCalledTimes(1);
     expect(dependencies.refreshTokens).toHaveBeenCalledWith(currentTokens.refreshToken);
     expect(dependencies.saveTokensIfCurrent).toHaveBeenCalledTimes(1);
-    expect(dependencies.saveTokensIfCurrent).toHaveBeenCalledWith(
-      initialSnapshot,
-      rotatedTokens,
-    );
+    expect(dependencies.saveTokensIfCurrent).toHaveBeenCalledWith(initialSnapshot, rotatedTokens);
     expect(dependencies.clearSession).not.toHaveBeenCalled();
   });
 
@@ -143,12 +136,12 @@ describe('createTokenRefreshService', () => {
     });
     const service = createTokenRefreshService(dependencies);
 
-    await expect(
-      service.refreshTokenPair({ expectedAuthState: failedAuthState }),
-    ).resolves.toEqual(sameAccessRotatedTokens);
-    await expect(
-      service.refreshTokenPair({ expectedAuthState: failedAuthState }),
-    ).resolves.toEqual(sameAccessRotatedTokens);
+    await expect(service.refreshTokenPair({ expectedAuthState: failedAuthState })).resolves.toEqual(
+      sameAccessRotatedTokens,
+    );
+    await expect(service.refreshTokenPair({ expectedAuthState: failedAuthState })).resolves.toEqual(
+      sameAccessRotatedTokens,
+    );
 
     expect(dependencies.refreshTokens).toHaveBeenCalledTimes(1);
     expect(dependencies.saveTokensIfCurrent).toHaveBeenCalledTimes(1);
@@ -284,9 +277,7 @@ describe('createTokenRefreshService', () => {
     });
     deferredRefresh.resolve(successfulRefresh);
 
-    await expect(pendingRefresh).rejects.toThrow(
-      'The authentication session changed during refresh.',
-    );
+    await expect(pendingRefresh).rejects.toThrow('The authentication session changed during refresh.');
     expect(dependencies.saveTokensIfCurrent).toHaveBeenCalledTimes(1);
     expect(dependencies.clearSession).not.toHaveBeenCalled();
   });
@@ -332,9 +323,9 @@ describe('createTokenRefreshService', () => {
     });
     const service = createTokenRefreshService(dependencies);
 
-    await expect(
-      service.refreshTokenPair({ expectedAuthState: failedAuthState }),
-    ).rejects.toThrow('The authentication session changed during refresh.');
+    await expect(service.refreshTokenPair({ expectedAuthState: failedAuthState })).rejects.toThrow(
+      'The authentication session changed during refresh.',
+    );
     expect(dependencies.refreshTokens).not.toHaveBeenCalled();
     expect(dependencies.saveTokensIfCurrent).not.toHaveBeenCalled();
     expect(dependencies.clearSession).not.toHaveBeenCalled();

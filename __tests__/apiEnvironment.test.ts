@@ -18,7 +18,7 @@ const readProjectFile = (relativePath: string): string => {
 describe('API environment selection', () => {
   it.each(['.env', '.env.development', '.env.production', '.env.example'])(
     'configures %s with the shared remote backend',
-    environmentFile => {
+    (environmentFile) => {
       expect(readProjectFile(environmentFile).trim()).toBe(remoteEnvironment);
     },
   );
@@ -46,8 +46,6 @@ describe('API environment selection', () => {
       readProjectFile('src/libs/requester/requester.ts'),
     ].join('\n');
 
-    expect(activeConfiguration).not.toMatch(
-      /localhost|127\.0\.0\.1|10\.0\.2\.2/,
-    );
+    expect(activeConfiguration).not.toMatch(/localhost|127\.0\.0\.1|10\.0\.2\.2/);
   });
 });

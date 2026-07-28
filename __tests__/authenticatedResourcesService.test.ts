@@ -24,9 +24,7 @@ describe('clearAuthenticatedResources', () => {
   });
 
   it('still clears cached data when query cancellation fails', async () => {
-    jest
-      .mocked(queryClient.cancelQueries)
-      .mockRejectedValueOnce(new Error('Cancellation failed'));
+    jest.mocked(queryClient.cancelQueries).mockRejectedValueOnce(new Error('Cancellation failed'));
 
     await expect(clearAuthenticatedResources()).rejects.toThrow('Cancellation failed');
 

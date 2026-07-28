@@ -4,14 +4,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useCallback, useRef, useState } from 'react';
 
 import { login } from '@/entities/user/API/userApi';
-import { useUserStore } from '@/entities/user/model/userStore';
-import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
-import type {
-  IAuthenticationResponse,
-  ILoginRequest,
-  ITokenPair,
-} from '@/entities/user/types/auth';
-import type { IUser } from '@/entities/user/types/user';
+import { applyAuthenticationResponse } from '@/entities/user/services/userSessionService';
+import type { ILoginRequest } from '@/entities/user/types/auth';
 import { toastService } from '@/libs/toast/toastService';
 import type { GuestStackParamList } from '@/navigation/types';
 
@@ -30,10 +24,7 @@ type LoginErrorTranslationKey =
   | 'auth.session.timeout'
   | 'common.somethingWentWrong';
 
-const getLoginErrorTranslationKey = ({
-  status,
-  type,
-}: IRequestFailure): LoginErrorTranslationKey => {
+const getLoginErrorTranslationKey = ({ status, type }: IRequestFailure): LoginErrorTranslationKey => {
   if (status === 401) {
     return 'auth.login.invalidCredentials';
   }
@@ -55,7 +46,6 @@ const getLoginErrorTranslationKey = ({
 
 export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
   const navigation = useNavigation<NativeStackNavigationProp<GuestStackParamList, 'Login'>>();
-  const setUser = useUserStore((state) => state.setUser);
   const isSubmittingRef = useRef(false);
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<LoginFormErrors>({});
@@ -68,26 +58,9 @@ export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
   const onUnexpectedFailure = useCallback(
     (error: unknown) => {
       console.error('Unexpected login failure', error);
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     },
     [t],
-  );
-
-  const saveAuthentication = useCallback(
-    async (authentication: IAuthenticationResponse) => {
-      const tokens: ITokenPair = {
-        accessToken: authentication.accessToken,
-        refreshToken: authentication.refreshToken,
-      };
-      const user: IUser = authentication.user;
-
-      await userTokenStorage.saveTokens(tokens);
-      setUser(user);
-    },
-    [setUser],
   );
 
   const onChangeEmail = useCallback((value: string) => {
@@ -126,14 +99,14 @@ export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
         return;
       }
 
-      await saveAuthentication(response.data);
+      await applyAuthenticationResponse(response.data);
     } catch (error: unknown) {
       onUnexpectedFailure(error);
     } finally {
       isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
-  }, [email, mutateLogin, onUnexpectedFailure, password, saveAuthentication, t]);
+  }, [email, mutateLogin, onUnexpectedFailure, password, t]);
 
   const onPressRegistration = useCallback(() => {
     navigation.navigate('Registration');

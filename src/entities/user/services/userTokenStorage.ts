@@ -109,10 +109,7 @@ export class UserTokenStorage {
     await mutation.completion;
   }
 
-  async saveTokensIfCurrent(
-    snapshot: ITokenSnapshot,
-    tokens: ITokenPair,
-  ): Promise<boolean> {
+  async saveTokensIfCurrent(snapshot: ITokenSnapshot, tokens: ITokenPair): Promise<boolean> {
     if (snapshot.version !== this.mutationVersion) {
       return false;
     }

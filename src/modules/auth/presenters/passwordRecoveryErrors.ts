@@ -6,11 +6,7 @@ type RecoveryRequest = Pick<IResponse<unknown>, 'message' | 'status' | 'type'>;
 
 const getTransportErrorKey = (
   response: RecoveryRequest,
-):
-  | 'auth.recovery.networkError'
-  | 'auth.recovery.serverUnavailable'
-  | 'auth.recovery.timeoutError'
-  | undefined => {
+): 'auth.recovery.networkError' | 'auth.recovery.serverUnavailable' | 'auth.recovery.timeoutError' | undefined => {
   if (response.type === 'network_error') {
     return 'auth.recovery.networkError';
   }
@@ -26,10 +22,7 @@ const getTransportErrorKey = (
   return undefined;
 };
 
-export const getForgotPasswordErrorMessage = (
-  response: RecoveryRequest,
-  t: TFunction,
-): string => {
+export const getForgotPasswordErrorMessage = (response: RecoveryRequest, t: TFunction): string => {
   const transportKey = getTransportErrorKey(response);
 
   if (transportKey) {
@@ -43,10 +36,7 @@ export const getForgotPasswordErrorMessage = (
   return String(t('common.somethingWentWrong'));
 };
 
-export const getResetPasswordErrorMessage = (
-  response: RecoveryRequest,
-  t: TFunction,
-): string => {
+export const getResetPasswordErrorMessage = (response: RecoveryRequest, t: TFunction): string => {
   const transportKey = getTransportErrorKey(response);
 
   if (transportKey) {

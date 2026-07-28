@@ -13,22 +13,12 @@ import { getStyles } from './styles';
 export const ForgotPasswordView = () => {
   const { colors, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
-  const {
-    email,
-    emailError,
-    isLoading,
-    onBackToLogin,
-    onChangeEmail,
-    onSubmit,
-  } = useForgotPasswordViewPresenter({ t });
+  const { email, emailError, isLoading, onBackToLogin, onChangeEmail, onSubmit } = useForgotPasswordViewPresenter({
+    t,
+  });
 
   return (
-    <ScreenContainer
-      backgroundColor={colors.white}
-      edges={['top', 'bottom']}
-      isKeyboardAvoiding
-      scrollEnabled
-    >
+    <ScreenContainer backgroundColor={colors.white} edges={['top', 'bottom']} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"

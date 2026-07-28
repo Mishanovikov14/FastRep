@@ -1,6 +1,7 @@
 import { getMeWithoutRefresh } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
 import { refreshTokenPair } from '@/entities/user/services/tokenRefreshService';
-import { restoreUserSession } from '@/entities/user/services/userSessionService';
+import { applyAuthenticationResponse, restoreUserSession } from '@/entities/user/services/userSessionService';
 import { clearUserSession } from '@/entities/user/services/userStateService';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import type { ITokenPair } from '@/entities/user/types/auth';
@@ -9,6 +10,7 @@ import type { IUser } from '@/entities/user/types/user';
 jest.mock('@/entities/user/services/userTokenStorage', () => ({
   userTokenStorage: {
     getTokens: jest.fn(),
+    saveTokens: jest.fn(),
   },
 }));
 
@@ -25,10 +27,7 @@ jest.mock('@/entities/user/services/tokenRefreshService', () => ({
     message: error instanceof Error ? error.message : undefined,
   })),
   isInvalidTokenRefreshError: jest.fn(
-    (error: unknown) =>
-      error instanceof Error &&
-      'shouldClearSession' in error &&
-      error.shouldClearSession === true,
+    (error: unknown) => error instanceof Error && 'shouldClearSession' in error && error.shouldClearSession === true,
   ),
   refreshTokenPair: jest.fn(),
 }));
@@ -59,6 +58,31 @@ const unauthorizedResponse = {
   message: 'Unauthorized',
   status: 401,
 };
+
+describe('applyAuthenticationResponse', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useUserStore.getState().clearUser();
+    jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
+  });
+
+  it('persists the Keychain token pair before authorizing the existing user store', async () => {
+    await applyAuthenticationResponse({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      user,
+    });
+
+    expect(userTokenStorage.saveTokens).toHaveBeenCalledWith({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+    });
+    expect(useUserStore.getState()).toMatchObject({
+      isAuthorized: true,
+      user,
+    });
+  });
+});
 
 describe('restoreUserSession', () => {
   beforeEach(() => {
@@ -96,14 +120,11 @@ describe('restoreUserSession', () => {
   });
 
   it('refreshes once and retries the user request once after a 401', async () => {
-    jest
-      .mocked(getMeWithoutRefresh)
-      .mockResolvedValueOnce(unauthorizedResponse)
-      .mockResolvedValueOnce({
-        data: user,
-        isError: false,
-        message: '',
-      });
+    jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse).mockResolvedValueOnce({
+      data: user,
+      isError: false,
+      message: '',
+    });
 
     await expect(restoreUserSession()).resolves.toEqual({
       status: 'authorized',
@@ -178,14 +199,11 @@ describe('restoreUserSession', () => {
   });
 
   it('preserves the rotated pair when the retried /auth/me request has a transient failure', async () => {
-    jest
-      .mocked(getMeWithoutRefresh)
-      .mockResolvedValueOnce(unauthorizedResponse)
-      .mockResolvedValueOnce({
-        isError: true,
-        message: 'Service unavailable',
-        status: 503,
-      });
+    jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse).mockResolvedValueOnce({
+      isError: true,
+      message: 'Service unavailable',
+      status: 503,
+    });
 
     await expect(restoreUserSession()).resolves.toEqual({
       message: 'Service unavailable',
@@ -199,9 +217,7 @@ describe('restoreUserSession', () => {
 
   it('returns a temporary error when token refresh fails transiently', async () => {
     jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse);
-    jest
-      .mocked(refreshTokenPair)
-      .mockRejectedValueOnce(new Error('Network connection is unavailable.'));
+    jest.mocked(refreshTokenPair).mockRejectedValueOnce(new Error('Network connection is unavailable.'));
 
     await expect(restoreUserSession()).resolves.toEqual({
       message: 'Network connection is unavailable.',

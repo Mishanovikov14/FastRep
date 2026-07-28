@@ -87,17 +87,12 @@ export const getTokenRefreshErrorDetails = (
   };
 };
 
-const isSameTokenPair = (
-  left: ITokenPair | null,
-  right: ITokenPair | null,
-): boolean => {
+const isSameTokenPair = (left: ITokenPair | null, right: ITokenPair | null): boolean => {
   if (!left || !right) {
     return left === right;
   }
 
-  return (
-    left.accessToken === right.accessToken && left.refreshToken === right.refreshToken
-  );
+  return left.accessToken === right.accessToken && left.refreshToken === right.refreshToken;
 };
 
 const isInvalidRefreshResponse = (response: IResponse<ITokenPair>): boolean => {
@@ -115,9 +110,7 @@ export const createTokenRefreshService = ({
   let lastSuccessfulRefresh: IRefreshOutcome | null = null;
   let shouldNotifySessionExpired = false;
 
-  const performRefresh = async (
-    expectedAuthState?: IRequesterAuthState,
-  ): Promise<IRefreshOutcome> => {
+  const performRefresh = async (expectedAuthState?: IRequesterAuthState): Promise<IRefreshOutcome> => {
     let snapshot: ITokenSnapshot;
 
     try {
@@ -148,10 +141,7 @@ export const createTokenRefreshService = ({
       throw createTokenRefreshError('Refresh token is unavailable.', true, snapshot);
     }
 
-    if (
-      expectedAuthState &&
-      snapshot.tokens.accessToken !== expectedAuthState.accessToken
-    ) {
+    if (expectedAuthState && snapshot.tokens.accessToken !== expectedAuthState.accessToken) {
       throw STALE_REFRESH_ERROR;
     }
 
@@ -160,11 +150,7 @@ export const createTokenRefreshService = ({
     try {
       response = await refreshTokens(snapshot.tokens.refreshToken);
     } catch {
-      throw createTokenRefreshError(
-        'Unable to refresh the authentication session.',
-        false,
-        snapshot,
-      );
+      throw createTokenRefreshError('Unable to refresh the authentication session.', false, snapshot);
     }
 
     if (response.isError || !response.data) {
@@ -182,11 +168,7 @@ export const createTokenRefreshService = ({
     try {
       wasSaved = await saveTokensIfCurrent(snapshot, response.data);
     } catch {
-      throw createTokenRefreshError(
-        'Unable to save the refreshed authentication session.',
-        true,
-        snapshot,
-      );
+      throw createTokenRefreshError('Unable to save the refreshed authentication session.', true, snapshot);
     }
 
     if (!wasSaved) {
@@ -198,11 +180,7 @@ export const createTokenRefreshService = ({
     try {
       committedSnapshot = await getTokenSnapshot();
     } catch {
-      throw createTokenRefreshError(
-        'Unable to verify the refreshed authentication session.',
-        true,
-        snapshot,
-      );
+      throw createTokenRefreshError('Unable to verify the refreshed authentication session.', true, snapshot);
     }
 
     if (!isSameTokenPair(committedSnapshot.tokens, response.data)) {
@@ -242,18 +220,13 @@ export const createTokenRefreshService = ({
                 cleanupSnapshot = currentSnapshot;
                 shouldClear = true;
                 shouldNotify = false;
-              } else if (
-                isSameTokenPair(currentSnapshot.tokens, error.sessionSnapshot.tokens)
-              ) {
+              } else if (isSameTokenPair(currentSnapshot.tokens, error.sessionSnapshot.tokens)) {
                 cleanupSnapshot = currentSnapshot;
                 shouldClear = true;
                 shouldNotify = true;
               }
             } catch (snapshotError: unknown) {
-              console.error(
-                'Unable to verify the failed authentication session',
-                snapshotError,
-              );
+              console.error('Unable to verify the failed authentication session', snapshotError);
             }
 
             if (shouldClear && cleanupSnapshot) {
@@ -262,10 +235,7 @@ export const createTokenRefreshService = ({
               try {
                 wasCleared = await clearSession(cleanupSnapshot);
               } catch (clearError: unknown) {
-                console.error(
-                  'Unable to clear the expired authentication session',
-                  clearError,
-                );
+                console.error('Unable to clear the expired authentication session', clearError);
 
                 if (shouldNotify && shouldNotifySessionExpired) {
                   onSessionExpired?.();
@@ -308,14 +278,10 @@ const tokenRefreshService = createTokenRefreshService({
   clearSession: clearUserSessionIfCurrent,
   getTokenSnapshot: () => userTokenStorage.getTokenSnapshot(),
   onSessionExpired: () => {
-    toastService.showError(
-      String(i18n.t('common.error')),
-      String(i18n.t('auth.session.expired')),
-    );
+    toastService.showError(String(i18n.t('common.error')), String(i18n.t('auth.session.expired')));
   },
   refreshTokens: refresh,
-  saveTokensIfCurrent: (snapshot, tokens) =>
-    userTokenStorage.saveTokensIfCurrent(snapshot, tokens),
+  saveTokensIfCurrent: (snapshot, tokens) => userTokenStorage.saveTokensIfCurrent(snapshot, tokens),
 });
 
 let isRequesterConfigured = false;

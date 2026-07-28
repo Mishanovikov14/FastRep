@@ -1,7 +1,4 @@
-import type {
-  ICreateReportRequest,
-  IUpdateReportRequest,
-} from '@/entities/report/types/report';
+import type { ICreateReportRequest, IUpdateReportRequest } from '@/entities/report/types/report';
 
 export const REPORT_TITLE_MAX_LENGTH = 120;
 export const REPORT_NOTES_MAX_LENGTH = 50_000;
@@ -14,10 +11,7 @@ interface IReportFormValues {
   title: string;
 }
 
-export const validateReportForm = ({
-  notes,
-  title,
-}: IReportFormValues): ReportFormErrors => {
+export const validateReportForm = ({ notes, title }: IReportFormValues): ReportFormErrors => {
   const errors: ReportFormErrors = {};
   const trimmedTitle = title.trim();
 
@@ -34,10 +28,7 @@ export const validateReportForm = ({
   return errors;
 };
 
-export const normalizeCreateReportRequest = ({
-  notes,
-  title,
-}: IReportFormValues): ICreateReportRequest => {
+export const normalizeCreateReportRequest = ({ notes, title }: IReportFormValues): ICreateReportRequest => {
   const trimmedNotes = notes.trim();
 
   return {
@@ -46,10 +37,7 @@ export const normalizeCreateReportRequest = ({
   };
 };
 
-export const normalizeUpdateReportRequest = ({
-  notes,
-  title,
-}: IReportFormValues): IUpdateReportRequest => {
+export const normalizeUpdateReportRequest = ({ notes, title }: IReportFormValues): IUpdateReportRequest => {
   return {
     notes: notes.trim(),
     title: title.trim(),

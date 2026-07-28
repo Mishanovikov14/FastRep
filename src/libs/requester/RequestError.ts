@@ -3,8 +3,10 @@ import axios, { AxiosError } from 'axios';
 import type { IResponse } from './IResponse';
 
 interface BackendErrorBody {
+  code?: unknown;
   errors?: unknown;
   message?: unknown;
+  retryAfterSeconds?: unknown;
   type?: unknown;
 }
 
@@ -28,8 +30,7 @@ export const normalizeRequestError = (error: unknown): IResponse<never> => {
 
   const axiosError = error as AxiosError<unknown>;
   const backendError = parseBackendError(axiosError.response?.data);
-  const isTimeout =
-    axiosError.code === AxiosError.ECONNABORTED || axiosError.code === AxiosError.ETIMEDOUT;
+  const isTimeout = axiosError.code === AxiosError.ECONNABORTED || axiosError.code === AxiosError.ETIMEDOUT;
   const isNetworkError = axiosError.code === AxiosError.ERR_NETWORK || !axiosError.response;
 
   let message = axiosError.message || 'Something went wrong.';
@@ -43,17 +44,20 @@ export const normalizeRequestError = (error: unknown): IResponse<never> => {
   }
 
   return {
+    code: typeof backendError.code === 'string' ? backendError.code : undefined,
     errors: backendError.errors ?? axiosError.response?.data,
     isError: true,
     message,
+    retryAfterSeconds:
+      typeof backendError.retryAfterSeconds === 'number' ? backendError.retryAfterSeconds : undefined,
     status: axiosError.response?.status,
     type:
       typeof backendError.type === 'string'
         ? backendError.type
         : isTimeout
-          ? 'timeout_error'
-          : isNetworkError
-            ? 'network_error'
-            : undefined,
+        ? 'timeout_error'
+        : isNetworkError
+        ? 'network_error'
+        : undefined,
   };
 };

@@ -3,11 +3,9 @@ import type { TranslationResources } from './types';
 export const en: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent:
-        'If an account exists for this email, we sent a verification code.',
+      codeSent: 'If an account exists for this email, we sent a verification code.',
       email: 'Email',
-      explanation:
-        'Enter your email address and we will send you a six-digit verification code.',
+      explanation: 'Enter your email address and we will send you a six-digit verification code.',
       sendCode: 'Send code',
       title: 'Forgot password',
       validation: {
@@ -55,9 +53,28 @@ export const en: TranslationResources = {
         passwordsMismatch: 'Passwords do not match.',
       },
     },
+    registrationVerification: {
+      accountAlreadyExists: 'An account with this email already exists. Return to log in.',
+      codeAccessibilityLabel: 'Six-digit registration verification code',
+      codeResent: 'A new verification code was sent.',
+      confirm: 'Confirm email',
+      correctDetails: 'Correct registration details',
+      description: 'Enter the six-digit code we sent to your email.',
+      emailDestination: 'Code sent to {{email}}',
+      expiredRegistration: 'This registration has expired. Return and create your account again.',
+      genericError: "We couldn't verify your email. Please try again.",
+      invalidCode: 'The verification code is invalid or expired.',
+      invalidCodeFormat: 'Enter exactly six digits.',
+      networkError: 'No internet connection. Check your connection and try again.',
+      rateLimited: 'Too many attempts. Please wait before trying again.',
+      resend: 'Resend code',
+      resendIn: 'Resend code in {{time}}',
+      serverUnavailable: 'The server is temporarily unavailable. Please try again later.',
+      timeoutError: 'The request timed out. Please try again.',
+      title: 'Verify your email',
+    },
     otp: {
-      codeResent:
-        'If an account exists for this email, we sent a new verification code.',
+      codeResent: 'If an account exists for this email, we sent a new verification code.',
       codeSentTo: 'Code sent to {{email}}',
       explanation: 'Enter the six-digit code from your email.',
       invalidCodeFormat: 'Enter exactly six digits.',
@@ -72,11 +89,9 @@ export const en: TranslationResources = {
       invalidOrExpiredCode: 'The verification code is invalid or expired.',
       networkError: 'No internet connection. Check your connection and try again.',
       rateLimited: 'Too many requests. Please wait before trying again.',
-      serverUnavailable:
-        'The server is temporarily unavailable. Please try again later.',
+      serverUnavailable: 'The server is temporarily unavailable. Please try again later.',
       timeoutError: 'The request timed out. Please try again.',
-      tooManyAttempts:
-        'Too many unsuccessful attempts. Request a new verification code.',
+      tooManyAttempts: 'Too many unsuccessful attempts. Request a new verification code.',
       usedCode: 'This verification code has already been used. Request a new code.',
     },
     resetPassword: {
@@ -120,8 +135,7 @@ export const en: TranslationResources = {
   },
   profile: {
     logout: 'Log out',
-    logoutError:
-      "You were logged out on this device, but we couldn't notify the server.",
+    logoutError: "You were logged out on this device, but we couldn't notify the server.",
     title: 'Profile',
   },
   reports: {
@@ -131,14 +145,14 @@ export const en: TranslationResources = {
     },
     create: {
       action: 'Create report',
-      success: 'Report created.',
+      success: 'Report created successfully.',
       title: 'Create report',
     },
     delete: {
-      action: 'Delete report',
-      alreadyDeleted: 'This report was already deleted.',
+      action: 'Delete',
+      alreadyDeleted: 'Report was already deleted.',
       confirmation: 'This action cannot be undone. The report will be permanently deleted.',
-      success: 'Report deleted.',
+      success: 'Report deleted successfully.',
       title: 'Delete report?',
     },
     details: {
@@ -152,8 +166,8 @@ export const en: TranslationResources = {
       updatedAt: 'Updated',
     },
     edit: {
-      action: 'Edit report',
-      success: 'Report updated.',
+      action: 'Edit',
+      success: 'Report updated successfully.',
       title: 'Edit report',
     },
     errors: {

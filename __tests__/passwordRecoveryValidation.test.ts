@@ -4,10 +4,7 @@ import {
   normalizeForgotPasswordRequest,
   validateForgotPassword,
 } from '@/modules/auth/ui/ForgotPasswordView/presenters/forgotPasswordValidation';
-import {
-  isValidOtpInput,
-  validateOtp,
-} from '@/modules/auth/ui/OtpVerificationView/presenters/otpValidation';
+import { isValidOtpInput, validateOtp } from '@/modules/auth/ui/OtpVerificationView/presenters/otpValidation';
 import { validateResetPassword } from '@/modules/auth/ui/ResetPasswordView/presenters/resetPasswordValidation';
 
 const t = ((key: string) => key) as unknown as TFunction;

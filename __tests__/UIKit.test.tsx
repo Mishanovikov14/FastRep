@@ -30,9 +30,7 @@ describe('UIKit', () => {
         >
           <UIProvider>
             <NavigationContainer>
-              <ScreenContainer
-                headerComponent={<Header showBackButton title="FastRep" />}
-              >
+              <ScreenContainer headerComponent={<Header showBackButton title="FastRep" />}>
                 <Typography>FastRep</Typography>
                 <Input label="Email" onChangeText={() => undefined} value="" />
                 <Button onPress={() => undefined} title="Continue" />

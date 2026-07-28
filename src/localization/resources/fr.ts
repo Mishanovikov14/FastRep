@@ -3,11 +3,9 @@ import type { TranslationResources } from './types';
 export const fr: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent:
-        'Si un compte existe pour cet e-mail, nous avons envoyé un code de vérification.',
+      codeSent: 'Si un compte existe pour cet e-mail, nous avons envoyé un code de vérification.',
       email: 'E-mail',
-      explanation:
-        'Saisissez votre e-mail pour recevoir un code de vérification à six chiffres.',
+      explanation: 'Saisissez votre e-mail pour recevoir un code de vérification à six chiffres.',
       sendCode: 'Envoyer le code',
       title: 'Mot de passe oublié',
       validation: {
@@ -55,9 +53,28 @@ export const fr: TranslationResources = {
         passwordsMismatch: 'Les mots de passe ne correspondent pas.',
       },
     },
+    registrationVerification: {
+      accountAlreadyExists: 'Un compte existe déjà avec cet e-mail. Revenez à la connexion.',
+      codeAccessibilityLabel: 'Code de vérification d’inscription à six chiffres',
+      codeResent: 'Un nouveau code de vérification a été envoyé.',
+      confirm: 'Confirmer l’e-mail',
+      correctDetails: 'Corriger les informations d’inscription',
+      description: 'Saisissez le code à six chiffres envoyé à votre adresse e-mail.',
+      emailDestination: 'Code envoyé à {{email}}',
+      expiredRegistration: 'Cette inscription a expiré. Revenez en arrière et recréez votre compte.',
+      genericError: 'Impossible de vérifier votre e-mail. Veuillez réessayer.',
+      invalidCode: 'Le code de vérification est incorrect ou a expiré.',
+      invalidCodeFormat: 'Saisissez exactement six chiffres.',
+      networkError: 'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
+      rateLimited: 'Trop de tentatives. Veuillez patienter avant de réessayer.',
+      resend: 'Renvoyer le code',
+      resendIn: 'Renvoyer le code dans {{time}}',
+      serverUnavailable: 'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
+      timeoutError: 'La requête a expiré. Veuillez réessayer.',
+      title: 'Vérifiez votre e-mail',
+    },
     otp: {
-      codeResent:
-        'Si un compte existe pour cet e-mail, nous avons envoyé un nouveau code.',
+      codeResent: 'Si un compte existe pour cet e-mail, nous avons envoyé un nouveau code.',
       codeSentTo: 'Code envoyé à {{email}}',
       explanation: 'Saisissez le code à six chiffres reçu par e-mail.',
       invalidCodeFormat: 'Saisissez exactement six chiffres.',
@@ -70,14 +87,11 @@ export const fr: TranslationResources = {
       back: 'Retour',
       backToLogin: 'Retour à la connexion',
       invalidOrExpiredCode: 'Le code de vérification est invalide ou expiré.',
-      networkError:
-        'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
+      networkError: 'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
       rateLimited: 'Trop de demandes. Veuillez patienter avant de réessayer.',
-      serverUnavailable:
-        'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
+      serverUnavailable: 'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
       timeoutError: "Le délai d'attente de la requête a été dépassé.",
-      tooManyAttempts:
-        'Trop de tentatives infructueuses. Demandez un nouveau code.',
+      tooManyAttempts: 'Trop de tentatives infructueuses. Demandez un nouveau code.',
       usedCode: 'Ce code a déjà été utilisé. Demandez un nouveau code.',
     },
     resetPassword: {
@@ -85,8 +99,7 @@ export const fr: TranslationResources = {
       explanation: 'Choisissez un nouveau mot de passe pour votre compte FastRep.',
       newPassword: 'Nouveau mot de passe',
       resetPassword: 'Réinitialiser le mot de passe',
-      success:
-        'Votre mot de passe a été réinitialisé. Connectez-vous avec le nouveau.',
+      success: 'Votre mot de passe a été réinitialisé. Connectez-vous avec le nouveau.',
       title: 'Réinitialiser le mot de passe',
       validation: {
         confirmPasswordRequired: 'Confirmez votre nouveau mot de passe.',
@@ -99,11 +112,9 @@ export const fr: TranslationResources = {
     session: {
       expired: 'Votre session a expiré. Veuillez vous reconnecter.',
       genericError: "L'authentification n'a pas pu aboutir. Veuillez réessayer.",
-      networkUnavailable:
-        'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
+      networkUnavailable: 'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
       restoring: 'Restauration de votre session…',
-      serverError:
-        'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
+      serverError: 'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
       timeout: "Le délai d'attente de la requête a été dépassé. Veuillez réessayer.",
     },
   },
@@ -124,8 +135,7 @@ export const fr: TranslationResources = {
   },
   profile: {
     logout: 'Se déconnecter',
-    logoutError:
-      "Vous avez été déconnecté sur cet appareil, mais le serveur n'a pas pu être averti.",
+    logoutError: "Vous avez été déconnecté sur cet appareil, mais le serveur n'a pas pu être averti.",
     title: 'Profil',
   },
   reports: {
@@ -135,14 +145,14 @@ export const fr: TranslationResources = {
     },
     create: {
       action: 'Créer un rapport',
-      success: 'Rapport créé.',
+      success: 'Rapport créé avec succès.',
       title: 'Créer un rapport',
     },
     delete: {
-      action: 'Supprimer le rapport',
-      alreadyDeleted: 'Ce rapport a déjà été supprimé.',
+      action: 'Supprimer',
+      alreadyDeleted: 'Le rapport a déjà été supprimé.',
       confirmation: 'Cette action est irréversible. Le rapport sera définitivement supprimé.',
-      success: 'Rapport supprimé.',
+      success: 'Rapport supprimé avec succès.',
       title: 'Supprimer le rapport ?',
     },
     details: {
@@ -156,8 +166,8 @@ export const fr: TranslationResources = {
       updatedAt: 'Mis à jour',
     },
     edit: {
-      action: 'Modifier le rapport',
-      success: 'Rapport mis à jour.',
+      action: 'Modifier',
+      success: 'Rapport mis à jour avec succès.',
       title: 'Modifier le rapport',
     },
     errors: {

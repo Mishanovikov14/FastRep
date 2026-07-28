@@ -16,26 +16,12 @@ interface IProps {
   visible: boolean;
 }
 
-export const CustomAlert = ({
-  actions,
-  description,
-  onDismiss,
-  title,
-  visible,
-}: IProps) => {
+export const CustomAlert = ({ actions, description, onDismiss, title, visible }: IProps) => {
   const { colors, radius, spacing } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, radius, spacing),
-    [colors, radius, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
 
   return (
-    <Modal
-      animationType="fade"
-      onRequestClose={onDismiss}
-      transparent
-      visible={visible}
-    >
+    <Modal animationType="fade" onRequestClose={onDismiss} transparent visible={visible}>
       <View style={styles.container}>
         <View style={styles.backdrop} />
         <View accessibilityViewIsModal style={styles.card}>
@@ -48,6 +34,7 @@ export const CustomAlert = ({
                 key={action.key}
                 loading={action.loading}
                 onPress={action.onPress}
+                style={styles.action}
                 title={action.title}
                 variant={action.variant}
               />

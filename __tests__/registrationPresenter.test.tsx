@@ -5,21 +5,13 @@ import ReactTestRenderer from 'react-test-renderer';
 
 import { register } from '@/entities/user/API/userApi';
 import { useUserStore } from '@/entities/user/model/userStore';
-import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
-import type { IAuthenticationResponse } from '@/entities/user/types/auth';
+import type { IRegistrationPendingResponse } from '@/entities/user/types/auth';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { toastService } from '@/libs/toast/toastService';
 import { useRegistrationViewPresenter } from '@/modules/auth/ui/RegistrationView/presenters/useRegistrationViewPresenter';
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
-}));
-jest.mock('@/entities/user/services/userTokenStorage', () => ({
-  userTokenStorage: {
-    clearTokens: jest.fn(),
-    getTokens: jest.fn(),
-    saveTokens: jest.fn(),
-  },
 }));
 jest.mock('@/libs/toast/toastService', () => ({
   toastService: {
@@ -38,14 +30,14 @@ describe('useRegistrationViewPresenter', () => {
     useUserStore.getState().clearUser();
   });
 
-  it('blocks duplicate submits and completes the authenticated registration flow', async () => {
+  it('blocks duplicate submits and navigates to verification without authenticating', async () => {
     const navigation = {
       navigate: jest.fn(),
       reset: jest.fn(),
     };
     let presenter: ReturnType<typeof useRegistrationViewPresenter> | undefined;
-    let resolveResponse: ((response: IResponse<IAuthenticationResponse>) => void) | undefined;
-    const responsePromise = new Promise<IResponse<IAuthenticationResponse>>((resolve) => {
+    let resolveResponse: ((response: IResponse<IRegistrationPendingResponse>) => void) | undefined;
+    const responsePromise = new Promise<IResponse<IRegistrationPendingResponse>>((resolve) => {
       resolveResponse = resolve;
     });
     const Harness = () => {
@@ -59,7 +51,6 @@ describe('useRegistrationViewPresenter', () => {
 
     jest.mocked(useNavigation).mockReturnValue(navigation);
     jest.mocked(register).mockReturnValue(responsePromise);
-    jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
 
     await ReactTestRenderer.act(async () => {
       ReactTestRenderer.create(<Harness />);
@@ -85,18 +76,9 @@ describe('useRegistrationViewPresenter', () => {
 
     resolveResponse?.({
       data: {
-        accessToken: 'access-token',
-        refreshToken: 'refresh-token',
-        user: {
-          createdAt: '2026-07-26T10:00:00.000Z',
-          email: 'alex@example.com',
-          fullName: 'Alex Morgan',
-          id: 'user-1',
-          isPremium: false,
-          language: 'en',
-          photoUrl: null,
-          updatedAt: '2026-07-26T10:00:00.000Z',
-        },
+        email: 'alex@example.com',
+        resendAvailableInSeconds: 57,
+        verificationRequired: true,
       },
       isError: false,
       message: '',
@@ -106,18 +88,15 @@ describe('useRegistrationViewPresenter', () => {
       await firstSubmit;
     });
 
-    expect(userTokenStorage.saveTokens).toHaveBeenCalledWith({
-      accessToken: 'access-token',
-      refreshToken: 'refresh-token',
-    });
     expect(useUserStore.getState()).toMatchObject({
-      isAuthorized: true,
-      user: {
-        email: 'alex@example.com',
-        id: 'user-1',
-      },
+      isAuthorized: false,
+      user: null,
     });
-    expect(navigation.reset).not.toHaveBeenCalled();
+    expect(navigation.navigate).toHaveBeenCalledWith('RegistrationVerification', {
+      email: 'alex@example.com',
+      resendAvailableInSeconds: 57,
+    });
+    expect(navigation.navigate.mock.calls[0]?.[1]).not.toHaveProperty('password');
   });
 
   it('does not save or authorize a session after a failed registration', async () => {
@@ -140,7 +119,6 @@ describe('useRegistrationViewPresenter', () => {
       message: 'Email already exists',
       status: 409,
     });
-    jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
 
     await ReactTestRenderer.act(async () => {
       ReactTestRenderer.create(<Harness />);
@@ -157,14 +135,13 @@ describe('useRegistrationViewPresenter', () => {
       await presenter?.onRegister();
     });
 
-    expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
     expect(useUserStore.getState()).toMatchObject({
       isAuthorized: false,
       user: null,
     });
     expect(toastService.showError).toHaveBeenCalledWith(
       'common.error',
-      'Email already exists',
+      'auth.registrationVerification.accountAlreadyExists',
     );
   });
 
@@ -194,6 +171,5 @@ describe('useRegistrationViewPresenter', () => {
 
     expect(navigation.goBack).toHaveBeenCalledTimes(1);
     expect(register).not.toHaveBeenCalled();
-    expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
   });
 });

@@ -4,12 +4,8 @@ import type { TFunction } from 'i18next';
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
-import { useUserStore } from '@/entities/user/model/userStore';
-import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
-import type {
-  IAuthenticationResponse,
-  ILoginRequest,
-} from '@/entities/user/types/auth';
+import { applyAuthenticationResponse } from '@/entities/user/services/userSessionService';
+import type { IAuthenticationResponse, ILoginRequest } from '@/entities/user/types/auth';
 import type { IUser } from '@/entities/user/types/user';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { toastService } from '@/libs/toast/toastService';
@@ -21,12 +17,8 @@ jest.mock('@react-navigation/native', () => ({
 jest.mock('@tanstack/react-query', () => ({
   useMutation: jest.fn(),
 }));
-jest.mock('@/entities/user/services/userTokenStorage', () => ({
-  userTokenStorage: {
-    clearTokens: jest.fn(),
-    getTokens: jest.fn(),
-    saveTokens: jest.fn(),
-  },
+jest.mock('@/entities/user/services/userSessionService', () => ({
+  applyAuthenticationResponse: jest.fn(),
 }));
 jest.mock('@/libs/toast/toastService', () => ({
   toastService: {
@@ -53,9 +45,7 @@ const authentication: IAuthenticationResponse = {
   refreshToken: 'refresh-token',
   user,
 };
-const originalSetUser = useUserStore.getState().setUser;
 const mockMutateAsync = jest.fn();
-const mockSetUser = jest.fn();
 const waitForAsyncWork = () =>
   new Promise<void>((resolve) => {
     setTimeout(resolve, 0);
@@ -78,12 +68,6 @@ describe('useLoginViewPresenter', () => {
     jest.clearAllMocks();
     presenter = undefined;
     renderer = undefined;
-    useUserStore.setState({
-      isAuthorized: false,
-      isSessionRestored: false,
-      setUser: mockSetUser,
-      user: null,
-    });
     jest.mocked(useNavigation).mockReturnValue(navigation as never);
     jest.mocked(useMutation).mockReturnValue({
       isPending: false,
@@ -94,31 +78,16 @@ describe('useLoginViewPresenter', () => {
   afterEach(() => {
     ReactTestRenderer.act(() => {
       renderer?.unmount();
-      useUserStore.setState({
-        isAuthorized: false,
-        isSessionRestored: false,
-        setUser: originalSetUser,
-        user: null,
-      });
     });
   });
 
-  it('saves the token pair before the user and blocks a duplicate login submission', async () => {
-    const events: string[] = [];
-    let resolveResponse:
-      | ((response: IResponse<IAuthenticationResponse>) => void)
-      | undefined;
+  it('applies the shared authentication response and blocks a duplicate login submission', async () => {
+    let resolveResponse: ((response: IResponse<IAuthenticationResponse>) => void) | undefined;
     const responsePromise = new Promise<IResponse<IAuthenticationResponse>>((resolve) => {
       resolveResponse = resolve;
     });
 
-    jest.mocked(userTokenStorage.saveTokens).mockImplementation(async () => {
-      events.push('tokens');
-    });
-    mockSetUser.mockImplementation((nextUser: IUser) => {
-      events.push('user');
-      originalSetUser(nextUser);
-    });
+    jest.mocked(applyAuthenticationResponse).mockResolvedValue();
     mockMutateAsync.mockReturnValue(responsePromise);
 
     await ReactTestRenderer.act(async () => {
@@ -152,16 +121,7 @@ describe('useLoginViewPresenter', () => {
       await waitForAsyncWork();
     });
 
-    expect(userTokenStorage.saveTokens).toHaveBeenCalledWith({
-      accessToken: 'access-token',
-      refreshToken: 'refresh-token',
-    });
-    expect(mockSetUser).toHaveBeenCalledWith(user);
-    expect(events).toEqual(['tokens', 'user']);
-    expect(useUserStore.getState()).toMatchObject({
-      isAuthorized: true,
-      user,
-    });
+    expect(applyAuthenticationResponse).toHaveBeenCalledWith(authentication);
   });
 
   it('does not save tokens or set the user when login fails', async () => {
@@ -185,16 +145,8 @@ describe('useLoginViewPresenter', () => {
       await waitForAsyncWork();
     });
 
-    expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
-    expect(mockSetUser).not.toHaveBeenCalled();
-    expect(useUserStore.getState()).toMatchObject({
-      isAuthorized: false,
-      user: null,
-    });
-    expect(toastService.showError).toHaveBeenCalledWith(
-      'common.error',
-      'auth.login.invalidCredentials',
-    );
+    expect(applyAuthenticationResponse).not.toHaveBeenCalled();
+    expect(toastService.showError).toHaveBeenCalledWith('common.error', 'auth.login.invalidCredentials');
   });
 
   it('opens Registration and the real password-recovery flow', async () => {
