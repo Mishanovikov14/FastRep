@@ -1,6 +1,7 @@
 import { getMeWithoutRefresh } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
 import { refreshTokenPair } from '@/entities/user/services/tokenRefreshService';
-import { restoreUserSession } from '@/entities/user/services/userSessionService';
+import { applyAuthenticationResponse, restoreUserSession } from '@/entities/user/services/userSessionService';
 import { clearUserSession } from '@/entities/user/services/userStateService';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import type { ITokenPair } from '@/entities/user/types/auth';
@@ -9,6 +10,7 @@ import type { IUser } from '@/entities/user/types/user';
 jest.mock('@/entities/user/services/userTokenStorage', () => ({
   userTokenStorage: {
     getTokens: jest.fn(),
+    saveTokens: jest.fn(),
   },
 }));
 
@@ -56,6 +58,31 @@ const unauthorizedResponse = {
   message: 'Unauthorized',
   status: 401,
 };
+
+describe('applyAuthenticationResponse', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useUserStore.getState().clearUser();
+    jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
+  });
+
+  it('persists the Keychain token pair before authorizing the existing user store', async () => {
+    await applyAuthenticationResponse({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+      user,
+    });
+
+    expect(userTokenStorage.saveTokens).toHaveBeenCalledWith({
+      accessToken: 'access-token',
+      refreshToken: 'refresh-token',
+    });
+    expect(useUserStore.getState()).toMatchObject({
+      isAuthorized: true,
+      user,
+    });
+  });
+});
 
 describe('restoreUserSession', () => {
   beforeEach(() => {

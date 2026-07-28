@@ -5,7 +5,10 @@ import {
   login,
   logout,
   refresh,
+  register,
+  resendRegistrationCode,
   resetPassword,
+  verifyRegistration,
 } from '@/entities/user/API/userApi';
 import { requester } from '@/libs/requester/requester';
 
@@ -37,6 +40,57 @@ describe('auth API', () => {
       method: 'POST',
       requiresAuth: false,
       url: '/auth/login',
+    });
+  });
+
+  it('sends registration and verification through their public endpoints', async () => {
+    const registrationRequest = {
+      email: 'alex@example.com',
+      fullName: 'Alex Morgan',
+      language: 'en' as const,
+      password: 'password123',
+    };
+
+    await register(registrationRequest);
+    await verifyRegistration({
+      code: '123456',
+      email: 'alex@example.com',
+    });
+
+    expect(requester.request).toHaveBeenNthCalledWith(1, {
+      data: registrationRequest,
+      method: 'POST',
+      requiresAuth: false,
+      url: '/auth/register',
+    });
+    expect(requester.request).toHaveBeenNthCalledWith(2, {
+      data: {
+        code: '123456',
+        email: 'alex@example.com',
+      },
+      method: 'POST',
+      requiresAuth: false,
+      url: '/auth/verify-registration',
+    });
+  });
+
+  it('treats an empty resend response as a successful public request', async () => {
+    jest.mocked(requester.request).mockResolvedValueOnce({
+      isError: false,
+      message: '',
+    });
+
+    const response = await resendRegistrationCode({ email: 'alex@example.com' });
+
+    expect(response).toEqual({
+      isError: false,
+      message: '',
+    });
+    expect(requester.request).toHaveBeenCalledWith({
+      data: { email: 'alex@example.com' },
+      method: 'POST',
+      requiresAuth: false,
+      url: '/auth/resend-registration-code',
     });
   });
 
