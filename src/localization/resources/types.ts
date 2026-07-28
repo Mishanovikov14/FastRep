@@ -97,6 +97,7 @@ export interface TranslationResources {
     };
   };
   common: {
+    back: string;
     cancel: string;
     close: string;
     continue: string;
@@ -120,6 +121,70 @@ export interface TranslationResources {
     premiumActive: string;
     premiumInactive: string;
     title: string;
+  };
+  reports: {
+    card: {
+      created: string;
+      updated: string;
+    };
+    create: {
+      action: string;
+      success: string;
+      title: string;
+    };
+    delete: {
+      action: string;
+      alreadyDeleted: string;
+      confirmation: string;
+      success: string;
+      title: string;
+    };
+    details: {
+      createdAt: string;
+      errorDescription: string;
+      errorTitle: string;
+      noNotes: string;
+      notFoundDescription: string;
+      notFoundTitle: string;
+      title: string;
+      updatedAt: string;
+    };
+    edit: {
+      action: string;
+      success: string;
+      title: string;
+    };
+    errors: {
+      network: string;
+      notFound: string;
+      server: string;
+      timeout: string;
+      validation: string;
+    };
+    form: {
+      notes: string;
+      notesPlaceholder: string;
+      title: string;
+      titlePlaceholder: string;
+    };
+    list: {
+      emptyDescription: string;
+      emptyTitle: string;
+      errorDescription: string;
+      errorTitle: string;
+      title: string;
+    };
+    status: {
+      draft: string;
+      failed: string;
+      processing: string;
+      ready: string;
+    };
+    validation: {
+      notesMax: string;
+      titleMax: string;
+      titleRequired: string;
+    };
   };
   languages: {
     english: string;

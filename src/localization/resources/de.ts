@@ -110,6 +110,7 @@ export const de: TranslationResources = {
     },
   },
   common: {
+    back: 'Zurück',
     cancel: 'Abbrechen',
     close: 'Schließen',
     continue: 'Weiter',
@@ -134,6 +135,70 @@ export const de: TranslationResources = {
     premiumActive: 'Aktiv',
     premiumInactive: 'Inaktiv',
     title: 'Startseite',
+  },
+  reports: {
+    card: {
+      created: 'Erstellt {{date}}',
+      updated: 'Aktualisiert {{date}}',
+    },
+    create: {
+      action: 'Bericht erstellen',
+      success: 'Bericht erstellt.',
+      title: 'Bericht erstellen',
+    },
+    delete: {
+      action: 'Bericht löschen',
+      alreadyDeleted: 'Dieser Bericht wurde bereits gelöscht.',
+      confirmation: 'Diese Aktion kann nicht rückgängig gemacht werden. Der Bericht wird dauerhaft gelöscht.',
+      success: 'Bericht gelöscht.',
+      title: 'Bericht löschen?',
+    },
+    details: {
+      createdAt: 'Erstellt',
+      errorDescription: 'Dieser Bericht konnte nicht geladen werden. Bitte erneut versuchen.',
+      errorTitle: 'Bericht kann nicht geladen werden',
+      noNotes: 'Keine Notizen',
+      notFoundDescription: 'Dieser Bericht wurde möglicherweise gelöscht oder ist nicht mehr verfügbar.',
+      notFoundTitle: 'Bericht nicht gefunden',
+      title: 'Berichtsdetails',
+      updatedAt: 'Aktualisiert',
+    },
+    edit: {
+      action: 'Bericht bearbeiten',
+      success: 'Bericht aktualisiert.',
+      title: 'Bericht bearbeiten',
+    },
+    errors: {
+      network: 'Keine Internetverbindung. Verbindung prüfen und erneut versuchen.',
+      notFound: 'Der Bericht wurde nicht gefunden.',
+      server: 'Der Server ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.',
+      timeout: 'Die Anfrage hat zu lange gedauert. Bitte erneut versuchen.',
+      validation: 'Berichtsdaten prüfen und erneut versuchen.',
+    },
+    form: {
+      notes: 'Notizen',
+      notesPlaceholder: 'Nützliche Details hinzufügen',
+      title: 'Titel',
+      titlePlaceholder: 'Berichtstitel',
+    },
+    list: {
+      emptyDescription: 'Erstellen Sie Ihren ersten Bericht, um Fortschritt und Notizen an einem Ort zu verwalten.',
+      emptyTitle: 'Noch keine Berichte',
+      errorDescription: 'Ihre Berichte konnten nicht geladen werden. Verbindung prüfen und erneut versuchen.',
+      errorTitle: 'Berichte können nicht geladen werden',
+      title: 'Berichte',
+    },
+    status: {
+      draft: 'Entwurf',
+      failed: 'Fehlgeschlagen',
+      processing: 'In Bearbeitung',
+      ready: 'Bereit',
+    },
+    validation: {
+      notesMax: 'Notizen dürfen höchstens 50.000 Zeichen enthalten.',
+      titleMax: 'Der Titel darf höchstens 120 Zeichen enthalten.',
+      titleRequired: 'Der Titel ist erforderlich.',
+    },
   },
   languages: {
     english: 'Englisch',
