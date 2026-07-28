@@ -84,6 +84,31 @@ describe('AxiosRequester', () => {
     });
   });
 
+  it('preserves registration cooldown metadata from backend errors', async () => {
+    const { client, request } = createClient();
+    request.mockRejectedValue({
+      isAxiosError: true,
+      message: 'Request failed',
+      response: {
+        data: {
+          code: 'REGISTRATION_CODE_COOLDOWN',
+          message: 'Please wait before requesting another registration code',
+          retryAfterSeconds: 42,
+        },
+        status: 429,
+      },
+    });
+
+    const result = await new AxiosRequester(client).request({ url: '/auth/resend-registration-code' });
+
+    expect(result).toMatchObject({
+      code: 'REGISTRATION_CODE_COOLDOWN',
+      isError: true,
+      retryAfterSeconds: 42,
+      status: 429,
+    });
+  });
+
   it.each([
     ['ERR_NETWORK', 'Network connection is unavailable.'],
     ['ECONNABORTED', 'The request timed out.'],

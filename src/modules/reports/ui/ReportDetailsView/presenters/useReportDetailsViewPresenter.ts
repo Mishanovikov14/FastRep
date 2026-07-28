@@ -76,7 +76,6 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
 
       onHideDeleteAlert();
       toastService.showSuccess(
-        String(t('common.success')),
         String(t(response.status === 404 ? 'reports.delete.alreadyDeleted' : 'reports.delete.success')),
       );
       navigation.popTo('Tabs', { screen: 'Reports' });

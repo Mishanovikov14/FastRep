@@ -1,4 +1,6 @@
 import { getMeWithoutRefresh } from '@/entities/user/API/userApi';
+import { useUserStore } from '@/entities/user/model/userStore';
+import type { IAuthenticationResponse } from '@/entities/user/types/auth';
 import type { SessionRestoreResult } from '@/entities/user/types/session';
 
 import { getTokenRefreshErrorDetails, isInvalidTokenRefreshError, refreshTokenPair } from './tokenRefreshService';
@@ -12,6 +14,14 @@ const getTemporaryErrorResult = (message?: string, type?: string, statusCode?: n
     statusCode,
     type,
   };
+};
+
+export const applyAuthenticationResponse = async (authentication: IAuthenticationResponse): Promise<void> => {
+  await userTokenStorage.saveTokens({
+    accessToken: authentication.accessToken,
+    refreshToken: authentication.refreshToken,
+  });
+  useUserStore.getState().setUser(authentication.user);
 };
 
 export const restoreUserSession = async (): Promise<SessionRestoreResult> => {

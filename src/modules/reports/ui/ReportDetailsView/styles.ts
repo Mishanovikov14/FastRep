@@ -5,6 +5,9 @@ import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
   const styles = StyleSheet.create({
+    action: {
+      flex: 1,
+    },
     actions: {
       flexDirection: 'row',
       gap: scaleHorizontal(spacing.sm),

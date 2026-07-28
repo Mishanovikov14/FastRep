@@ -62,7 +62,7 @@ export const useCreateReportViewPresenter = ({ t }: IInput) => {
         return;
       }
 
-      toastService.showSuccess(String(t('common.success')), String(t('reports.create.success')));
+      toastService.showSuccess(String(t('reports.create.success')));
       navigation.replace('ReportDetails', { reportId: response.data.id });
     } catch (error: unknown) {
       console.error('Unexpected report creation failure', error);

@@ -34,6 +34,7 @@ export const CustomAlert = ({ actions, description, onDismiss, title, visible }:
                 key={action.key}
                 loading={action.loading}
                 onPress={action.onPress}
+                style={styles.action}
                 title={action.title}
                 variant={action.variant}
               />

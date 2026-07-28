@@ -3,8 +3,10 @@ import axios, { AxiosError } from 'axios';
 import type { IResponse } from './IResponse';
 
 interface BackendErrorBody {
+  code?: unknown;
   errors?: unknown;
   message?: unknown;
+  retryAfterSeconds?: unknown;
   type?: unknown;
 }
 
@@ -42,9 +44,12 @@ export const normalizeRequestError = (error: unknown): IResponse<never> => {
   }
 
   return {
+    code: typeof backendError.code === 'string' ? backendError.code : undefined,
     errors: backendError.errors ?? axiosError.response?.data,
     isError: true,
     message,
+    retryAfterSeconds:
+      typeof backendError.retryAfterSeconds === 'number' ? backendError.retryAfterSeconds : undefined,
     status: axiosError.response?.status,
     type:
       typeof backendError.type === 'string'

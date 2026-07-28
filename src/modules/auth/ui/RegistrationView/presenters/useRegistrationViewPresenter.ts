@@ -3,17 +3,43 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useRef, useState } from 'react';
 
 import { register } from '@/entities/user/API/userApi';
-import { useUserStore } from '@/entities/user/model/userStore';
-import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import { toastService } from '@/libs/toast/toastService';
 import type { IPresenterInput, RegistrationFormErrors } from '@/modules/auth/ui/RegistrationView/types';
 import type { GuestStackParamList } from '@/navigation/types';
 
 import { validateRegistration } from './registrationValidation';
 
+interface IRequestFailure {
+  status?: number;
+  type?: string;
+}
+
+const getRegistrationErrorMessage = ({ status, type }: IRequestFailure, t: IPresenterInput['t']): string => {
+  if (type === 'network_error') {
+    return String(t('auth.registrationVerification.networkError'));
+  }
+
+  if (type === 'timeout_error' || status === 408) {
+    return String(t('auth.registrationVerification.timeoutError'));
+  }
+
+  if (status === 503 || (status !== undefined && status >= 500)) {
+    return String(t('auth.registrationVerification.serverUnavailable'));
+  }
+
+  if (status === 429) {
+    return String(t('auth.registrationVerification.rateLimited'));
+  }
+
+  if (status === 409) {
+    return String(t('auth.registrationVerification.accountAlreadyExists'));
+  }
+
+  return String(t('common.somethingWentWrong'));
+};
+
 export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) => {
   const navigation = useNavigation<NativeStackNavigationProp<GuestStackParamList, 'Registration'>>();
-  const setUser = useUserStore((state) => state.setUser);
   const isSubmittingRef = useRef(false);
   const [confirmPassword, setConfirmPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -83,19 +109,16 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
       });
 
       if (response.isError || !response.data) {
-        const message = response.message || String(t('common.somethingWentWrong'));
-
-        toastService.showError(String(t('common.error')), message);
+        toastService.showError(String(t('common.error')), getRegistrationErrorMessage(response, t));
         return;
       }
 
-      const { accessToken, refreshToken, user } = response.data;
-
-      await userTokenStorage.saveTokens({
-        accessToken,
-        refreshToken,
+      setConfirmPassword('');
+      setPassword('');
+      navigation.navigate('RegistrationVerification', {
+        email: response.data.email,
+        resendAvailableInSeconds: response.data.resendAvailableInSeconds,
       });
-      setUser(user);
     } catch (error: unknown) {
       console.error('Unexpected registration failure', error);
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
@@ -103,7 +126,7 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
       isSubmittingRef.current = false;
       setIsLoading(false);
     }
-  }, [confirmPassword, email, fullName, language, password, setUser, t]);
+  }, [confirmPassword, email, fullName, language, navigation, password, t]);
 
   return {
     confirmPassword,

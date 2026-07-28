@@ -5,11 +5,12 @@ import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
   const styles = StyleSheet.create({
+    action: {
+      flex: 1,
+    },
     actions: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
       gap: scaleHorizontal(spacing.sm),
-      justifyContent: 'flex-end',
     },
     backdrop: {
       backgroundColor: colors.black,

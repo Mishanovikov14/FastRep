@@ -77,7 +77,7 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
         return;
       }
 
-      toastService.showSuccess(String(t('common.success')), String(t('reports.edit.success')));
+      toastService.showSuccess(String(t('reports.edit.success')));
       navigation.goBack();
     } catch (error: unknown) {
       console.error('Unexpected report update failure', error);

@@ -100,8 +100,18 @@ export const ReportDetailsView = () => {
               <Typography>{updatedAtLabel}</Typography>
             </View>
             <View style={styles.actions}>
-              <Button onPress={onEdit} title={String(t('reports.edit.action'))} variant="secondary" />
-              <Button onPress={onShowDeleteConfirmation} title={String(t('reports.delete.action'))} variant="danger" />
+              <Button
+                onPress={onEdit}
+                style={styles.action}
+                title={String(t('reports.edit.action'))}
+                variant="secondary"
+              />
+              <Button
+                onPress={onShowDeleteConfirmation}
+                style={styles.action}
+                title={String(t('reports.delete.action'))}
+                variant="danger"
+              />
             </View>
           </View>
         )}
