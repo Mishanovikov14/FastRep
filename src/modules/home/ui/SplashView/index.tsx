@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { Image, View } from 'react-native';
 
 import { Button } from '@/UIKit/Button';
-import { Loader } from '@/UIKit/Loader';
 import { ScreenContainer } from '@/UIKit/ScreenContainer';
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
@@ -24,7 +23,6 @@ export const SplashView = () => {
         style={styles.logo}
       />
       <View style={styles.status}>
-        {isLoading ? <Loader size="large" /> : null}
         {errorMessage ? (
           <Typography align="center" color={colors.error}>
             {errorMessage}

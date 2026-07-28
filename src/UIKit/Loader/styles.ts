@@ -5,10 +5,14 @@ import type { Colors } from '@/UIProvider/theme/types';
 export const getStyles = (colors: Colors) => {
   const styles = StyleSheet.create({
     fullscreen: {
+      ...StyleSheet.absoluteFillObject,
       alignItems: 'center',
       backgroundColor: colors.background,
-      flex: 1,
       justifyContent: 'center',
+      zIndex: 1,
+    },
+    transparent: {
+      backgroundColor: 'transparent',
     },
   });
 
