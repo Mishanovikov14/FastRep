@@ -57,7 +57,7 @@ Responsibilities:
 
 - `modules/` — UI and presenters only.
 - `entities/` — domain data, API, state, services, models, and domain types.
-- `UIKit/` — reusable visual components only.
+- `UIKit/` — global visual components reusable across independent modules only.
 - `UIProvider/` — theme and localization context.
 - `libs/` — generic technical infrastructure.
 - `localization/` — i18next configuration, resources, language resolution.
@@ -82,35 +82,55 @@ Do not create duplicate requester, storage, localization, theme, or toast implem
 
 ## 3. Component structure
 
-A non-trivial component or screen must use:
+Component-local props must be declared in the component's `index.tsx` and named
+`IProps`. Do not create `types.ts` only to hold component props.
+
+For a simple component:
 
 ```text
 ComponentName/
   index.tsx
   styles.ts
-  types.ts
+```
+
+For a component or screen with its own presenter:
+
+```text
+ComponentName/
+  index.tsx
+  styles.ts
   presenters/
     useComponentNamePresenter.ts
 ```
 
-For a simple purely visual component:
-
-```text
-ComponentName/
-  index.tsx
-  styles.ts
-  types.ts
-```
+A separate `types.ts` is optional and allowed only for genuinely shared,
+exported, non-local component contracts used by more than one file. Domain
+types remain in the relevant entity. Navigation and application-global
+technical types remain centralized in their existing owners. Do not inline
+shared domain or API contracts into components.
 
 Rules:
 
 - JSX belongs in `index.tsx`.
 - Styles belong in `styles.ts`.
-- Exported props and shared component types belong in `types.ts`.
-- Logic belongs in presenters or focused hooks.
-- Exported component props must be named `IProps`.
+- Component-local `IProps` belongs in `index.tsx`, even when the component is exported.
+- Component-owned logic belongs in its nested `presenters/` folder or in a focused local hook.
 - Component and screen folders use `index.tsx` as the implementation file.
 - Screen folders and exported screen components must end with `View`, not `Screen`.
+
+Good:
+
+```tsx
+interface IProps {
+  title: string;
+}
+
+export const ReportCard = ({ title }: IProps) => {
+  return <Typography>{title}</Typography>;
+};
+```
+
+Bad: `ReportCard/types.ts` containing only `IProps`.
 
 ---
 
@@ -181,20 +201,122 @@ UI components must not contain API calls, business logic, storage access, token 
 
 Move behavior into presenters or focused hooks.
 
+### Component ownership
+
+A component used by only one screen must live under that screen:
+
+```text
+ReportsListView/
+  components/
+    ReportCard/
+      index.tsx
+      styles.ts
+```
+
+Use `modules/reports/ui/components/` only for a report UI component that is
+actually used by at least two report screens. Do not promote screen-local
+components into module-shared folders, duplicate a shared component in several
+screens, or move a module-specific component into UIKit.
+
+Good: `ReportsListView/components/ReportCard/` when only the list renders it.
+Bad: `modules/reports/ui/components/ReportCard/` for one consumer.
+Good: `modules/reports/ui/components/ReportStatusBadge/` when both list and
+details screens render it.
+
+UIKit is reserved for globally reusable visual components expected to be used
+across independent modules. It may contain primitives such as Button, Input,
+Header, Loader, ScreenContainer, EmptyState, and CustomAlert. It must not
+contain domain-, report-, or screen-specific components, business logic,
+entity dependencies, or a generic icon registry.
+
 ---
 
-## 7. Presenters
+## 7. Presenters and shared orchestration
 
 Presenters may contain handlers, coordinate entity APIs and entity models, use React Query, Zustand, navigation, validation orchestration, derived state, effects, request error handling, and Reanimated shared values/styles.
 
 Presenters must not contain JSX, styles, theme colors, `useUiContext`, `keyExtractor`, or render functions.
 Reusable domain, token, and session logic belongs in the relevant entity rather than in presenters.
 
+If a screen or component owns a presenter, it must be nested in that owner's
+folder:
+
+```text
+ReportDetailsView/
+  presenters/
+    useReportDetailsViewPresenter.ts
+```
+
+A component-specific presenter is forbidden in the module root, directly
+beside `index.tsx`, or in a generic shared `presenters/` folder. Genuinely
+shared query hooks, mutation hooks, and domain orchestration used by multiple
+screens may live in a clearly shared module or entity location.
+
+Good: `ReportDetailsView/presenters/useReportDetailsViewPresenter.ts`.
+Bad: `modules/reports/presenters/useReportDetailsViewPresenter.ts`.
+
 Use `on` naming, not `handle`.
 
 ---
 
-## 8. Styles
+## 8. Icons
+
+Every icon must be an independent named React component in
+`src/assets/icons/`, one icon per file, implemented with `react-native-svg`.
+Expose explicit `width`, `height`, and `color` props where appropriate.
+
+```text
+src/assets/icons/
+  ArrowBackIcon.tsx
+  ProfileIcon.tsx
+```
+
+UIKit and modules may import icons from assets. Icons do not belong in UIKit.
+Do not create a generic UIKit `Icon`, `switch(name)`, an icon-name string
+union, or duplicate the same SVG path in several files.
+
+Good (`src/assets/icons/ArrowBackIcon.tsx`):
+
+```tsx
+interface IProps {
+  color: string;
+  height?: number;
+  width?: number;
+}
+
+export const ArrowBackIcon = ({ color, height = 24, width = 24 }: IProps) => {
+  return <Svg height={height} width={width}><Path d="..." fill={color} /></Svg>;
+};
+```
+
+Bad: `<Icon name="arrow-back" />`.
+
+---
+
+## 9. Screen rendering
+
+Render a screen's shared shell once. Loading, error, empty, and content states
+must switch only the changing body when they share the same ScreenContainer,
+Header, SafeArea configuration, providers, padding, and layout.
+
+Good:
+
+```tsx
+return (
+  <ScreenContainer headerComponent={<Header title={t('reports.title')} />}>
+    {isLoading ? <Loader /> : <ReportsContent />}
+  </ScreenContainer>
+);
+```
+
+Bad: separate early-return branches that repeat the same `ScreenContainer` and
+`Header`. Duplicate the shell only when states require fundamentally different
+screen behavior. Prefer a readable condition, a local helper, or a small local
+content component; do not create a generic abstraction used only once.
+
+---
+
+## 10. Styles
 
 Every component with styles must have its own `styles.ts`.
 
@@ -222,7 +344,7 @@ Presenters must not receive or return colors or styles. Do not place large `Styl
 
 ---
 
-## 9. Request errors
+## 11. Request errors
 
 Every user-triggered request must be awaited by the presenter or hook that owns it. Always check `response.isError` and show the standard toast on failure. Unexpected failures must be caught, logged, and shown using the fallback toast.
 
@@ -230,7 +352,7 @@ Do not update success state before checking the request result.
 
 ---
 
-## 10. Storage and tokens
+## 12. Storage and tokens
 
 - Use one MMKV instance behind `libs/storage`.
 - Do not access MMKV directly throughout the app.
@@ -242,7 +364,7 @@ Do not update success state before checking the request result.
 
 ---
 
-## 11. Imports and types
+## 13. Imports and types
 
 - Use the `@` alias for imports from `src`.
 - Use named exports.
@@ -250,14 +372,21 @@ Do not update success state before checking the request result.
 - Avoid circular dependencies.
 - Domain types belong inside the relevant entity.
 - `src/types` is reserved for truly application-global technical types that cannot belong to an entity.
-- Component-local shared types belong in the component's `types.ts`.
-- Small local non-exported types may stay in their implementation file.
+- Component-local props belong in the component's `index.tsx` and are named `IProps`.
+- A component `types.ts` is allowed only for shared exported contracts used by more than one file.
+- Navigation types remain in the navigation layer; do not relocate them into components.
 - Do not use `any`; use `unknown` and narrowing.
 
 ---
 
-## 12. Files and responsibilities
+## 14. Simplicity, files, and responsibilities
 
+- Always choose the simplest implementation that satisfies the requirement.
+- Create an abstraction only when it removes real duplication in at least two places or establishes a genuine project-wide boundary.
+- Avoid wrappers, hooks, helpers, classes, and generic components used only once.
+- Do not optimize for hypothetical future requirements or create architecture for a local problem.
+- Prefer readable local code over theoretical reusability; do not over-engineer.
+- A one-off helper is acceptable when it materially improves readability, but it must not pretend to be a reusable abstraction.
 - Each file must have one primary responsibility.
 - UI components should preferably stay under 200 lines.
 - Presenters should preferably stay under 250 lines.
@@ -267,7 +396,7 @@ Do not update success state before checking the request result.
 
 ---
 
-## 13. Verification policy
+## 15. Verification policy
 
 Do not run lint, TypeScript, tests, Android builds, iOS builds, CocoaPods, Gradle, E2E, CI, or other verification commands unless the user explicitly asks for verification.
 
@@ -275,12 +404,12 @@ During active development, make the requested code changes only. Run a full veri
 
 ---
 
-## 14. Final checklist
+## 16. Final checklist
 
-Confirm folder structure, entity boundaries, separate styles/types, clean UI, named const components, no local barrels, no re-export chains, handled request errors, Keychain token storage, correct aliases/imports, and no unrelated changes. Confirm verification was run only when explicitly requested.
+Confirm folder structure, entity boundaries, local props placement, presenter ownership, icon ownership, component reuse level, a single shared screen shell, separate styles, clean UI, named const components, no local barrels, no re-export chains, handled request errors, Keychain token storage, correct aliases/imports, and no unrelated changes. Confirm verification was run only when explicitly requested.
 
 ---
 
-## 15. Governance
+## 17. Governance
 
 `AGENTS.md` is project governance. Do not modify it in ordinary feature or bug-fix tasks. Modify it only when the user explicitly requests an architecture or governance rule change.
