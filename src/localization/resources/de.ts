@@ -3,11 +3,9 @@ import type { TranslationResources } from './types';
 export const de: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent:
-        'Falls ein Konto für diese E-Mail existiert, wurde ein Bestätigungscode gesendet.',
+      codeSent: 'Falls ein Konto für diese E-Mail existiert, wurde ein Bestätigungscode gesendet.',
       email: 'E-Mail',
-      explanation:
-        'Geben Sie Ihre E-Mail ein, um einen sechsstelligen Bestätigungscode zu erhalten.',
+      explanation: 'Geben Sie Ihre E-Mail ein, um einen sechsstelligen Bestätigungscode zu erhalten.',
       sendCode: 'Code senden',
       title: 'Passwort vergessen',
       validation: {
@@ -56,8 +54,7 @@ export const de: TranslationResources = {
       },
     },
     otp: {
-      codeResent:
-        'Falls ein Konto für diese E-Mail existiert, wurde ein neuer Code gesendet.',
+      codeResent: 'Falls ein Konto für diese E-Mail existiert, wurde ein neuer Code gesendet.',
       codeSentTo: 'Code gesendet an {{email}}',
       explanation: 'Geben Sie den sechsstelligen Code aus Ihrer E-Mail ein.',
       invalidCodeFormat: 'Geben Sie genau sechs Ziffern ein.',
@@ -70,14 +67,11 @@ export const de: TranslationResources = {
       back: 'Zurück',
       backToLogin: 'Zurück zur Anmeldung',
       invalidOrExpiredCode: 'Der Bestätigungscode ist ungültig oder abgelaufen.',
-      networkError:
-        'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      networkError: 'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
       rateLimited: 'Zu viele Anfragen. Bitte warten Sie vor dem nächsten Versuch.',
-      serverUnavailable:
-        'Der Server ist vorübergehend nicht verfügbar. Versuchen Sie es später erneut.',
+      serverUnavailable: 'Der Server ist vorübergehend nicht verfügbar. Versuchen Sie es später erneut.',
       timeoutError: 'Die Zeitüberschreitung für die Anfrage wurde erreicht.',
-      tooManyAttempts:
-        'Zu viele fehlgeschlagene Versuche. Fordern Sie einen neuen Code an.',
+      tooManyAttempts: 'Zu viele fehlgeschlagene Versuche. Fordern Sie einen neuen Code an.',
       usedCode: 'Dieser Code wurde bereits verwendet. Fordern Sie einen neuen an.',
     },
     resetPassword: {
@@ -85,8 +79,7 @@ export const de: TranslationResources = {
       explanation: 'Wählen Sie ein neues Passwort für Ihr FastRep-Konto.',
       newPassword: 'Neues Passwort',
       resetPassword: 'Passwort zurücksetzen',
-      success:
-        'Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an.',
+      success: 'Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an.',
       title: 'Passwort zurücksetzen',
       validation: {
         confirmPasswordRequired: 'Bestätigen Sie Ihr neues Passwort.',
@@ -98,15 +91,11 @@ export const de: TranslationResources = {
     },
     session: {
       expired: 'Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.',
-      genericError:
-        'Die Authentifizierung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.',
-      networkUnavailable:
-        'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
+      genericError: 'Die Authentifizierung konnte nicht abgeschlossen werden. Bitte versuchen Sie es erneut.',
+      networkUnavailable: 'Keine Internetverbindung. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
       restoring: 'Ihre Sitzung wird wiederhergestellt…',
-      serverError:
-        'Der Server ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.',
-      timeout:
-        'Die Zeitüberschreitung für die Anfrage wurde erreicht. Bitte versuchen Sie es erneut.',
+      serverError: 'Der Server ist vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.',
+      timeout: 'Die Zeitüberschreitung für die Anfrage wurde erreicht. Bitte versuchen Sie es erneut.',
     },
   },
   common: {
@@ -126,8 +115,7 @@ export const de: TranslationResources = {
   },
   profile: {
     logout: 'Abmelden',
-    logoutError:
-      'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
+    logoutError: 'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
     title: 'Profil',
   },
   reports: {

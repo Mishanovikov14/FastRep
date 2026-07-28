@@ -1,10 +1,6 @@
 import { useMemo } from 'react';
 import { Keyboard, Pressable, ScrollView, View } from 'react-native';
-import {
-  KeyboardAvoidingView,
-  KeyboardAwareScrollView,
-  KeyboardStickyView,
-} from 'react-native-keyboard-controller';
+import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardStickyView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Gradient } from '@/UIKit/Gradient';
@@ -30,14 +26,10 @@ export const ScreenContainer = ({
   withGradient = false,
 }: IProps) => {
   const { colors, spacing } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, backgroundColor),
-    [backgroundColor, colors],
-  );
+  const styles = useMemo(() => getStyles(colors, backgroundColor), [backgroundColor, colors]);
   const safeAreaInsets = useSafeAreaInsets();
   const bottomOffset = scaleVertical(spacing.xl);
-  const { extraKeyboardSpace, onStickyLayout, scrollBottomOffset, stickyOpenedOffset } =
-    useKeyboardStickyLayout();
+  const { extraKeyboardSpace, onStickyLayout, scrollBottomOffset, stickyOpenedOffset } = useKeyboardStickyLayout();
   const keyboardBottomOffset = footerComponent ? scrollBottomOffset : bottomOffset;
   const edgesStyle = useMemo(() => {
     if (!edges) {

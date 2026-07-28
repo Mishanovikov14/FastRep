@@ -1,10 +1,6 @@
 import type { TFunction } from 'i18next';
 import { useCallback, useMemo } from 'react';
-import type {
-  PressableStateCallbackType,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import type { PressableStateCallbackType, StyleProp, ViewStyle } from 'react-native';
 
 import type { IReport } from '@/entities/report/types/report';
 import type { SupportedLanguage } from '@/localization/types';
@@ -19,23 +15,13 @@ interface IInput {
   t: TFunction;
 }
 
-export const useReportCardPresenter = ({
-  cardPressedStyle,
-  cardStyle,
-  language,
-  onPress,
-  report,
-  t,
-}: IInput) => {
+export const useReportCardPresenter = ({ cardPressedStyle, cardStyle, language, onPress, report, t }: IInput) => {
   const isUpdated = report.updatedAt !== report.createdAt;
   const dateLabel = useMemo(
     () =>
       String(
         t(isUpdated ? 'reports.card.updated' : 'reports.card.created', {
-          date: formatLocalizedDate(
-            isUpdated ? report.updatedAt : report.createdAt,
-            language,
-          ),
+          date: formatLocalizedDate(isUpdated ? report.updatedAt : report.createdAt, language),
         }),
       ),
     [isUpdated, language, report.createdAt, report.updatedAt, t],
@@ -46,10 +32,7 @@ export const useReportCardPresenter = ({
   }, [onPress, report]);
 
   const getCardStyle = useCallback(
-    ({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => [
-      cardStyle,
-      pressed && cardPressedStyle,
-    ],
+    ({ pressed }: PressableStateCallbackType): StyleProp<ViewStyle> => [cardStyle, pressed && cardPressedStyle],
     [cardPressedStyle, cardStyle],
   );
 

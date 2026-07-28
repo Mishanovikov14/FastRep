@@ -25,11 +25,7 @@ interface IInput {
   t: TFunction;
 }
 
-export const useReportDetailsViewPresenter = ({
-  language,
-  reportId,
-  t,
-}: IInput) => {
+export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput) => {
   const navigation = useNavigation<Navigation>();
   const query = useReportDetailsQuery(reportId);
   const deleteMutation = useDeleteReportMutation(reportId);
@@ -74,33 +70,24 @@ export const useReportDetailsViewPresenter = ({
       const response = await deleteMutation.mutateAsync();
 
       if (response.isError && response.status !== 404) {
-        toastService.showError(
-          String(t('common.error')),
-          getReportErrorMessage(response, t),
-        );
+        toastService.showError(String(t('common.error')), getReportErrorMessage(response, t));
         return;
       }
 
       onHideDeleteAlert();
       toastService.showSuccess(
         String(t('common.success')),
-        String(
-          t(response.status === 404 ? 'reports.delete.alreadyDeleted' : 'reports.delete.success'),
-        ),
+        String(t(response.status === 404 ? 'reports.delete.alreadyDeleted' : 'reports.delete.success')),
       );
       navigation.popTo('Tabs', { screen: 'Reports' });
       removeReportDetailsCache(reportId);
     } catch (error: unknown) {
       console.error('Unexpected report deletion failure', error);
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     }
   }, [deleteMutation, navigation, onHideDeleteAlert, reportId, t]);
 
-  const isNotFound =
-    query.error instanceof ReportRequestError && query.error.status === 404;
+  const isNotFound = query.error instanceof ReportRequestError && query.error.status === 404;
   const deleteActions = useMemo<ICustomAlertAction[]>(
     () => [
       {
@@ -118,25 +105,14 @@ export const useReportDetailsViewPresenter = ({
         variant: 'danger',
       },
     ],
-    [
-      deleteMutation.isPending,
-      onDelete,
-      onHideDeleteConfirmation,
-      t,
-    ],
+    [deleteMutation.isPending, onDelete, onHideDeleteConfirmation, t],
   );
   const createdAtLabel = useMemo(
-    () =>
-      query.data
-        ? formatLocalizedDate(query.data.createdAt, language)
-        : undefined,
+    () => (query.data ? formatLocalizedDate(query.data.createdAt, language) : undefined),
     [language, query.data],
   );
   const updatedAtLabel = useMemo(
-    () =>
-      query.data
-        ? formatLocalizedDate(query.data.updatedAt, language)
-        : undefined,
+    () => (query.data ? formatLocalizedDate(query.data.updatedAt, language) : undefined),
     [language, query.data],
   );
 

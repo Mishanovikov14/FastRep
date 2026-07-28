@@ -32,20 +32,10 @@ export const EmptyState = ({ action, description, image, title }: IProps) => {
       <Typography align="center" variant="heading">
         {title}
       </Typography>
-      <Typography
-        align="center"
-        color={colors.textSecondary}
-        style={styles.description}
-      >
+      <Typography align="center" color={colors.textSecondary} style={styles.description}>
         {description}
       </Typography>
-      {action ? (
-        <Button
-          onPress={action.onPress}
-          title={action.title}
-          variant={action.variant}
-        />
-      ) : null}
+      {action ? <Button onPress={action.onPress} title={action.title} variant={action.variant} /> : null}
     </View>
   );
 };

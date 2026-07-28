@@ -20,9 +20,7 @@ const requestCurrentUser = (skipAuthRefresh: boolean): Promise<IResponse<IUser>>
   });
 };
 
-export const register = (
-  request: IRegisterRequest,
-): Promise<IResponse<IAuthenticationResponse>> => {
+export const register = (request: IRegisterRequest): Promise<IResponse<IAuthenticationResponse>> => {
   return requester.request<IAuthenticationResponse>({
     data: request,
     method: 'POST',
@@ -40,9 +38,7 @@ export const login = (request: ILoginRequest): Promise<IResponse<IAuthentication
   });
 };
 
-export const forgotPassword = (
-  request: IForgotPasswordRequest,
-): Promise<IResponse<void>> => {
+export const forgotPassword = (request: IForgotPasswordRequest): Promise<IResponse<void>> => {
   return requester.request<void>({
     data: request,
     method: 'POST',
@@ -52,9 +48,7 @@ export const forgotPassword = (
   });
 };
 
-export const resetPassword = (
-  request: IResetPasswordRequest,
-): Promise<IResponse<void>> => {
+export const resetPassword = (request: IResetPasswordRequest): Promise<IResponse<void>> => {
   return requester.request<void>({
     data: request,
     method: 'POST',

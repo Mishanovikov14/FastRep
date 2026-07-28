@@ -6,18 +6,9 @@ interface IProps {
   width?: number;
 }
 
-export const ArrowBackIcon = ({
-  color,
-  height = 24,
-  width = 24,
-}: IProps) => {
+export const ArrowBackIcon = ({ color, height = 24, width = 24 }: IProps) => {
   return (
-    <Svg
-      accessibilityElementsHidden
-      height={height}
-      viewBox="0 0 24 24"
-      width={width}
-    >
+    <Svg accessibilityElementsHidden height={height} viewBox="0 0 24 24" width={width}>
       <Path
         d="M15 18L9 12L15 6"
         fill="none"

@@ -9,10 +9,7 @@ const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 128;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const validateLogin = (
-  values: LoginFormValues,
-  t: TFunction,
-): LoginFormErrors => {
+export const validateLogin = (values: LoginFormValues, t: TFunction): LoginFormErrors => {
   const errors: LoginFormErrors = {};
   const email = values.email.trim();
 

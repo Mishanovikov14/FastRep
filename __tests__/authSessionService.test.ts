@@ -25,10 +25,7 @@ jest.mock('@/entities/user/services/tokenRefreshService', () => ({
     message: error instanceof Error ? error.message : undefined,
   })),
   isInvalidTokenRefreshError: jest.fn(
-    (error: unknown) =>
-      error instanceof Error &&
-      'shouldClearSession' in error &&
-      error.shouldClearSession === true,
+    (error: unknown) => error instanceof Error && 'shouldClearSession' in error && error.shouldClearSession === true,
   ),
   refreshTokenPair: jest.fn(),
 }));
@@ -96,14 +93,11 @@ describe('restoreUserSession', () => {
   });
 
   it('refreshes once and retries the user request once after a 401', async () => {
-    jest
-      .mocked(getMeWithoutRefresh)
-      .mockResolvedValueOnce(unauthorizedResponse)
-      .mockResolvedValueOnce({
-        data: user,
-        isError: false,
-        message: '',
-      });
+    jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse).mockResolvedValueOnce({
+      data: user,
+      isError: false,
+      message: '',
+    });
 
     await expect(restoreUserSession()).resolves.toEqual({
       status: 'authorized',
@@ -178,14 +172,11 @@ describe('restoreUserSession', () => {
   });
 
   it('preserves the rotated pair when the retried /auth/me request has a transient failure', async () => {
-    jest
-      .mocked(getMeWithoutRefresh)
-      .mockResolvedValueOnce(unauthorizedResponse)
-      .mockResolvedValueOnce({
-        isError: true,
-        message: 'Service unavailable',
-        status: 503,
-      });
+    jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse).mockResolvedValueOnce({
+      isError: true,
+      message: 'Service unavailable',
+      status: 503,
+    });
 
     await expect(restoreUserSession()).resolves.toEqual({
       message: 'Service unavailable',
@@ -199,9 +190,7 @@ describe('restoreUserSession', () => {
 
   it('returns a temporary error when token refresh fails transiently', async () => {
     jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce(unauthorizedResponse);
-    jest
-      .mocked(refreshTokenPair)
-      .mockRejectedValueOnce(new Error('Network connection is unavailable.'));
+    jest.mocked(refreshTokenPair).mockRejectedValueOnce(new Error('Network connection is unavailable.'));
 
     await expect(restoreUserSession()).resolves.toEqual({
       message: 'Network connection is unavailable.',

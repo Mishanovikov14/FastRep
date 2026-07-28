@@ -28,8 +28,7 @@ export const normalizeRequestError = (error: unknown): IResponse<never> => {
 
   const axiosError = error as AxiosError<unknown>;
   const backendError = parseBackendError(axiosError.response?.data);
-  const isTimeout =
-    axiosError.code === AxiosError.ECONNABORTED || axiosError.code === AxiosError.ETIMEDOUT;
+  const isTimeout = axiosError.code === AxiosError.ECONNABORTED || axiosError.code === AxiosError.ETIMEDOUT;
   const isNetworkError = axiosError.code === AxiosError.ERR_NETWORK || !axiosError.response;
 
   let message = axiosError.message || 'Something went wrong.';
@@ -51,9 +50,9 @@ export const normalizeRequestError = (error: unknown): IResponse<never> => {
       typeof backendError.type === 'string'
         ? backendError.type
         : isTimeout
-          ? 'timeout_error'
-          : isNetworkError
-            ? 'network_error'
-            : undefined,
+        ? 'timeout_error'
+        : isNetworkError
+        ? 'network_error'
+        : undefined,
   };
 };

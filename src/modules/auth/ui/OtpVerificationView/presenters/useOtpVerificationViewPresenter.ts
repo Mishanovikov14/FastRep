@@ -13,8 +13,7 @@ import { isValidOtpInput, validateOtp } from './otpValidation';
 const RESEND_COOLDOWN_SECONDS = 60;
 
 export const useOtpVerificationViewPresenter = ({ t }: IPresenterInput) => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<GuestStackParamList, 'OtpVerification'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<GuestStackParamList, 'OtpVerification'>>();
   const route = useRoute<RouteProp<GuestStackParamList, 'OtpVerification'>>();
   const isResendingRef = useRef(false);
   const [code, setCode] = useState('');
@@ -82,31 +81,20 @@ export const useOtpVerificationViewPresenter = ({ t }: IPresenterInput) => {
 
       if (response.isError) {
         if (response.status === 429) {
-          setResendSeconds((current) =>
-            current > 0 ? current : RESEND_COOLDOWN_SECONDS,
-          );
+          setResendSeconds((current) => (current > 0 ? current : RESEND_COOLDOWN_SECONDS));
         }
 
-        toastService.showError(
-          String(t('common.error')),
-          getForgotPasswordErrorMessage(response, t),
-        );
+        toastService.showError(String(t('common.error')), getForgotPasswordErrorMessage(response, t));
         return;
       }
 
       setCode('');
       setErrors({});
       setResendSeconds(RESEND_COOLDOWN_SECONDS);
-      toastService.showSuccess(
-        String(t('common.success')),
-        String(t('auth.otp.codeResent')),
-      );
+      toastService.showSuccess(String(t('common.success')), String(t('auth.otp.codeResent')));
     } catch {
       console.error('Unexpected password-code resend failure');
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isResendingRef.current = false;
       setIsResending(false);
@@ -128,9 +116,7 @@ export const useOtpVerificationViewPresenter = ({ t }: IPresenterInput) => {
     onContinue,
     onResend,
     resendLabel:
-      resendSeconds > 0
-        ? String(t('auth.otp.resendIn', { seconds: resendSeconds }))
-        : String(t('auth.otp.resendCode')),
+      resendSeconds > 0 ? String(t('auth.otp.resendIn', { seconds: resendSeconds })) : String(t('auth.otp.resendCode')),
     resendSeconds,
   };
 };

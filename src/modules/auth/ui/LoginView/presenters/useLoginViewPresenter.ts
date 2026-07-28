@@ -6,11 +6,7 @@ import { useCallback, useRef, useState } from 'react';
 import { login } from '@/entities/user/API/userApi';
 import { useUserStore } from '@/entities/user/model/userStore';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
-import type {
-  IAuthenticationResponse,
-  ILoginRequest,
-  ITokenPair,
-} from '@/entities/user/types/auth';
+import type { IAuthenticationResponse, ILoginRequest, ITokenPair } from '@/entities/user/types/auth';
 import type { IUser } from '@/entities/user/types/user';
 import { toastService } from '@/libs/toast/toastService';
 import type { GuestStackParamList } from '@/navigation/types';
@@ -30,10 +26,7 @@ type LoginErrorTranslationKey =
   | 'auth.session.timeout'
   | 'common.somethingWentWrong';
 
-const getLoginErrorTranslationKey = ({
-  status,
-  type,
-}: IRequestFailure): LoginErrorTranslationKey => {
+const getLoginErrorTranslationKey = ({ status, type }: IRequestFailure): LoginErrorTranslationKey => {
   if (status === 401) {
     return 'auth.login.invalidCredentials';
   }
@@ -68,10 +61,7 @@ export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
   const onUnexpectedFailure = useCallback(
     (error: unknown) => {
       console.error('Unexpected login failure', error);
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     },
     [t],
   );

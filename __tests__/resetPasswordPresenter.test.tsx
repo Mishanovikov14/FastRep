@@ -99,10 +99,7 @@ describe('useResetPasswordViewPresenter', () => {
       confirmPassword: '',
       password: '',
     });
-    expect(toastService.showSuccess).toHaveBeenCalledWith(
-      'common.success',
-      'auth.resetPassword.success',
-    );
+    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'auth.resetPassword.success');
     expect(navigation.reset).toHaveBeenCalledWith({
       index: 0,
       routes: [{ name: 'Login' }],
@@ -134,9 +131,6 @@ describe('useResetPasswordViewPresenter', () => {
       confirmPassword: 'new-password',
       password: 'new-password',
     });
-    expect(toastService.showError).toHaveBeenCalledWith(
-      'common.error',
-      'auth.recovery.invalidOrExpiredCode',
-    );
+    expect(toastService.showError).toHaveBeenCalledWith('common.error', 'auth.recovery.invalidOrExpiredCode');
   });
 });

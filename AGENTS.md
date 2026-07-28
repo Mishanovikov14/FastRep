@@ -317,7 +317,11 @@ interface IProps {
 }
 
 export const ArrowBackIcon = ({ color, height = 24, width = 24 }: IProps) => {
-  return <Svg height={height} width={width}><Path d="..." fill={color} /></Svg>;
+  return (
+    <Svg height={height} width={width}>
+      <Path d="..." fill={color} />
+    </Svg>
+  );
 };
 ```
 

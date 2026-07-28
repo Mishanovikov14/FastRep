@@ -6,17 +6,13 @@ import { register } from '@/entities/user/API/userApi';
 import { useUserStore } from '@/entities/user/model/userStore';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import { toastService } from '@/libs/toast/toastService';
-import type {
-  IPresenterInput,
-  RegistrationFormErrors,
-} from '@/modules/auth/ui/RegistrationView/types';
+import type { IPresenterInput, RegistrationFormErrors } from '@/modules/auth/ui/RegistrationView/types';
 import type { GuestStackParamList } from '@/navigation/types';
 
 import { validateRegistration } from './registrationValidation';
 
 export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<GuestStackParamList, 'Registration'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<GuestStackParamList, 'Registration'>>();
   const setUser = useUserStore((state) => state.setUser);
   const isSubmittingRef = useRef(false);
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -102,10 +98,7 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
       setUser(user);
     } catch (error: unknown) {
       console.error('Unexpected registration failure', error);
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;
       setIsLoading(false);

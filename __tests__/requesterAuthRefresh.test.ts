@@ -49,20 +49,14 @@ const createAxiosError = (status: number) => {
   };
 };
 
-const createAuthState = (
-  accessToken: string | null,
-  version = 0,
-): IRequesterAuthState => {
+const createAuthState = (accessToken: string | null, version = 0): IRequesterAuthState => {
   return {
     accessToken,
     version,
   };
 };
 
-const getRequestHeaders = (
-  request: ReturnType<typeof createClient>['request'],
-  callIndex: number,
-): AxiosHeaders => {
+const getRequestHeaders = (request: ReturnType<typeof createClient>['request'], callIndex: number): AxiosHeaders => {
   const config = request.mock.calls[callIndex]?.[0] as AxiosRequestConfig;
 
   return AxiosHeaders.from(config.headers as RawAxiosHeaders | AxiosHeaders | undefined);
@@ -82,46 +76,41 @@ describe('AxiosRequester authentication and refresh', () => {
     expect(getRequestHeaders(request, 0).get('Authorization')).toBe('Bearer access-token');
   });
 
-  it.each([
-    '/auth/login',
-    '/auth/forgot-password',
-    '/auth/reset-password',
-  ])('keeps public endpoint %s free of Authorization and refresh', async (url) => {
-    const { client, request } = createClient();
-    const getAuthState = jest.fn().mockResolvedValue(createAuthState('access-token'));
-    const refreshAuthState = jest
-      .fn()
-      .mockResolvedValue(createAuthState('new-access-token', 1));
-    request.mockRejectedValue(createAxiosError(401));
+  it.each(['/auth/login', '/auth/forgot-password', '/auth/reset-password'])(
+    'keeps public endpoint %s free of Authorization and refresh',
+    async (url) => {
+      const { client, request } = createClient();
+      const getAuthState = jest.fn().mockResolvedValue(createAuthState('access-token'));
+      const refreshAuthState = jest.fn().mockResolvedValue(createAuthState('new-access-token', 1));
+      request.mockRejectedValue(createAxiosError(401));
 
-    const result = await new AxiosRequester(client, {
-      getAuthState,
-      refreshAuthState,
-    }).request({
-      headers: {
-        Authorization: 'Bearer stale-token',
-      },
-      requiresAuth: false,
-      skipAuthRefresh: true,
-      url,
-    });
+      const result = await new AxiosRequester(client, {
+        getAuthState,
+        refreshAuthState,
+      }).request({
+        headers: {
+          Authorization: 'Bearer stale-token',
+        },
+        requiresAuth: false,
+        skipAuthRefresh: true,
+        url,
+      });
 
-    expect(result).toMatchObject({
-      isError: true,
-      status: 401,
-    });
-    expect(request).toHaveBeenCalledTimes(1);
-    expect(getAuthState).not.toHaveBeenCalled();
-    expect(refreshAuthState).not.toHaveBeenCalled();
-    expect(getRequestHeaders(request, 0).has('Authorization')).toBe(false);
-  });
+      expect(result).toMatchObject({
+        isError: true,
+        status: 401,
+      });
+      expect(request).toHaveBeenCalledTimes(1);
+      expect(getAuthState).not.toHaveBeenCalled();
+      expect(refreshAuthState).not.toHaveBeenCalled();
+      expect(getRequestHeaders(request, 0).has('Authorization')).toBe(false);
+    },
+  );
 
   it.each([400, 403])('does not refresh a protected request after status %s', async (status) => {
     const { client, request } = createClient();
     const getAuthState = jest.fn().mockResolvedValue(createAuthState('access-token'));
-    const refreshAuthState = jest
-      .fn()
-      .mockResolvedValue(createAuthState('new-access-token', 1));
+    const refreshAuthState = jest.fn().mockResolvedValue(createAuthState('new-access-token', 1));
     request.mockRejectedValue(createAxiosError(status));
 
     const result = await new AxiosRequester(client, {
@@ -143,10 +132,7 @@ describe('AxiosRequester authentication and refresh', () => {
     const { client, request } = createClient();
     const failedAuthState = createAuthState('expired-token', 12);
     const refreshedAuthState = createAuthState('new-access-token', 13);
-    const getAuthState = jest
-      .fn()
-      .mockResolvedValueOnce(failedAuthState)
-      .mockResolvedValue(refreshedAuthState);
+    const getAuthState = jest.fn().mockResolvedValueOnce(failedAuthState).mockResolvedValue(refreshedAuthState);
     const refreshAuthState = jest.fn().mockResolvedValue(refreshedAuthState);
     request
       .mockRejectedValueOnce(createAxiosError(401))
@@ -177,10 +163,7 @@ describe('AxiosRequester authentication and refresh', () => {
     const { client, request } = createClient();
     const failedAuthState = createAuthState('expired-token');
     const refreshedAuthState = createAuthState('new-access-token', 1);
-    const getAuthState = jest
-      .fn()
-      .mockResolvedValueOnce(failedAuthState)
-      .mockResolvedValue(refreshedAuthState);
+    const getAuthState = jest.fn().mockResolvedValueOnce(failedAuthState).mockResolvedValue(refreshedAuthState);
     const refreshAuthState = jest.fn().mockResolvedValue(refreshedAuthState);
     request.mockRejectedValue(createAxiosError(401));
 
@@ -203,9 +186,7 @@ describe('AxiosRequester authentication and refresh', () => {
   it('does not refresh when the auth snapshot could not be read for the failed request', async () => {
     const { client, request } = createClient();
     const getAuthState = jest.fn().mockRejectedValue(new Error('Keychain unavailable'));
-    const refreshAuthState = jest
-      .fn()
-      .mockResolvedValue(createAuthState('new-account-token', 2));
+    const refreshAuthState = jest.fn().mockResolvedValue(createAuthState('new-account-token', 2));
     request.mockRejectedValue(createAxiosError(401));
 
     const result = await new AxiosRequester(client, {
@@ -228,10 +209,7 @@ describe('AxiosRequester authentication and refresh', () => {
     const failedAuthState = createAuthState('expired-token', 4);
     const refreshedAuthState = createAuthState('refreshed-token', 5);
     const newerLoginState = createAuthState('new-account-token', 6);
-    const getAuthState = jest
-      .fn()
-      .mockResolvedValueOnce(failedAuthState)
-      .mockResolvedValueOnce(newerLoginState);
+    const getAuthState = jest.fn().mockResolvedValueOnce(failedAuthState).mockResolvedValueOnce(newerLoginState);
     const refreshAuthState = jest.fn().mockResolvedValue(refreshedAuthState);
     request.mockRejectedValue(createAxiosError(401));
 
@@ -274,9 +252,7 @@ describe('AxiosRequester authentication and refresh', () => {
     });
 
     request.mockImplementation(async (config: AxiosRequestConfig) => {
-      const headers = AxiosHeaders.from(
-        config.headers as RawAxiosHeaders | AxiosHeaders | undefined,
-      );
+      const headers = AxiosHeaders.from(config.headers as RawAxiosHeaders | AxiosHeaders | undefined);
 
       if (headers.get('Authorization') === 'Bearer expired-token') {
         throw createAxiosError(401);
@@ -308,9 +284,7 @@ describe('AxiosRequester authentication and refresh', () => {
     const results = await Promise.all(pendingRequests);
     const authorizations = request.mock.calls.map((call) => {
       const config = call[0] as AxiosRequestConfig;
-      const headers = AxiosHeaders.from(
-        config.headers as RawAxiosHeaders | AxiosHeaders | undefined,
-      );
+      const headers = AxiosHeaders.from(config.headers as RawAxiosHeaders | AxiosHeaders | undefined);
 
       return headers.get('Authorization');
     });
@@ -324,9 +298,7 @@ describe('AxiosRequester authentication and refresh', () => {
   it('never refreshes recursively when a refresh-endpoint request returns 401', async () => {
     const { client, request } = createClient();
     const getAuthState = jest.fn().mockResolvedValue(createAuthState('access-token'));
-    const refreshAuthState = jest
-      .fn()
-      .mockResolvedValue(createAuthState('new-access-token', 1));
+    const refreshAuthState = jest.fn().mockResolvedValue(createAuthState('new-access-token', 1));
     request.mockRejectedValue(createAxiosError(401));
 
     const result = await new AxiosRequester(client, {

@@ -1,16 +1,10 @@
 import type { TFunction } from 'i18next';
 
-import type {
-  RegistrationFormErrors,
-  RegistrationFormValues,
-} from '@/modules/auth/ui/RegistrationView/types';
+import type { RegistrationFormErrors, RegistrationFormValues } from '@/modules/auth/ui/RegistrationView/types';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const validateRegistration = (
-  values: RegistrationFormValues,
-  t: TFunction,
-): RegistrationFormErrors => {
+export const validateRegistration = (values: RegistrationFormValues, t: TFunction): RegistrationFormErrors => {
   const errors: RegistrationFormErrors = {};
   const fullName = values.fullName.trim();
   const email = values.email.trim();

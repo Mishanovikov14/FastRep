@@ -1,19 +1,11 @@
 import { getMeWithoutRefresh } from '@/entities/user/API/userApi';
 import type { SessionRestoreResult } from '@/entities/user/types/session';
 
-import {
-  getTokenRefreshErrorDetails,
-  isInvalidTokenRefreshError,
-  refreshTokenPair,
-} from './tokenRefreshService';
+import { getTokenRefreshErrorDetails, isInvalidTokenRefreshError, refreshTokenPair } from './tokenRefreshService';
 import { clearUserSession } from './userStateService';
 import { userTokenStorage } from './userTokenStorage';
 
-const getTemporaryErrorResult = (
-  message?: string,
-  type?: string,
-  statusCode?: number,
-): SessionRestoreResult => {
+const getTemporaryErrorResult = (message?: string, type?: string, statusCode?: number): SessionRestoreResult => {
   return {
     message,
     status: 'temporary_error',
@@ -40,11 +32,7 @@ export const restoreUserSession = async (): Promise<SessionRestoreResult> => {
     }
 
     if (response.status !== 401) {
-      return getTemporaryErrorResult(
-        response.message,
-        response.type,
-        response.status,
-      );
+      return getTemporaryErrorResult(response.message, response.type, response.status);
     }
 
     try {
@@ -56,11 +44,7 @@ export const restoreUserSession = async (): Promise<SessionRestoreResult> => {
 
       const details = getTokenRefreshErrorDetails(error);
 
-      return getTemporaryErrorResult(
-        details.message,
-        details.type,
-        details.statusCode,
-      );
+      return getTemporaryErrorResult(details.message, details.type, details.statusCode);
     }
 
     const retryResponse = await getMeWithoutRefresh();
@@ -78,17 +62,10 @@ export const restoreUserSession = async (): Promise<SessionRestoreResult> => {
       return { status: 'unauthorized' };
     }
 
-    return getTemporaryErrorResult(
-      retryResponse.message,
-      retryResponse.type,
-      retryResponse.status,
-    );
+    return getTemporaryErrorResult(retryResponse.message, retryResponse.type, retryResponse.status);
   } catch (error: unknown) {
     console.error('Unexpected session restoration failure', error);
 
-    return getTemporaryErrorResult(
-      error instanceof Error ? error.message : undefined,
-      'unexpected_error',
-    );
+    return getTemporaryErrorResult(error instanceof Error ? error.message : undefined, 'unexpected_error');
   }
 };

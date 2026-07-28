@@ -6,10 +6,7 @@ import ReactTestRenderer from 'react-test-renderer';
 
 import { useUserStore } from '@/entities/user/model/userStore';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
-import type {
-  IAuthenticationResponse,
-  ILoginRequest,
-} from '@/entities/user/types/auth';
+import type { IAuthenticationResponse, ILoginRequest } from '@/entities/user/types/auth';
 import type { IUser } from '@/entities/user/types/user';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { toastService } from '@/libs/toast/toastService';
@@ -105,9 +102,7 @@ describe('useLoginViewPresenter', () => {
 
   it('saves the token pair before the user and blocks a duplicate login submission', async () => {
     const events: string[] = [];
-    let resolveResponse:
-      | ((response: IResponse<IAuthenticationResponse>) => void)
-      | undefined;
+    let resolveResponse: ((response: IResponse<IAuthenticationResponse>) => void) | undefined;
     const responsePromise = new Promise<IResponse<IAuthenticationResponse>>((resolve) => {
       resolveResponse = resolve;
     });
@@ -191,10 +186,7 @@ describe('useLoginViewPresenter', () => {
       isAuthorized: false,
       user: null,
     });
-    expect(toastService.showError).toHaveBeenCalledWith(
-      'common.error',
-      'auth.login.invalidCredentials',
-    );
+    expect(toastService.showError).toHaveBeenCalledWith('common.error', 'auth.login.invalidCredentials');
   });
 
   it('opens Registration and the real password-recovery flow', async () => {

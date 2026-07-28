@@ -85,10 +85,7 @@ describe('useForgotPasswordViewPresenter', () => {
       await firstSubmit;
     });
 
-    expect(toastService.showSuccess).toHaveBeenCalledWith(
-      'common.success',
-      'auth.forgotPassword.codeSent',
-    );
+    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'auth.forgotPassword.codeSent');
     expect(navigation.navigate).toHaveBeenCalledWith('OtpVerification', {
       email: 'alex@example.com',
     });
@@ -114,9 +111,6 @@ describe('useForgotPasswordViewPresenter', () => {
     });
 
     expect(navigation.navigate).not.toHaveBeenCalled();
-    expect(toastService.showError).toHaveBeenCalledWith(
-      'common.error',
-      'auth.recovery.rateLimited',
-    );
+    expect(toastService.showError).toHaveBeenCalledWith('common.error', 'auth.recovery.rateLimited');
   });
 });

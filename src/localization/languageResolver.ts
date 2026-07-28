@@ -11,10 +11,7 @@ export const normalizeLanguage = (locale: LocaleCandidate): SupportedLanguage | 
   return isSupportedLanguage(normalizedCandidate) ? normalizedCandidate : null;
 };
 
-export const resolveLanguage = (
-  storedLanguage: unknown,
-  locales: readonly LocaleCandidate[],
-): SupportedLanguage => {
+export const resolveLanguage = (storedLanguage: unknown, locales: readonly LocaleCandidate[]): SupportedLanguage => {
   if (isSupportedLanguage(storedLanguage)) {
     return storedLanguage.toLowerCase() as SupportedLanguage;
   }

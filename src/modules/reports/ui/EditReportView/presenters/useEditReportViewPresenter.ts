@@ -3,18 +3,12 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { TFunction } from 'i18next';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import {
-  normalizeUpdateReportRequest,
-  validateReportForm,
-} from '@/entities/report/model/reportValidation';
+import { normalizeUpdateReportRequest, validateReportForm } from '@/entities/report/model/reportValidation';
 import type { ReportFormErrors } from '@/entities/report/model/reportValidation';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
 import { getReportErrorMessage, getReportFieldErrors } from '@/modules/reports/presenters/reportErrors';
-import {
-  useReportDetailsQuery,
-  useUpdateReportMutation,
-} from '@/modules/reports/presenters/reportQueries';
+import { useReportDetailsQuery, useUpdateReportMutation } from '@/modules/reports/presenters/reportQueries';
 
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'EditReport'>;
 
@@ -34,10 +28,7 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
   const [errors, setErrors] = useState<ReportFormErrors>({});
 
   useEffect(() => {
-    if (
-      reportQuery.data &&
-      initializedReportIdRef.current !== reportQuery.data.id
-    ) {
+    if (reportQuery.data && initializedReportIdRef.current !== reportQuery.data.id) {
       initializedReportIdRef.current = reportQuery.data.id;
       setTitle(reportQuery.data.title);
       setNotes(reportQuery.data.notes ?? '');
@@ -73,9 +64,7 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
     isSubmittingRef.current = true;
 
     try {
-      const response = await mutation.mutateAsync(
-        normalizeUpdateReportRequest({ notes, title }),
-      );
+      const response = await mutation.mutateAsync(normalizeUpdateReportRequest({ notes, title }));
 
       if (response.isError || !response.data) {
         const fieldErrors = getReportFieldErrors(response.errors);
@@ -84,24 +73,15 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
           setErrors(fieldErrors);
         }
 
-        toastService.showError(
-          String(t('common.error')),
-          getReportErrorMessage(response, t),
-        );
+        toastService.showError(String(t('common.error')), getReportErrorMessage(response, t));
         return;
       }
 
-      toastService.showSuccess(
-        String(t('common.success')),
-        String(t('reports.edit.success')),
-      );
+      toastService.showSuccess(String(t('common.success')), String(t('reports.edit.success')));
       navigation.goBack();
     } catch (error: unknown) {
       console.error('Unexpected report update failure', error);
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;
     }

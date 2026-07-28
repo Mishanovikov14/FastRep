@@ -40,10 +40,7 @@ export const getReportFieldErrors = (errors: unknown): ReportFormErrors => {
   return result;
 };
 
-export const getReportErrorMessage = (
-  response: ReportErrorResponse,
-  t: TFunction,
-): string => {
+export const getReportErrorMessage = (response: ReportErrorResponse, t: TFunction): string => {
   if (response.status === 404) {
     return String(t('reports.errors.notFound'));
   }

@@ -3,11 +3,9 @@ import type { TranslationResources } from './types';
 export const fr: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent:
-        'Si un compte existe pour cet e-mail, nous avons envoyé un code de vérification.',
+      codeSent: 'Si un compte existe pour cet e-mail, nous avons envoyé un code de vérification.',
       email: 'E-mail',
-      explanation:
-        'Saisissez votre e-mail pour recevoir un code de vérification à six chiffres.',
+      explanation: 'Saisissez votre e-mail pour recevoir un code de vérification à six chiffres.',
       sendCode: 'Envoyer le code',
       title: 'Mot de passe oublié',
       validation: {
@@ -56,8 +54,7 @@ export const fr: TranslationResources = {
       },
     },
     otp: {
-      codeResent:
-        'Si un compte existe pour cet e-mail, nous avons envoyé un nouveau code.',
+      codeResent: 'Si un compte existe pour cet e-mail, nous avons envoyé un nouveau code.',
       codeSentTo: 'Code envoyé à {{email}}',
       explanation: 'Saisissez le code à six chiffres reçu par e-mail.',
       invalidCodeFormat: 'Saisissez exactement six chiffres.',
@@ -70,14 +67,11 @@ export const fr: TranslationResources = {
       back: 'Retour',
       backToLogin: 'Retour à la connexion',
       invalidOrExpiredCode: 'Le code de vérification est invalide ou expiré.',
-      networkError:
-        'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
+      networkError: 'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
       rateLimited: 'Trop de demandes. Veuillez patienter avant de réessayer.',
-      serverUnavailable:
-        'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
+      serverUnavailable: 'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
       timeoutError: "Le délai d'attente de la requête a été dépassé.",
-      tooManyAttempts:
-        'Trop de tentatives infructueuses. Demandez un nouveau code.',
+      tooManyAttempts: 'Trop de tentatives infructueuses. Demandez un nouveau code.',
       usedCode: 'Ce code a déjà été utilisé. Demandez un nouveau code.',
     },
     resetPassword: {
@@ -85,8 +79,7 @@ export const fr: TranslationResources = {
       explanation: 'Choisissez un nouveau mot de passe pour votre compte FastRep.',
       newPassword: 'Nouveau mot de passe',
       resetPassword: 'Réinitialiser le mot de passe',
-      success:
-        'Votre mot de passe a été réinitialisé. Connectez-vous avec le nouveau.',
+      success: 'Votre mot de passe a été réinitialisé. Connectez-vous avec le nouveau.',
       title: 'Réinitialiser le mot de passe',
       validation: {
         confirmPasswordRequired: 'Confirmez votre nouveau mot de passe.',
@@ -99,11 +92,9 @@ export const fr: TranslationResources = {
     session: {
       expired: 'Votre session a expiré. Veuillez vous reconnecter.',
       genericError: "L'authentification n'a pas pu aboutir. Veuillez réessayer.",
-      networkUnavailable:
-        'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
+      networkUnavailable: 'Aucune connexion Internet. Vérifiez votre connexion et réessayez.',
       restoring: 'Restauration de votre session…',
-      serverError:
-        'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
+      serverError: 'Le serveur est temporairement indisponible. Veuillez réessayer plus tard.',
       timeout: "Le délai d'attente de la requête a été dépassé. Veuillez réessayer.",
     },
   },
@@ -124,8 +115,7 @@ export const fr: TranslationResources = {
   },
   profile: {
     logout: 'Se déconnecter',
-    logoutError:
-      "Vous avez été déconnecté sur cet appareil, mais le serveur n'a pas pu être averti.",
+    logoutError: "Vous avez été déconnecté sur cet appareil, mais le serveur n'a pas pu être averti.",
     title: 'Profil',
   },
   reports: {

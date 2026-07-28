@@ -8,10 +8,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import type { IReport } from '@/entities/report/types/report';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList, AppTabsParamList } from '@/navigation/types';
-import {
-  refreshReportsFirstPage,
-  useReportsListQuery,
-} from '@/modules/reports/presenters/reportQueries';
+import { refreshReportsFirstPage, useReportsListQuery } from '@/modules/reports/presenters/reportQueries';
 import { getReportErrorMessage } from '@/modules/reports/presenters/reportErrors';
 
 type Navigation = CompositeNavigationProp<
@@ -29,10 +26,7 @@ export const useReportsListViewPresenter = ({ t }: IInput) => {
   const isRefreshingRef = useRef(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const query = useReportsListQuery();
-  const reports = useMemo(
-    () => query.data?.pages.flatMap((page) => page.data) ?? [],
-    [query.data],
-  );
+  const reports = useMemo(() => query.data?.pages.flatMap((page) => page.data) ?? [], [query.data]);
 
   const onCreateReport = useCallback(() => {
     navigation.navigate('CreateReport');
@@ -57,17 +51,11 @@ export const useReportsListViewPresenter = ({ t }: IInput) => {
       const response = await refreshReportsFirstPage();
 
       if (response.isError) {
-        toastService.showError(
-          String(t('common.error')),
-          getReportErrorMessage(response, t),
-        );
+        toastService.showError(String(t('common.error')), getReportErrorMessage(response, t));
       }
     } catch (error: unknown) {
       console.error('Unexpected reports refresh failure', error);
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isRefreshingRef.current = false;
       setIsRefreshing(false);
@@ -79,11 +67,7 @@ export const useReportsListViewPresenter = ({ t }: IInput) => {
   }, [query]);
 
   const onLoadMore = useCallback(async () => {
-    if (
-      !query.hasNextPage ||
-      query.isFetchingNextPage ||
-      isLoadingNextPageRef.current
-    ) {
+    if (!query.hasNextPage || query.isFetchingNextPage || isLoadingNextPageRef.current) {
       return;
     }
 

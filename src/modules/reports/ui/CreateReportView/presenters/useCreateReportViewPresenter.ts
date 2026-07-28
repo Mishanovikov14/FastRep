@@ -3,10 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { TFunction } from 'i18next';
 import { useCallback, useRef, useState } from 'react';
 
-import {
-  normalizeCreateReportRequest,
-  validateReportForm,
-} from '@/entities/report/model/reportValidation';
+import { normalizeCreateReportRequest, validateReportForm } from '@/entities/report/model/reportValidation';
 import type { ReportFormErrors } from '@/entities/report/model/reportValidation';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
@@ -52,9 +49,7 @@ export const useCreateReportViewPresenter = ({ t }: IInput) => {
     isSubmittingRef.current = true;
 
     try {
-      const response = await mutation.mutateAsync(
-        normalizeCreateReportRequest({ notes, title }),
-      );
+      const response = await mutation.mutateAsync(normalizeCreateReportRequest({ notes, title }));
 
       if (response.isError || !response.data) {
         const fieldErrors = getReportFieldErrors(response.errors);
@@ -63,24 +58,15 @@ export const useCreateReportViewPresenter = ({ t }: IInput) => {
           setErrors(fieldErrors);
         }
 
-        toastService.showError(
-          String(t('common.error')),
-          getReportErrorMessage(response, t),
-        );
+        toastService.showError(String(t('common.error')), getReportErrorMessage(response, t));
         return;
       }
 
-      toastService.showSuccess(
-        String(t('common.success')),
-        String(t('reports.create.success')),
-      );
+      toastService.showSuccess(String(t('common.success')), String(t('reports.create.success')));
       navigation.replace('ReportDetails', { reportId: response.data.id });
     } catch (error: unknown) {
       console.error('Unexpected report creation failure', error);
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;
     }

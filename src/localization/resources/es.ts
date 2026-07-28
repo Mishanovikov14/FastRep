@@ -3,11 +3,9 @@ import type { TranslationResources } from './types';
 export const es: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent:
-        'Si existe una cuenta con este correo, hemos enviado un código de verificación.',
+      codeSent: 'Si existe una cuenta con este correo, hemos enviado un código de verificación.',
       email: 'Correo electrónico',
-      explanation:
-        'Introduce tu correo para recibir un código de verificación de seis dígitos.',
+      explanation: 'Introduce tu correo para recibir un código de verificación de seis dígitos.',
       sendCode: 'Enviar código',
       title: 'Contraseña olvidada',
       validation: {
@@ -56,8 +54,7 @@ export const es: TranslationResources = {
       },
     },
     otp: {
-      codeResent:
-        'Si existe una cuenta con este correo, hemos enviado un código nuevo.',
+      codeResent: 'Si existe una cuenta con este correo, hemos enviado un código nuevo.',
       codeSentTo: 'Código enviado a {{email}}',
       explanation: 'Introduce el código de seis dígitos enviado a tu correo.',
       invalidCodeFormat: 'Introduce exactamente seis dígitos.',
@@ -70,11 +67,9 @@ export const es: TranslationResources = {
       back: 'Atrás',
       backToLogin: 'Volver al inicio de sesión',
       invalidOrExpiredCode: 'El código de verificación no es válido o ha caducado.',
-      networkError:
-        'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
+      networkError: 'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
       rateLimited: 'Demasiadas solicitudes. Espera antes de volver a intentarlo.',
-      serverUnavailable:
-        'El servidor no está disponible temporalmente. Inténtalo más tarde.',
+      serverUnavailable: 'El servidor no está disponible temporalmente. Inténtalo más tarde.',
       timeoutError: 'La solicitud ha agotado el tiempo de espera.',
       tooManyAttempts: 'Demasiados intentos fallidos. Solicita un código nuevo.',
       usedCode: 'Este código ya se ha utilizado. Solicita un código nuevo.',
@@ -84,8 +79,7 @@ export const es: TranslationResources = {
       explanation: 'Elige una contraseña nueva para tu cuenta de FastRep.',
       newPassword: 'Contraseña nueva',
       resetPassword: 'Restablecer contraseña',
-      success:
-        'Tu contraseña se ha restablecido. Inicia sesión con la contraseña nueva.',
+      success: 'Tu contraseña se ha restablecido. Inicia sesión con la contraseña nueva.',
       title: 'Restablecer contraseña',
       validation: {
         confirmPasswordRequired: 'Confirma tu contraseña nueva.',
@@ -98,11 +92,9 @@ export const es: TranslationResources = {
     session: {
       expired: 'Tu sesión ha caducado. Vuelve a iniciar sesión.',
       genericError: 'No se pudo completar la autenticación. Inténtalo de nuevo.',
-      networkUnavailable:
-        'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
+      networkUnavailable: 'No hay conexión a Internet. Comprueba la conexión e inténtalo de nuevo.',
       restoring: 'Restaurando tu sesión…',
-      serverError:
-        'El servidor no está disponible temporalmente. Inténtalo de nuevo más tarde.',
+      serverError: 'El servidor no está disponible temporalmente. Inténtalo de nuevo más tarde.',
       timeout: 'La solicitud ha agotado el tiempo de espera. Inténtalo de nuevo.',
     },
   },
@@ -123,8 +115,7 @@ export const es: TranslationResources = {
   },
   profile: {
     logout: 'Cerrar sesión',
-    logoutError:
-      'Has cerrado sesión en este dispositivo, pero no se pudo notificar al servidor.',
+    logoutError: 'Has cerrado sesión en este dispositivo, pero no se pudo notificar al servidor.',
     title: 'Perfil',
   },
   reports: {

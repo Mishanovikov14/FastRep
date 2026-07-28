@@ -7,7 +7,7 @@ import { ArrowBackIcon } from '@/assets/icons/ArrowBackIcon';
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
-import { useHeaderPresenter } from './presenters/useHeaderPresenter';
+import { useHeader } from './presenters/useHeader';
 import { getStyles } from './styles';
 
 interface IProps {
@@ -17,19 +17,11 @@ interface IProps {
   title: string;
 }
 
-export const Header = ({
-  onBackPress,
-  rightComponent,
-  showBackButton = false,
-  title,
-}: IProps) => {
+export const Header = ({ onBackPress, rightComponent, showBackButton = false, title }: IProps) => {
   const { colors, spacing, t } = useUIContext();
   const { top } = useSafeAreaInsets();
-  const styles = useMemo(
-    () => getStyles(colors, spacing, top),
-    [colors, spacing, top],
-  );
-  const { getBackButtonStyle, onPressBack } = useHeaderPresenter({
+  const styles = useMemo(() => getStyles(colors, spacing, top), [colors, spacing, top]);
+  const { getBackButtonStyle, onPressBack } = useHeader({
     backButtonPressedStyle: styles.backButtonPressed,
     backButtonStyle: styles.backButton,
     onBackPress,
@@ -56,9 +48,7 @@ export const Header = ({
             {title}
           </Typography>
         </View>
-        <View style={[styles.sideSlot, styles.sideSlotRight]}>
-          {rightComponent}
-        </View>
+        <View style={[styles.sideSlot, styles.sideSlotRight]}>{rightComponent}</View>
       </View>
     </View>
   );

@@ -4,10 +4,7 @@ import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 
 import type { IReport } from '@/entities/report/types/report';
-import {
-  refreshReportsFirstPage,
-  useReportsListQuery,
-} from '@/modules/reports/presenters/reportQueries';
+import { refreshReportsFirstPage, useReportsListQuery } from '@/modules/reports/presenters/reportQueries';
 import { useReportsListViewPresenter } from '@/modules/reports/ui/ReportsListView/presenters/useReportsListViewPresenter';
 
 jest.mock('@react-navigation/native', () => ({

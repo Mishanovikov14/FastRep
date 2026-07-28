@@ -18,10 +18,7 @@ export const Input = ({
   ...textInputProps
 }: IProps) => {
   const { colors, fonts, radius, spacing } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, fonts, radius, spacing),
-    [colors, fonts, radius, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, fonts, radius, spacing), [colors, fonts, radius, spacing]);
 
   return (
     <View style={styles.field}>

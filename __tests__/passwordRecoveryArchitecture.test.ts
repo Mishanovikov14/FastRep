@@ -13,20 +13,10 @@ const readProjectFile = (relativePath: string): string => {
 
 describe('password-recovery architecture and startup', () => {
   it('configures production releases with the FastRep production API URL', () => {
-    expect(readProjectFile('.env').trim()).toBe(
-      'API_URL=https://api.fastrep.app',
-    );
-    expect(readProjectFile('.env.production').trim()).toBe(
-      'API_URL=https://api.fastrep.app',
-    );
-    expect(readProjectFile('android/app/build.gradle')).toContain(
-      'release: ".env.production"',
-    );
-    expect(
-      readProjectFile('ios/FastRep.xcodeproj/project.pbxproj'),
-    ).not.toContain(
-      'ENVFILE =',
-    );
+    expect(readProjectFile('.env').trim()).toBe('API_URL=https://api.fastrep.app');
+    expect(readProjectFile('.env.production').trim()).toBe('API_URL=https://api.fastrep.app');
+    expect(readProjectFile('android/app/build.gradle')).toContain('release: ".env.production"');
+    expect(readProjectFile('ios/FastRep.xcodeproj/project.pbxproj')).not.toContain('ENVFILE =');
   });
 
   it('registers a mandatory separate OTP route with only email input params', () => {
@@ -36,9 +26,7 @@ describe('password-recovery architecture and startup', () => {
     expect(navigation).toContain('name="OtpVerification"');
     expect(navigation).toContain('component={OtpVerificationView}');
     expect(types).toMatch(/OtpVerification:\s*\{\s*email: string;\s*\}/);
-    expect(types).toMatch(
-      /ResetPassword:\s*\{\s*code: string;\s*email: string;\s*\}/,
-    );
+    expect(types).toMatch(/ResetPassword:\s*\{\s*code: string;\s*email: string;\s*\}/);
   });
 
   it('keeps reset secrets in local navigation flow and outside persistent state', () => {
@@ -50,9 +38,7 @@ describe('password-recovery architecture and startup', () => {
     );
     const recoverySources = `${otpPresenter}\n${resetPresenter}`;
 
-    expect(recoverySources).not.toMatch(
-      /userTokenStorage|MMKV|Keychain|AsyncStorage|useUserStore/,
-    );
+    expect(recoverySources).not.toMatch(/userTokenStorage|MMKV|Keychain|AsyncStorage|useUserStore/);
     expect(recoverySources).not.toMatch(/console\.(log|debug|info)\s*\(/);
   });
 
@@ -62,9 +48,7 @@ describe('password-recovery architecture and startup', () => {
     const splash = readProjectFile('src/modules/home/ui/SplashView/index.tsx');
 
     expect(providers).not.toContain('<Loader fullscreen');
-    expect(navigation).toContain(
-      'isSessionRestored: isInitialized && isSessionRestored',
-    );
-    expect(splash).toContain("logo-horizontal.png");
+    expect(navigation).toContain('isSessionRestored: isInitialized && isSessionRestored');
+    expect(splash).toContain('logo-horizontal.png');
   });
 });

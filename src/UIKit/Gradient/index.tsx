@@ -11,11 +11,5 @@ export const Gradient = () => {
   const styles = useMemo(() => getStyles(), []);
   const gradientColors: GradientColors = [colors.primaryLight, colors.background];
 
-  return (
-    <LinearGradient
-      colors={gradientColors}
-      pointerEvents="none"
-      style={styles.gradient}
-    />
-  );
+  return <LinearGradient colors={gradientColors} pointerEvents="none" style={styles.gradient} />;
 };

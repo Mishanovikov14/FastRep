@@ -8,14 +8,10 @@ import { getForgotPasswordErrorMessage } from '@/modules/auth/presenters/passwor
 import type { GuestStackParamList } from '@/navigation/types';
 
 import type { ForgotPasswordFormErrors, IPresenterInput } from '../types';
-import {
-  normalizeForgotPasswordRequest,
-  validateForgotPassword,
-} from './forgotPasswordValidation';
+import { normalizeForgotPasswordRequest, validateForgotPassword } from './forgotPasswordValidation';
 
 export const useForgotPasswordViewPresenter = ({ t }: IPresenterInput) => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<GuestStackParamList, 'ForgotPassword'>>();
+  const navigation = useNavigation<NativeStackNavigationProp<GuestStackParamList, 'ForgotPassword'>>();
   const isSubmittingRef = useRef(false);
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState<ForgotPasswordFormErrors>({});
@@ -52,26 +48,17 @@ export const useForgotPasswordViewPresenter = ({ t }: IPresenterInput) => {
       const response = await forgotPassword(request);
 
       if (response.isError) {
-        toastService.showError(
-          String(t('common.error')),
-          getForgotPasswordErrorMessage(response, t),
-        );
+        toastService.showError(String(t('common.error')), getForgotPasswordErrorMessage(response, t));
         return;
       }
 
-      toastService.showSuccess(
-        String(t('common.success')),
-        String(t('auth.forgotPassword.codeSent')),
-      );
+      toastService.showSuccess(String(t('common.success')), String(t('auth.forgotPassword.codeSent')));
       navigation.navigate('OtpVerification', {
         email: request.email,
       });
     } catch {
       console.error('Unexpected forgot-password failure');
-      toastService.showError(
-        String(t('common.error')),
-        String(t('common.somethingWentWrong')),
-      );
+      toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;
       setIsLoading(false);

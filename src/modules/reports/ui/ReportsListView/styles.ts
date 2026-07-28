@@ -3,11 +3,7 @@ import { StyleSheet } from 'react-native';
 import type { Colors, Spacing } from '@/UIProvider/theme/types';
 import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
-export const getStyles = (
-  colors: Colors,
-  spacing: Spacing,
-  bottomInset: number,
-) => {
+export const getStyles = (colors: Colors, spacing: Spacing, bottomInset: number) => {
   const styles = StyleSheet.create({
     action: {
       alignSelf: 'center',

@@ -16,10 +16,7 @@ interface IProps {
 
 export const ReportCard = ({ onPress, report }: IProps) => {
   const { colors, language, radius, spacing, t } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, radius, spacing),
-    [colors, radius, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const { dateLabel, getCardStyle, onPressCard } = useReportCardPresenter({
     cardPressedStyle: styles.cardPressed,
     cardStyle: styles.card,

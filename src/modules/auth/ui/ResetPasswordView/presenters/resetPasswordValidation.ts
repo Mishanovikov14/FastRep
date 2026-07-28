@@ -2,10 +2,7 @@ import type { TFunction } from 'i18next';
 
 import type { ResetPasswordFormErrors, ResetPasswordFormValues } from '../types';
 
-export const validateResetPassword = (
-  values: ResetPasswordFormValues,
-  t: TFunction,
-): ResetPasswordFormErrors => {
+export const validateResetPassword = (values: ResetPasswordFormValues, t: TFunction): ResetPasswordFormErrors => {
   const errors: ResetPasswordFormErrors = {};
 
   if (!values.password) {
@@ -17,13 +14,9 @@ export const validateResetPassword = (
   }
 
   if (!values.confirmPassword) {
-    errors.confirmPassword = String(
-      t('auth.resetPassword.validation.confirmPasswordRequired'),
-    );
+    errors.confirmPassword = String(t('auth.resetPassword.validation.confirmPasswordRequired'));
   } else if (values.confirmPassword !== values.password) {
-    errors.confirmPassword = String(
-      t('auth.resetPassword.validation.passwordsMismatch'),
-    );
+    errors.confirmPassword = String(t('auth.resetPassword.validation.passwordsMismatch'));
   }
 
   return errors;

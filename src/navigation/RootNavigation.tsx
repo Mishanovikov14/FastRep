@@ -21,12 +21,7 @@ import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getRootNavigationState } from './getRootNavigationState';
 import { getStyles } from './styles';
-import type {
-  AppStackParamList,
-  AppTabsParamList,
-  GuestStackParamList,
-  SplashStackParamList,
-} from './types';
+import type { AppStackParamList, AppTabsParamList, GuestStackParamList, SplashStackParamList } from './types';
 
 const AppStack = createNativeStackNavigator<AppStackParamList>();
 const AppTabs = createBottomTabNavigator<AppTabsParamList>();
@@ -48,10 +43,7 @@ const ProfileTabIcon = ({ color, size }: ITabBarIconProps) => {
 
 const AppTabsNavigation = () => {
   const { colors, fonts, spacing, t } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, fonts, spacing),
-    [colors, fonts, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, fonts, spacing), [colors, fonts, spacing]);
 
   return (
     <AppTabs.Navigator
@@ -136,7 +128,5 @@ export const RootNavigation = () => {
     }
   };
 
-  return (
-    <NavigationContainer>{renderNavigation()}</NavigationContainer>
-  );
+  return <NavigationContainer>{renderNavigation()}</NavigationContainer>;
 };

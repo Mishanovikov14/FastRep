@@ -18,7 +18,5 @@ export interface IRequesterAuthState {
 
 export interface RequesterAuthCallbacks {
   getAuthState(): Promise<IRequesterAuthState | null>;
-  refreshAuthState?(
-    failedAuthState: IRequesterAuthState | null,
-  ): Promise<IRequesterAuthState | null>;
+  refreshAuthState?(failedAuthState: IRequesterAuthState | null): Promise<IRequesterAuthState | null>;
 }

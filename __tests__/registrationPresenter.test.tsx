@@ -162,10 +162,7 @@ describe('useRegistrationViewPresenter', () => {
       isAuthorized: false,
       user: null,
     });
-    expect(toastService.showError).toHaveBeenCalledWith(
-      'common.error',
-      'Email already exists',
-    );
+    expect(toastService.showError).toHaveBeenCalledWith('common.error', 'Email already exists');
   });
 
   it('navigates back to Login without making a registration request', async () => {

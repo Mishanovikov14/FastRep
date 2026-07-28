@@ -20,10 +20,7 @@ const statusTranslationKeys: Record<ReportStatus, string> = {
 
 export const ReportStatusBadge = ({ status }: IProps) => {
   const { colors, radius, spacing, t } = useUIContext();
-  const styles = useMemo(
-    () => getStyles(colors, radius, spacing),
-    [colors, radius, spacing],
-  );
+  const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const styleByStatus = {
     DRAFT: styles.draft,
     FAILED: styles.failed,

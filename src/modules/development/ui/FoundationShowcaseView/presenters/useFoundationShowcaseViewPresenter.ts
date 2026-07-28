@@ -3,12 +3,7 @@ import Config from 'react-native-config';
 
 import { toastService } from '@/libs/toast';
 
-import type {
-  IFontLanguageSample,
-  IFontWeightSample,
-  ILanguageControl,
-  IPresenterInput,
-} from '../types';
+import type { IFontLanguageSample, IFontWeightSample, ILanguageControl, IPresenterInput } from '../types';
 
 const fontWeightSamples: readonly IFontWeightSample[] = [
   { label: 'Regular — 400', weight: 'regular' },
@@ -25,12 +20,7 @@ const fontLanguageSamples: readonly IFontLanguageSample[] = [
   { code: 'de', label: 'German', text: 'Schnelle und gut organisierte Berichte.' },
 ];
 
-export const useFoundationShowcaseViewPresenter = ({
-  language,
-  languages,
-  setLanguage,
-  t,
-}: IPresenterInput) => {
+export const useFoundationShowcaseViewPresenter = ({ language, languages, setLanguage, t }: IPresenterInput) => {
   const onPressNoop = useCallback(() => undefined, []);
 
   const onPressShowSuccess = useCallback(() => {
