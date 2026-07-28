@@ -104,6 +104,7 @@ export const uk: TranslationResources = {
     },
   },
   common: {
+    back: 'Назад',
     cancel: 'Скасувати',
     close: 'Закрити',
     continue: 'Продовжити',
@@ -117,17 +118,75 @@ export const uk: TranslationResources = {
     success: 'Успішно',
     yes: 'Так',
   },
-  home: {
-    email: 'Електронна пошта',
-    fullName: "Повне ім'я",
-    language: 'Мова',
+  profile: {
     logout: 'Вийти',
     logoutError:
       'Ви вийшли з облікового запису на цьому пристрої, але повідомити сервер не вдалося.',
-    premium: 'Преміум',
-    premiumActive: 'Активний',
-    premiumInactive: 'Неактивний',
-    title: 'Головна',
+    title: 'Профіль',
+  },
+  reports: {
+    card: {
+      created: 'Створено {{date}}',
+      updated: 'Оновлено {{date}}',
+    },
+    create: {
+      action: 'Створити звіт',
+      success: 'Звіт створено.',
+      title: 'Створити звіт',
+    },
+    delete: {
+      action: 'Видалити звіт',
+      alreadyDeleted: 'Цей звіт уже видалено.',
+      confirmation: 'Цю дію неможливо скасувати. Звіт буде видалено назавжди.',
+      success: 'Звіт видалено.',
+      title: 'Видалити звіт?',
+    },
+    details: {
+      createdAt: 'Створено',
+      errorDescription: 'Не вдалося завантажити цей звіт. Спробуйте ще раз.',
+      errorTitle: 'Не вдалося завантажити звіт',
+      noNotes: 'Нотаток немає',
+      notFoundDescription: 'Можливо, цей звіт видалено або він більше недоступний.',
+      notFoundTitle: 'Звіт не знайдено',
+      title: 'Деталі звіту',
+      updatedAt: 'Оновлено',
+    },
+    edit: {
+      action: 'Редагувати звіт',
+      success: 'Звіт оновлено.',
+      title: 'Редагувати звіт',
+    },
+    errors: {
+      network: 'Немає з’єднання з інтернетом. Перевірте мережу й спробуйте ще раз.',
+      notFound: 'Звіт не знайдено.',
+      server: 'Сервер тимчасово недоступний. Спробуйте пізніше.',
+      timeout: 'Час очікування запиту вичерпано. Спробуйте ще раз.',
+      validation: 'Перевірте дані звіту й спробуйте ще раз.',
+    },
+    form: {
+      notes: 'Нотатки',
+      notesPlaceholder: 'Додайте корисні деталі',
+      title: 'Назва',
+      titlePlaceholder: 'Назва звіту',
+    },
+    list: {
+      emptyDescription: 'Створіть перший звіт, щоб зберігати його прогрес і нотатки в одному місці.',
+      emptyTitle: 'Звітів ще немає',
+      errorDescription: 'Не вдалося завантажити звіти. Перевірте з’єднання й спробуйте ще раз.',
+      errorTitle: 'Не вдалося завантажити звіти',
+      title: 'Звіти',
+    },
+    status: {
+      draft: 'Чернетка',
+      failed: 'Помилка',
+      processing: 'Обробляється',
+      ready: 'Готовий',
+    },
+    validation: {
+      notesMax: 'Нотатки мають містити не більше 50 000 символів.',
+      titleMax: 'Назва має містити не більше 120 символів.',
+      titleRequired: 'Назва обов’язкова.',
+    },
   },
   languages: {
     english: 'Англійська',

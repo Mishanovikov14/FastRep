@@ -1,5 +1,19 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
+
+export type AppTabsParamList = {
+  Profile: undefined;
+  Reports: undefined;
+};
+
 export type AppStackParamList = {
-  Home: undefined;
+  CreateReport: undefined;
+  EditReport: {
+    reportId: string;
+  };
+  ReportDetails: {
+    reportId: string;
+  };
+  Tabs: NavigatorScreenParams<AppTabsParamList> | undefined;
 };
 
 export type GuestStackParamList = {

@@ -9,7 +9,7 @@ import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import type { IUser } from '@/entities/user/types/user';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { toastService } from '@/libs/toast/toastService';
-import { useHomeViewPresenter } from '@/modules/home/ui/HomeView/presenters/useHomeViewPresenter';
+import { useLogout } from '@/hooks/useLogout';
 
 jest.mock('@tanstack/react-query', () => ({
   useMutation: jest.fn(),
@@ -46,12 +46,12 @@ const user: IUser = {
 };
 const mockMutateAsync = jest.fn();
 
-describe('useHomeViewPresenter', () => {
-  let presenter: ReturnType<typeof useHomeViewPresenter> | undefined;
+describe('useLogout', () => {
+  let presenter: ReturnType<typeof useLogout> | undefined;
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
 
   const Harness = () => {
-    presenter = useHomeViewPresenter({ t });
+    presenter = useLogout(t);
 
     return null;
   };
@@ -146,7 +146,7 @@ describe('useHomeViewPresenter', () => {
     expect(clearUserSession).toHaveBeenCalledTimes(1);
     expect(toastService.showError).toHaveBeenCalledWith(
       'common.error',
-      'home.logoutError',
+      'profile.logoutError',
     );
   });
 });

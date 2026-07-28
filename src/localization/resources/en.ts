@@ -104,6 +104,7 @@ export const en: TranslationResources = {
     },
   },
   common: {
+    back: 'Back',
     cancel: 'Cancel',
     close: 'Close',
     continue: 'Continue',
@@ -117,17 +118,75 @@ export const en: TranslationResources = {
     success: 'Success',
     yes: 'Yes',
   },
-  home: {
-    email: 'Email',
-    fullName: 'Full name',
-    language: 'Language',
+  profile: {
     logout: 'Log out',
     logoutError:
       "You were logged out on this device, but we couldn't notify the server.",
-    premium: 'Premium',
-    premiumActive: 'Active',
-    premiumInactive: 'Inactive',
-    title: 'Home',
+    title: 'Profile',
+  },
+  reports: {
+    card: {
+      created: 'Created {{date}}',
+      updated: 'Updated {{date}}',
+    },
+    create: {
+      action: 'Create report',
+      success: 'Report created.',
+      title: 'Create report',
+    },
+    delete: {
+      action: 'Delete report',
+      alreadyDeleted: 'This report was already deleted.',
+      confirmation: 'This action cannot be undone. The report will be permanently deleted.',
+      success: 'Report deleted.',
+      title: 'Delete report?',
+    },
+    details: {
+      createdAt: 'Created',
+      errorDescription: 'We could not load this report. Please try again.',
+      errorTitle: 'Unable to load report',
+      noNotes: 'No notes',
+      notFoundDescription: 'This report may have been deleted or is no longer available.',
+      notFoundTitle: 'Report not found',
+      title: 'Report details',
+      updatedAt: 'Updated',
+    },
+    edit: {
+      action: 'Edit report',
+      success: 'Report updated.',
+      title: 'Edit report',
+    },
+    errors: {
+      network: 'No internet connection. Check your connection and try again.',
+      notFound: 'The report was not found.',
+      server: 'The server is temporarily unavailable. Please try again later.',
+      timeout: 'The request timed out. Please try again.',
+      validation: 'Check the report details and try again.',
+    },
+    form: {
+      notes: 'Notes',
+      notesPlaceholder: 'Add any useful details',
+      title: 'Title',
+      titlePlaceholder: 'Report title',
+    },
+    list: {
+      emptyDescription: 'Create your first report to keep its progress and notes in one place.',
+      emptyTitle: 'No reports yet',
+      errorDescription: 'We could not load your reports. Check your connection and try again.',
+      errorTitle: 'Unable to load reports',
+      title: 'Reports',
+    },
+    status: {
+      draft: 'Draft',
+      failed: 'Failed',
+      processing: 'Processing',
+      ready: 'Ready',
+    },
+    validation: {
+      notesMax: 'Notes must contain no more than 50,000 characters.',
+      titleMax: 'Title must contain no more than 120 characters.',
+      titleRequired: 'Title is required.',
+    },
   },
   languages: {
     english: 'English',

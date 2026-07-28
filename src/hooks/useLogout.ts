@@ -1,16 +1,13 @@
 import { useMutation } from '@tanstack/react-query';
+import type { TFunction } from 'i18next';
 import { useCallback, useRef, useState } from 'react';
 
 import { logout } from '@/entities/user/API/userApi';
-import { useUserStore } from '@/entities/user/model/userStore';
 import { clearUserSession } from '@/entities/user/services/userStateService';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
 import { toastService } from '@/libs/toast/toastService';
 
-import type { IPresenterInput } from '../types';
-
-export const useHomeViewPresenter = ({ t }: IPresenterInput) => {
-  const user = useUserStore((state) => state.user);
+export const useLogout = (t: TFunction) => {
   const isLoggingOutRef = useRef(false);
   const [isLoading, setIsLoading] = useState(false);
   const { mutateAsync: mutateLogout } = useMutation({
@@ -46,7 +43,7 @@ export const useHomeViewPresenter = ({ t }: IPresenterInput) => {
       }
 
       if (hasRemoteError) {
-        toastService.showError(String(t('common.error')), String(t('home.logoutError')));
+        toastService.showError(String(t('common.error')), String(t('profile.logoutError')));
       }
 
       isLoggingOutRef.current = false;
@@ -57,6 +54,5 @@ export const useHomeViewPresenter = ({ t }: IPresenterInput) => {
   return {
     isLoading,
     onLogout,
-    user,
   };
 };
