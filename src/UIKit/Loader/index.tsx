@@ -4,9 +4,15 @@ import { ActivityIndicator, View } from 'react-native';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getStyles } from './styles';
-import type { IProps } from './types';
 
-export const Loader = ({ color, fullscreen = false, size = 'small' }: IProps) => {
+interface IProps {
+  color?: string;
+  fullscreen?: boolean;
+  size?: 'large' | 'small';
+  transparent?: boolean;
+}
+
+export const Loader = ({ color, fullscreen = false, size = 'small', transparent = false }: IProps) => {
   const { colors, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors), [colors]);
   const indicator = (
@@ -22,5 +28,5 @@ export const Loader = ({ color, fullscreen = false, size = 'small' }: IProps) =>
     return indicator;
   }
 
-  return <View style={styles.fullscreen}>{indicator}</View>;
+  return <View style={[styles.fullscreen, transparent && styles.transparent]}>{indicator}</View>;
 };
