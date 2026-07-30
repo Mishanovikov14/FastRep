@@ -85,7 +85,7 @@ describe('useForgotPasswordViewPresenter', () => {
       await firstSubmit;
     });
 
-    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'auth.forgotPassword.codeSent');
+    expect(toastService.showSuccess).toHaveBeenCalledWith('auth.forgotPassword.codeSent');
     expect(navigation.navigate).toHaveBeenCalledWith('OtpVerification', {
       email: 'alex@example.com',
     });

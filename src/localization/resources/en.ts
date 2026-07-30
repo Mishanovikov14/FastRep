@@ -3,7 +3,7 @@ import type { TranslationResources } from './types';
 export const en: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent: 'If an account exists for this email, we sent a verification code.',
+      codeSent: 'Verification code sent',
       email: 'Email',
       explanation: 'Enter your email address and we will send you a six-digit verification code.',
       sendCode: 'Send code',
@@ -56,7 +56,7 @@ export const en: TranslationResources = {
     registrationVerification: {
       accountAlreadyExists: 'An account with this email already exists. Return to log in.',
       codeAccessibilityLabel: 'Six-digit registration verification code',
-      codeResent: 'A new verification code was sent.',
+      codeResent: 'New verification code sent',
       confirm: 'Confirm email',
       correctDetails: 'Correct registration details',
       description: 'Enter the six-digit code we sent to your email.',
@@ -74,7 +74,7 @@ export const en: TranslationResources = {
       title: 'Verify your email',
     },
     otp: {
-      codeResent: 'If an account exists for this email, we sent a new verification code.',
+      codeResent: 'New verification code sent',
       codeSentTo: 'Code sent to {{email}}',
       explanation: 'Enter the six-digit code from your email.',
       invalidCodeFormat: 'Enter exactly six digits.',
@@ -99,7 +99,7 @@ export const en: TranslationResources = {
       explanation: 'Choose a new password for your FastRep account.',
       newPassword: 'New password',
       resetPassword: 'Reset password',
-      success: 'Your password was reset. Log in with your new password.',
+      success: 'Password changed',
       title: 'Reset password',
       validation: {
         confirmPasswordRequired: 'Confirm your new password.',
@@ -145,14 +145,14 @@ export const en: TranslationResources = {
     },
     create: {
       action: 'Create report',
-      success: 'Report created successfully.',
+      success: 'Report created',
       title: 'Create report',
     },
     delete: {
       action: 'Delete',
       alreadyDeleted: 'Report was already deleted.',
       confirmation: 'This action cannot be undone. The report will be permanently deleted.',
-      success: 'Report deleted successfully.',
+      success: 'Report deleted',
       title: 'Delete report?',
     },
     details: {
@@ -167,7 +167,7 @@ export const en: TranslationResources = {
     },
     edit: {
       action: 'Edit',
-      success: 'Report updated successfully.',
+      success: 'Report updated',
       title: 'Edit report',
     },
     errors: {
@@ -214,6 +214,8 @@ export const en: TranslationResources = {
     description: 'Reusable application foundation showcase',
     showError: 'Show error',
     showSuccess: 'Show success',
+    successMessage: 'Two-line success toasts remain available for additional details.',
+    successTitle: 'Changes saved',
     title: 'FastRep Foundation',
   },
 };

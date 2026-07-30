@@ -78,7 +78,7 @@ export const useResetPasswordViewPresenter = ({ t }: IPresenterInput) => {
       setConfirmPassword('');
       setPassword('');
       setErrors({});
-      toastService.showSuccess(String(t('common.success')), String(t('auth.resetPassword.success')));
+      toastService.showSuccess(String(t('auth.resetPassword.success')));
       navigation.reset({
         index: 0,
         routes: [{ name: 'Login' }],

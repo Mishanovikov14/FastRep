@@ -3,7 +3,7 @@ import type { TranslationResources } from './types';
 export const de: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent: 'Falls ein Konto für diese E-Mail existiert, wurde ein Bestätigungscode gesendet.',
+      codeSent: 'Bestätigungscode gesendet',
       email: 'E-Mail',
       explanation: 'Geben Sie Ihre E-Mail ein, um einen sechsstelligen Bestätigungscode zu erhalten.',
       sendCode: 'Code senden',
@@ -56,7 +56,7 @@ export const de: TranslationResources = {
     registrationVerification: {
       accountAlreadyExists: 'Ein Konto mit dieser E-Mail existiert bereits. Kehren Sie zur Anmeldung zurück.',
       codeAccessibilityLabel: 'Sechsstelliger Bestätigungscode für die Registrierung',
-      codeResent: 'Ein neuer Bestätigungscode wurde gesendet.',
+      codeResent: 'Neuer Bestätigungscode gesendet',
       confirm: 'E-Mail bestätigen',
       correctDetails: 'Registrierungsdaten korrigieren',
       description: 'Geben Sie den sechsstelligen Code ein, den wir an Ihre E-Mail gesendet haben.',
@@ -74,7 +74,7 @@ export const de: TranslationResources = {
       title: 'E-Mail bestätigen',
     },
     otp: {
-      codeResent: 'Falls ein Konto für diese E-Mail existiert, wurde ein neuer Code gesendet.',
+      codeResent: 'Neuer Bestätigungscode gesendet',
       codeSentTo: 'Code gesendet an {{email}}',
       explanation: 'Geben Sie den sechsstelligen Code aus Ihrer E-Mail ein.',
       invalidCodeFormat: 'Geben Sie genau sechs Ziffern ein.',
@@ -99,7 +99,7 @@ export const de: TranslationResources = {
       explanation: 'Wählen Sie ein neues Passwort für Ihr FastRep-Konto.',
       newPassword: 'Neues Passwort',
       resetPassword: 'Passwort zurücksetzen',
-      success: 'Ihr Passwort wurde zurückgesetzt. Melden Sie sich mit dem neuen Passwort an.',
+      success: 'Passwort geändert',
       title: 'Passwort zurücksetzen',
       validation: {
         confirmPasswordRequired: 'Bestätigen Sie Ihr neues Passwort.',
@@ -145,14 +145,14 @@ export const de: TranslationResources = {
     },
     create: {
       action: 'Bericht erstellen',
-      success: 'Bericht erfolgreich erstellt.',
+      success: 'Bericht erstellt',
       title: 'Bericht erstellen',
     },
     delete: {
       action: 'Löschen',
       alreadyDeleted: 'Bericht wurde bereits gelöscht.',
       confirmation: 'Diese Aktion kann nicht rückgängig gemacht werden. Der Bericht wird dauerhaft gelöscht.',
-      success: 'Bericht erfolgreich gelöscht.',
+      success: 'Bericht gelöscht',
       title: 'Bericht löschen?',
     },
     details: {
@@ -167,7 +167,7 @@ export const de: TranslationResources = {
     },
     edit: {
       action: 'Bearbeiten',
-      success: 'Bericht erfolgreich aktualisiert.',
+      success: 'Bericht aktualisiert',
       title: 'Bericht bearbeiten',
     },
     errors: {
@@ -214,6 +214,8 @@ export const de: TranslationResources = {
     description: 'Demo der wiederverwendbaren Anwendungsgrundlage',
     showError: 'Fehler anzeigen',
     showSuccess: 'Erfolg anzeigen',
+    successMessage: 'Zweizeilige Erfolgsmeldungen bieten Platz für zusätzliche Details.',
+    successTitle: 'Änderungen gespeichert',
     title: 'FastRep Grundlage',
   },
 };
