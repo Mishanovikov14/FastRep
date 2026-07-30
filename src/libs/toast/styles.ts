@@ -9,10 +9,19 @@ export const getStyles = (colors: Colors, fonts: Fonts, spacing: Spacing, accent
       paddingHorizontal: scaleHorizontal(spacing.lg),
       paddingVertical: scaleVertical(spacing.md),
     },
+    contentCompact: {
+      paddingHorizontal: scaleHorizontal(spacing.lg),
+      paddingVertical: scaleVertical(spacing.sm),
+    },
     root: {
       borderLeftColor: accentColor,
       height: 'auto',
       minHeight: scaleVertical(60),
+    },
+    rootCompact: {
+      borderLeftColor: accentColor,
+      height: 'auto',
+      minHeight: scaleVertical(48),
     },
     text1: {
       ...fonts.semibold,

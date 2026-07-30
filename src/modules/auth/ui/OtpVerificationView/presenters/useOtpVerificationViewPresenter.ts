@@ -91,7 +91,7 @@ export const useOtpVerificationViewPresenter = ({ t }: IPresenterInput) => {
       setCode('');
       setErrors({});
       setResendSeconds(RESEND_COOLDOWN_SECONDS);
-      toastService.showSuccess(String(t('common.success')), String(t('auth.otp.codeResent')));
+      toastService.showSuccess(String(t('auth.otp.codeResent')));
     } catch {
       console.error('Unexpected password-code resend failure');
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));

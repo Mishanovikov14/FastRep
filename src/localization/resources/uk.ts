@@ -3,7 +3,7 @@ import type { TranslationResources } from './types';
 export const uk: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent: 'Якщо обліковий запис із цією поштою існує, ми надіслали код підтвердження.',
+      codeSent: 'Код підтвердження надіслано',
       email: 'Електронна пошта',
       explanation: 'Введіть електронну пошту, щоб отримати шестизначний код підтвердження.',
       sendCode: 'Надіслати код',
@@ -56,7 +56,7 @@ export const uk: TranslationResources = {
     registrationVerification: {
       accountAlreadyExists: 'Обліковий запис із цією поштою вже існує. Поверніться до входу.',
       codeAccessibilityLabel: 'Шестизначний код підтвердження реєстрації',
-      codeResent: 'Новий код підтвердження надіслано.',
+      codeResent: 'Новий код підтвердження надіслано',
       confirm: 'Підтвердити пошту',
       correctDetails: 'Виправити дані реєстрації',
       description: 'Введіть шестизначний код, який ми надіслали на вашу пошту.',
@@ -74,7 +74,7 @@ export const uk: TranslationResources = {
       title: 'Підтвердьте пошту',
     },
     otp: {
-      codeResent: 'Якщо обліковий запис із цією поштою існує, ми надіслали новий код.',
+      codeResent: 'Новий код підтвердження надіслано',
       codeSentTo: 'Код надіслано на {{email}}',
       explanation: 'Введіть шестизначний код із листа.',
       invalidCodeFormat: 'Введіть рівно шість цифр.',
@@ -99,7 +99,7 @@ export const uk: TranslationResources = {
       explanation: 'Оберіть новий пароль для облікового запису FastRep.',
       newPassword: 'Новий пароль',
       resetPassword: 'Скинути пароль',
-      success: 'Пароль скинуто. Увійдіть за допомогою нового пароля.',
+      success: 'Пароль змінено',
       title: 'Скинути пароль',
       validation: {
         confirmPasswordRequired: 'Підтвердьте новий пароль.',
@@ -145,14 +145,14 @@ export const uk: TranslationResources = {
     },
     create: {
       action: 'Створити звіт',
-      success: 'Звіт успішно створено.',
+      success: 'Звіт створено',
       title: 'Створити звіт',
     },
     delete: {
       action: 'Видалити',
       alreadyDeleted: 'Звіт уже було видалено.',
       confirmation: 'Цю дію неможливо скасувати. Звіт буде видалено назавжди.',
-      success: 'Звіт успішно видалено.',
+      success: 'Звіт видалено',
       title: 'Видалити звіт?',
     },
     details: {
@@ -167,7 +167,7 @@ export const uk: TranslationResources = {
     },
     edit: {
       action: 'Редагувати',
-      success: 'Звіт успішно оновлено.',
+      success: 'Звіт оновлено',
       title: 'Редагувати звіт',
     },
     errors: {
@@ -214,6 +214,8 @@ export const uk: TranslationResources = {
     description: 'Демонстрація багаторазової основи застосунку',
     showError: 'Показати помилку',
     showSuccess: 'Показати успіх',
+    successMessage: 'Дворядкові повідомлення про успіх підтримують додаткові деталі.',
+    successTitle: 'Зміни збережено',
     title: 'Основа FastRep',
   },
 };

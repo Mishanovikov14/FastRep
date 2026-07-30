@@ -2,11 +2,19 @@ import Toast from 'react-native-toast-message';
 
 import type { ToastMessage, ToastType } from './types';
 
+const VISIBILITY_TIME_BY_TYPE: Record<ToastType, number> = {
+  error: 4500,
+  info: 4000,
+  success: 2500,
+  warning: 3000,
+};
+
 const show = (type: ToastType, { message, title }: ToastMessage): void => {
   Toast.show({
     text1: title,
     text2: message,
     type,
+    visibilityTime: VISIBILITY_TIME_BY_TYPE[type],
   });
 };
 
