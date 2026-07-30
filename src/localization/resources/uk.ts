@@ -2,6 +2,9 @@ import type { TranslationResources } from './types';
 
 export const uk: TranslationResources = {
   auth: {
+    environment: {
+      productionRequired: 'Цей обліковий запис може використовувати лише Production. Увійдіть ще раз.',
+    },
     forgotPassword: {
       codeSent: 'Код підтвердження надіслано',
       email: 'Електронна пошта',
@@ -134,6 +137,14 @@ export const uk: TranslationResources = {
     yes: 'Так',
   },
   profile: {
+    environment: {
+      confirmationMessage: 'Ви вийдете з облікового запису та підключитеся до середовища {{environment}}.',
+      confirmationTitle: 'Змінити середовище?',
+      developmentIndicator: 'Середовище Development',
+      selectionMessage: 'Виберіть API-середовище для наступного сеансу.',
+      switchAction: 'Змінити',
+      title: 'Середовище',
+    },
     logout: 'Вийти',
     logoutError: 'Ви вийшли з облікового запису на цьому пристрої, але повідомити сервер не вдалося.',
     title: 'Профіль',

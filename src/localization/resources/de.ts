@@ -2,6 +2,9 @@ import type { TranslationResources } from './types';
 
 export const de: TranslationResources = {
   auth: {
+    environment: {
+      productionRequired: 'Dieses Konto kann nur die Produktionsumgebung verwenden. Melden Sie sich erneut an.',
+    },
     forgotPassword: {
       codeSent: 'Bestätigungscode gesendet',
       email: 'E-Mail',
@@ -134,6 +137,14 @@ export const de: TranslationResources = {
     yes: 'Ja',
   },
   profile: {
+    environment: {
+      confirmationMessage: 'Sie werden abgemeldet und mit der Umgebung {{environment}} verbunden.',
+      confirmationTitle: 'Umgebung wechseln?',
+      developmentIndicator: 'Entwicklungsumgebung',
+      selectionMessage: 'Wählen Sie die API-Umgebung für Ihre nächste Sitzung.',
+      switchAction: 'Wechseln',
+      title: 'Umgebung',
+    },
     logout: 'Abmelden',
     logoutError: 'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
     title: 'Profil',

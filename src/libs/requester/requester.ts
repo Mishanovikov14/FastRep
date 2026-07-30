@@ -1,21 +1,9 @@
 import axios from 'axios';
-import Config from 'react-native-config';
 
 import { AxiosRequester } from './AxiosRequester';
-import type { RequesterAuthCallbacks } from './IRequester';
-
-export const resolveApiBaseUrl = (apiUrl: string | undefined, isDevelopment: boolean): string | undefined => {
-  const normalizedApiUrl = apiUrl?.trim().replace(/\/+$/, '');
-
-  if (!normalizedApiUrl && isDevelopment) {
-    throw new Error('API_URL is required. Select a valid environment file before starting FastRep.');
-  }
-
-  return normalizedApiUrl || undefined;
-};
+import type { RequesterAuthCallbacks, RequesterEnvironmentCallbacks } from './IRequester';
 
 export const axiosClient = axios.create({
-  baseURL: resolveApiBaseUrl(Config.API_URL, __DEV__),
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -29,9 +17,27 @@ const authCallbacks: RequesterAuthCallbacks = {
   },
 };
 
+const environmentCallbacks: RequesterEnvironmentCallbacks = {
+  getBaseUrl() {
+    throw new Error('The application environment has not been initialized.');
+  },
+};
+
+let environmentCancelSource = axios.CancelToken.source();
+
 export const configureRequesterAuth = (callbacks: RequesterAuthCallbacks): void => {
   authCallbacks.getAuthState = callbacks.getAuthState;
   authCallbacks.refreshAuthState = callbacks.refreshAuthState;
 };
 
-export const requester = new AxiosRequester(axiosClient, authCallbacks);
+export const configureRequesterEnvironment = (callbacks: RequesterEnvironmentCallbacks): void => {
+  environmentCallbacks.getBaseUrl = callbacks.getBaseUrl;
+  environmentCallbacks.getCancelToken = () => environmentCancelSource.token;
+};
+
+export const cancelRequesterRequests = (): void => {
+  environmentCancelSource.cancel('The application environment changed.');
+  environmentCancelSource = axios.CancelToken.source();
+};
+
+export const requester = new AxiosRequester(axiosClient, authCallbacks, environmentCallbacks);

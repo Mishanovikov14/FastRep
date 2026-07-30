@@ -166,7 +166,7 @@ describe('useRegistrationVerificationViewPresenter', () => {
       resolveResponse = resolve;
     });
     jest.mocked(verifyRegistration).mockReturnValue(responsePromise);
-    jest.mocked(applyAuthenticationResponse).mockResolvedValue();
+    jest.mocked(applyAuthenticationResponse).mockResolvedValue('authenticated');
     await renderPresenter();
 
     ReactTestRenderer.act(() => {
