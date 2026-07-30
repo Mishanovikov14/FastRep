@@ -140,7 +140,7 @@ describe('report mutation presenters', () => {
     expect(navigation.replace).toHaveBeenCalledWith('ReportDetails', {
       reportId: 'report-1',
     });
-    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'reports.create.success');
+    expect(toastService.showSuccess).toHaveBeenCalledWith('reports.create.success');
   });
 
   it('prefills and updates only title and notes before navigating back', async () => {
@@ -178,7 +178,7 @@ describe('report mutation presenters', () => {
       title: 'Updated title',
     });
     expect(navigation.goBack).toHaveBeenCalledTimes(1);
-    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'reports.edit.success');
+    expect(toastService.showSuccess).toHaveBeenCalledWith('reports.edit.success');
   });
 
   it('deletes successfully and returns to the reports list', async () => {
@@ -214,7 +214,7 @@ describe('report mutation presenters', () => {
       screen: 'Reports',
     });
     expect(removeReportDetailsCache).toHaveBeenCalledWith('report-1');
-    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'reports.delete.success');
+    expect(toastService.showSuccess).toHaveBeenCalledWith('reports.delete.success');
   });
 
   it('opens edit, retries details, and exposes a 404 not-found state', async () => {

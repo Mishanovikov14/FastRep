@@ -52,7 +52,7 @@ export const useForgotPasswordViewPresenter = ({ t }: IPresenterInput) => {
         return;
       }
 
-      toastService.showSuccess(String(t('common.success')), String(t('auth.forgotPassword.codeSent')));
+      toastService.showSuccess(String(t('auth.forgotPassword.codeSent')));
       navigation.navigate('OtpVerification', {
         email: request.email,
       });

@@ -99,7 +99,7 @@ describe('useResetPasswordViewPresenter', () => {
       confirmPassword: '',
       password: '',
     });
-    expect(toastService.showSuccess).toHaveBeenCalledWith('common.success', 'auth.resetPassword.success');
+    expect(toastService.showSuccess).toHaveBeenCalledWith('auth.resetPassword.success');
     expect(navigation.reset).toHaveBeenCalledWith({
       index: 0,
       routes: [{ name: 'Login' }],

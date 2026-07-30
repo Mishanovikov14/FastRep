@@ -3,7 +3,7 @@ import type { TranslationResources } from './types';
 export const fr: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent: 'Si un compte existe pour cet e-mail, nous avons envoyé un code de vérification.',
+      codeSent: 'Code de vérification envoyé',
       email: 'E-mail',
       explanation: 'Saisissez votre e-mail pour recevoir un code de vérification à six chiffres.',
       sendCode: 'Envoyer le code',
@@ -56,7 +56,7 @@ export const fr: TranslationResources = {
     registrationVerification: {
       accountAlreadyExists: 'Un compte existe déjà avec cet e-mail. Revenez à la connexion.',
       codeAccessibilityLabel: 'Code de vérification d’inscription à six chiffres',
-      codeResent: 'Un nouveau code de vérification a été envoyé.',
+      codeResent: 'Nouveau code de vérification envoyé',
       confirm: 'Confirmer l’e-mail',
       correctDetails: 'Corriger les informations d’inscription',
       description: 'Saisissez le code à six chiffres envoyé à votre adresse e-mail.',
@@ -74,7 +74,7 @@ export const fr: TranslationResources = {
       title: 'Vérifiez votre e-mail',
     },
     otp: {
-      codeResent: 'Si un compte existe pour cet e-mail, nous avons envoyé un nouveau code.',
+      codeResent: 'Nouveau code de vérification envoyé',
       codeSentTo: 'Code envoyé à {{email}}',
       explanation: 'Saisissez le code à six chiffres reçu par e-mail.',
       invalidCodeFormat: 'Saisissez exactement six chiffres.',
@@ -99,7 +99,7 @@ export const fr: TranslationResources = {
       explanation: 'Choisissez un nouveau mot de passe pour votre compte FastRep.',
       newPassword: 'Nouveau mot de passe',
       resetPassword: 'Réinitialiser le mot de passe',
-      success: 'Votre mot de passe a été réinitialisé. Connectez-vous avec le nouveau.',
+      success: 'Mot de passe modifié',
       title: 'Réinitialiser le mot de passe',
       validation: {
         confirmPasswordRequired: 'Confirmez votre nouveau mot de passe.',
@@ -145,14 +145,14 @@ export const fr: TranslationResources = {
     },
     create: {
       action: 'Créer un rapport',
-      success: 'Rapport créé avec succès.',
+      success: 'Rapport créé',
       title: 'Créer un rapport',
     },
     delete: {
       action: 'Supprimer',
       alreadyDeleted: 'Le rapport a déjà été supprimé.',
       confirmation: 'Cette action est irréversible. Le rapport sera définitivement supprimé.',
-      success: 'Rapport supprimé avec succès.',
+      success: 'Rapport supprimé',
       title: 'Supprimer le rapport ?',
     },
     details: {
@@ -167,7 +167,7 @@ export const fr: TranslationResources = {
     },
     edit: {
       action: 'Modifier',
-      success: 'Rapport mis à jour avec succès.',
+      success: 'Rapport mis à jour',
       title: 'Modifier le rapport',
     },
     errors: {
@@ -214,6 +214,8 @@ export const fr: TranslationResources = {
     description: "Présentation de la base réutilisable de l'application",
     showError: "Afficher l'erreur",
     showSuccess: 'Afficher le succès',
+    successMessage: 'Les notifications de succès sur deux lignes acceptent des détails supplémentaires.',
+    successTitle: 'Modifications enregistrées',
     title: 'Base FastRep',
   },
 };

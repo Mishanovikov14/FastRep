@@ -219,10 +219,7 @@ describe('useRegistrationVerificationViewPresenter', () => {
     });
 
     expect(presenter?.resendSeconds).toBe(60);
-    expect(toastService.showSuccess).toHaveBeenCalledWith(
-      'common.success',
-      'auth.registrationVerification.codeResent',
-    );
+    expect(toastService.showSuccess).toHaveBeenCalledWith('auth.registrationVerification.codeResent');
 
     ReactTestRenderer.act(() => {
       jest.advanceTimersByTime(60_000);
