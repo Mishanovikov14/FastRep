@@ -72,6 +72,7 @@ export interface TranslationResources {
       title: string;
     };
     otp: {
+      codeAccessibilityLabel: string;
       codeResent: string;
       codeSentTo: string;
       explanation: string;
@@ -79,7 +80,6 @@ export interface TranslationResources {
       resendCode: string;
       resendIn: string;
       title: string;
-      verificationCode: string;
     };
     recovery: {
       back: string;

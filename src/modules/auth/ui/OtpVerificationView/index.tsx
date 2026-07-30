@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 import { Image, View } from 'react-native';
 
+import { VerificationCodeInput } from '@/modules/auth/ui/components/VerificationCodeInput';
 import { Button } from '@/UIKit/Button';
-import { Input } from '@/UIKit/Input';
 import { ScreenContainer } from '@/UIKit/ScreenContainer';
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
@@ -48,17 +48,10 @@ export const OtpVerificationView = () => {
           </Typography>
         </View>
 
-        <Input
-          autoComplete="one-time-code"
+        <VerificationCodeInput
+          accessibilityLabel={String(t('auth.otp.codeAccessibilityLabel'))}
           error={codeError}
-          keyboardType="number-pad"
-          label={String(t('auth.otp.verificationCode'))}
-          maxLength={6}
           onChangeText={onChangeCode}
-          onSubmitEditing={onContinue}
-          returnKeyType="done"
-          style={styles.otpInput}
-          textContentType="oneTimeCode"
           value={code}
         />
 

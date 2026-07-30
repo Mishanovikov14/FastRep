@@ -74,6 +74,7 @@ export const de: TranslationResources = {
       title: 'E-Mail bestätigen',
     },
     otp: {
+      codeAccessibilityLabel: 'Sechsstelliger Bestätigungscode zur Passwortwiederherstellung',
       codeResent: 'Falls ein Konto für diese E-Mail existiert, wurde ein neuer Code gesendet.',
       codeSentTo: 'Code gesendet an {{email}}',
       explanation: 'Geben Sie den sechsstelligen Code aus Ihrer E-Mail ein.',
@@ -81,7 +82,6 @@ export const de: TranslationResources = {
       resendCode: 'Code erneut senden',
       resendIn: 'Erneut senden in {{seconds}} s',
       title: 'Bestätigungscode eingeben',
-      verificationCode: 'Bestätigungscode',
     },
     recovery: {
       back: 'Zurück',

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 import type { Colors, Spacing } from '@/UIProvider/theme/types';
-import { scaleFontSize, scaleHorizontal, scaleVertical } from '@/utils/scaling';
+import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, spacing: Spacing) => {
   return StyleSheet.create({
@@ -24,11 +24,6 @@ export const getStyles = (colors: Colors, spacing: Spacing) => {
       height: scaleVertical(80),
       maxWidth: Math.min(scaleHorizontal(320), 320),
       width: '82%',
-    },
-    otpInput: {
-      fontSize: scaleFontSize(24),
-      letterSpacing: scaleHorizontal(12),
-      textAlign: 'center',
     },
   });
 };

@@ -74,6 +74,7 @@ export const en: TranslationResources = {
       title: 'Verify your email',
     },
     otp: {
+      codeAccessibilityLabel: 'Six-digit password recovery verification code',
       codeResent: 'If an account exists for this email, we sent a new verification code.',
       codeSentTo: 'Code sent to {{email}}',
       explanation: 'Enter the six-digit code from your email.',
@@ -81,7 +82,6 @@ export const en: TranslationResources = {
       resendCode: 'Resend code',
       resendIn: 'Resend in {{seconds}}s',
       title: 'Enter verification code',
-      verificationCode: 'Verification code',
     },
     recovery: {
       back: 'Back',
