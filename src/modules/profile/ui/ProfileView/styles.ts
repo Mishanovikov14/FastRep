@@ -7,11 +7,12 @@ export const getStyles = (spacing: Spacing) => {
   const styles = StyleSheet.create({
     button: {
       alignSelf: 'center',
+      marginTop: 'auto',
       maxWidth: 520,
       width: '100%',
     },
     content: {
-      justifyContent: 'center',
+      gap: scaleVertical(spacing.xl),
       paddingHorizontal: scaleHorizontal(spacing.lg),
       paddingVertical: scaleVertical(spacing.xl),
     },

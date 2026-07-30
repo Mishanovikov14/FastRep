@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
+import { VerificationCodeInput } from '@/modules/auth/ui/components/VerificationCodeInput';
 import { Button } from '@/UIKit/Button';
 import { Header } from '@/UIKit/Header';
 import { ScreenContainer } from '@/UIKit/ScreenContainer';
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
-import { VerificationCodeInput } from './components/VerificationCodeInput';
 import { useRegistrationVerificationViewPresenter } from './presenters/useRegistrationVerificationViewPresenter';
 import { getStyles } from './styles';
 

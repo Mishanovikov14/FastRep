@@ -1,5 +1,7 @@
 import { getMeWithoutRefresh } from '@/entities/user/API/userApi';
+import { enforceAppEnvironmentForAuthenticatedUser } from '@/entities/environment/services/appEnvironmentService';
 import { useUserStore } from '@/entities/user/model/userStore';
+import { clearAuthenticatedResources } from '@/entities/user/services/authenticatedResourcesService';
 import { refreshTokenPair } from '@/entities/user/services/tokenRefreshService';
 import { applyAuthenticationResponse, restoreUserSession } from '@/entities/user/services/userSessionService';
 import { clearUserSession } from '@/entities/user/services/userStateService';
@@ -12,6 +14,14 @@ jest.mock('@/entities/user/services/userTokenStorage', () => ({
     getTokens: jest.fn(),
     saveTokens: jest.fn(),
   },
+}));
+
+jest.mock('@/entities/environment/services/appEnvironmentService', () => ({
+  enforceAppEnvironmentForAuthenticatedUser: jest.fn(),
+}));
+
+jest.mock('@/entities/user/services/authenticatedResourcesService', () => ({
+  clearAuthenticatedResources: jest.fn(),
 }));
 
 jest.mock('@/entities/user/API/userApi', () => ({
@@ -64,6 +74,25 @@ describe('applyAuthenticationResponse', () => {
     jest.clearAllMocks();
     useUserStore.getState().clearUser();
     jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
+    jest.mocked(enforceAppEnvironmentForAuthenticatedUser).mockReturnValue(true);
+    jest.mocked(clearAuthenticatedResources).mockResolvedValue();
+  });
+
+  it('does not save Development tokens when a non-owner forces Production', async () => {
+    jest.mocked(enforceAppEnvironmentForAuthenticatedUser).mockReturnValueOnce(false);
+
+    await expect(
+      applyAuthenticationResponse({
+        accessToken: 'development-access-token',
+        refreshToken: 'development-refresh-token',
+        user,
+      }),
+    ).resolves.toBe('environment_reset');
+
+    expect(userTokenStorage.saveTokens).not.toHaveBeenCalled();
+    expect(clearUserSession).toHaveBeenCalledTimes(1);
+    expect(clearAuthenticatedResources).toHaveBeenCalledTimes(1);
+    expect(useUserStore.getState().isAuthorized).toBe(false);
   });
 
   it('persists the Keychain token pair before authorizing the existing user store', async () => {
@@ -90,6 +119,23 @@ describe('restoreUserSession', () => {
     jest.mocked(userTokenStorage.getTokens).mockResolvedValue(tokens);
     jest.mocked(refreshTokenPair).mockResolvedValue(rotatedTokens);
     jest.mocked(clearUserSession).mockResolvedValue();
+    jest.mocked(enforceAppEnvironmentForAuthenticatedUser).mockReturnValue(true);
+    jest.mocked(clearAuthenticatedResources).mockResolvedValue();
+  });
+
+  it('forces Production and clears a restored non-owner Development session', async () => {
+    jest.mocked(getMeWithoutRefresh).mockResolvedValueOnce({
+      data: user,
+      isError: false,
+      message: '',
+    });
+    jest.mocked(enforceAppEnvironmentForAuthenticatedUser).mockReturnValueOnce(false);
+
+    await expect(restoreUserSession()).resolves.toEqual({
+      status: 'unauthorized',
+    });
+    expect(clearUserSession).toHaveBeenCalledTimes(1);
+    expect(clearAuthenticatedResources).toHaveBeenCalledTimes(1);
   });
 
   it('returns an unauthorized result without a network request when no tokens exist', async () => {

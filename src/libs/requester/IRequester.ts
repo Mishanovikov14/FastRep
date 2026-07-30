@@ -1,4 +1,4 @@
-import type { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig, CancelToken } from 'axios';
 
 import type { IResponse } from './IResponse';
 
@@ -19,4 +19,9 @@ export interface IRequesterAuthState {
 export interface RequesterAuthCallbacks {
   getAuthState(): Promise<IRequesterAuthState | null>;
   refreshAuthState?(failedAuthState: IRequesterAuthState | null): Promise<IRequesterAuthState | null>;
+}
+
+export interface RequesterEnvironmentCallbacks {
+  getBaseUrl(): string;
+  getCancelToken?(): CancelToken;
 }

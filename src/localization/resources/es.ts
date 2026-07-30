@@ -2,6 +2,9 @@ import type { TranslationResources } from './types';
 
 export const es: TranslationResources = {
   auth: {
+    environment: {
+      productionRequired: 'Esta cuenta solo puede usar el entorno de Producción. Inicia sesión de nuevo.',
+    },
     forgotPassword: {
       codeSent: 'Código de verificación enviado',
       email: 'Correo electrónico',
@@ -74,6 +77,7 @@ export const es: TranslationResources = {
       title: 'Verifica tu correo',
     },
     otp: {
+      codeAccessibilityLabel: 'Código de verificación de recuperación de contraseña de seis dígitos',
       codeResent: 'Nuevo código de verificación enviado',
       codeSentTo: 'Código enviado a {{email}}',
       explanation: 'Introduce el código de seis dígitos enviado a tu correo.',
@@ -81,7 +85,6 @@ export const es: TranslationResources = {
       resendCode: 'Reenviar código',
       resendIn: 'Reenviar en {{seconds}} s',
       title: 'Introduce el código de verificación',
-      verificationCode: 'Código de verificación',
     },
     recovery: {
       back: 'Atrás',
@@ -134,6 +137,14 @@ export const es: TranslationResources = {
     yes: 'Sí',
   },
   profile: {
+    environment: {
+      confirmationMessage: 'Se cerrará tu sesión y te conectarás al entorno {{environment}}.',
+      confirmationTitle: '¿Cambiar de entorno?',
+      developmentIndicator: 'Entorno de Desarrollo',
+      selectionMessage: 'Elige el entorno de API para tu próxima sesión.',
+      switchAction: 'Cambiar',
+      title: 'Entorno',
+    },
     logout: 'Cerrar sesión',
     logoutError: 'Has cerrado sesión en este dispositivo, pero no se pudo notificar al servidor.',
     title: 'Perfil',

@@ -119,7 +119,7 @@ export const FoundationShowcaseView = () => {
       <View style={styles.surface}>
         <Typography variant="heading">Backend</Typography>
         <Typography color={colors.textSecondary} variant="caption">
-          API_URL
+          Active API base URL
         </Typography>
         <Typography>{apiUrl}</Typography>
         <Typography color={colors.textSecondary} variant="caption">

@@ -5,7 +5,13 @@ import { getUniqueId, getVersion } from 'react-native-device-info';
 
 import { i18n } from '@/localization/i18n';
 
-import type { IRequestConfig, IRequester, IRequesterAuthState, RequesterAuthCallbacks } from './IRequester';
+import type {
+  IRequestConfig,
+  IRequester,
+  IRequesterAuthState,
+  RequesterAuthCallbacks,
+  RequesterEnvironmentCallbacks,
+} from './IRequester';
 import type { IResponse } from './IResponse';
 import { normalizeRequestError } from './RequestError';
 
@@ -23,6 +29,7 @@ export class AxiosRequester implements IRequester {
   constructor(
     private readonly client: AxiosInstance,
     private readonly authCallbacks: RequesterAuthCallbacks = DEFAULT_AUTH_CALLBACKS,
+    private readonly environmentCallbacks?: RequesterEnvironmentCallbacks,
   ) {}
 
   async request<T>(config: IRequestConfig): Promise<IResponse<T>> {
@@ -85,6 +92,8 @@ export class AxiosRequester implements IRequester {
     try {
       const response = await this.client.request<T>({
         ...axiosConfig,
+        baseURL: this.environmentCallbacks?.getBaseUrl() ?? axiosConfig.baseURL,
+        cancelToken: this.environmentCallbacks?.getCancelToken?.() ?? axiosConfig.cancelToken,
         headers,
       });
 

@@ -134,7 +134,14 @@ export const useRegistrationVerificationViewPresenter = ({ t }: IPresenterInput)
         return;
       }
 
-      await applyAuthenticationResponse(response.data);
+      const authenticationResult = await applyAuthenticationResponse(response.data);
+
+      if (authenticationResult === 'environment_reset') {
+        toastService.showError(
+          String(t('common.error')),
+          String(t('auth.environment.productionRequired')),
+        );
+      }
     } catch (error: unknown) {
       console.error('Unexpected registration verification failure', error);
       toastService.showError(

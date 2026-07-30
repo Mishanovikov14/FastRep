@@ -2,6 +2,9 @@ import type { TranslationResources } from './types';
 
 export const de: TranslationResources = {
   auth: {
+    environment: {
+      productionRequired: 'Dieses Konto kann nur die Produktionsumgebung verwenden. Melden Sie sich erneut an.',
+    },
     forgotPassword: {
       codeSent: 'Bestätigungscode gesendet',
       email: 'E-Mail',
@@ -74,14 +77,14 @@ export const de: TranslationResources = {
       title: 'E-Mail bestätigen',
     },
     otp: {
-      codeResent: 'Neuer Bestätigungscode gesendet',
+      codeAccessibilityLabel: 'Sechsstelliger Bestätigungscode zur Passwortwiederherstellung',
+      codeResent: 'Falls ein Konto für diese E-Mail existiert, wurde ein neuer Code gesendet.',
       codeSentTo: 'Code gesendet an {{email}}',
       explanation: 'Geben Sie den sechsstelligen Code aus Ihrer E-Mail ein.',
       invalidCodeFormat: 'Geben Sie genau sechs Ziffern ein.',
       resendCode: 'Code erneut senden',
       resendIn: 'Erneut senden in {{seconds}} s',
       title: 'Bestätigungscode eingeben',
-      verificationCode: 'Bestätigungscode',
     },
     recovery: {
       back: 'Zurück',
@@ -134,6 +137,14 @@ export const de: TranslationResources = {
     yes: 'Ja',
   },
   profile: {
+    environment: {
+      confirmationMessage: 'Sie werden abgemeldet und mit der Umgebung {{environment}} verbunden.',
+      confirmationTitle: 'Umgebung wechseln?',
+      developmentIndicator: 'Entwicklungsumgebung',
+      selectionMessage: 'Wählen Sie die API-Umgebung für Ihre nächste Sitzung.',
+      switchAction: 'Wechseln',
+      title: 'Umgebung',
+    },
     logout: 'Abmelden',
     logoutError: 'Sie wurden auf diesem Gerät abgemeldet, der Server konnte jedoch nicht benachrichtigt werden.',
     title: 'Profil',

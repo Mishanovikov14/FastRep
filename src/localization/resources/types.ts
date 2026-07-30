@@ -1,5 +1,8 @@
 export interface TranslationResources {
   auth: {
+    environment: {
+      productionRequired: string;
+    };
     forgotPassword: {
       codeSent: string;
       email: string;
@@ -72,6 +75,7 @@ export interface TranslationResources {
       title: string;
     };
     otp: {
+      codeAccessibilityLabel: string;
       codeResent: string;
       codeSentTo: string;
       explanation: string;
@@ -79,7 +83,6 @@ export interface TranslationResources {
       resendCode: string;
       resendIn: string;
       title: string;
-      verificationCode: string;
     };
     recovery: {
       back: string;
@@ -132,6 +135,14 @@ export interface TranslationResources {
     yes: string;
   };
   profile: {
+    environment: {
+      confirmationMessage: string;
+      confirmationTitle: string;
+      developmentIndicator: string;
+      selectionMessage: string;
+      switchAction: string;
+      title: string;
+    };
     logout: string;
     logoutError: string;
     title: string;

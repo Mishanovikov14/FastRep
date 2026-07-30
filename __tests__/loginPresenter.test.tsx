@@ -87,7 +87,7 @@ describe('useLoginViewPresenter', () => {
       resolveResponse = resolve;
     });
 
-    jest.mocked(applyAuthenticationResponse).mockResolvedValue();
+    jest.mocked(applyAuthenticationResponse).mockResolvedValue('authenticated');
     mockMutateAsync.mockReturnValue(responsePromise);
 
     await ReactTestRenderer.act(async () => {

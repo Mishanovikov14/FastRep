@@ -106,3 +106,27 @@ State responsibilities:
 - Entity Zustand stores — local domain state.
 - MMKV — non-sensitive persistent preferences.
 - Keychain — authentication tokens and secrets.
+
+## Runtime API environments
+
+Runtime backend selection is owned by `src/entities/environment`:
+
+- `config/appEnvironments.ts` is the single typed definition of the Development and Production URLs.
+- `model/appEnvironmentStore.ts` exposes the active environment to React UI.
+- `services/appEnvironmentService.ts` validates persistence, owner authorization, defaults, and requester configuration.
+
+The user-owned `entities/user/services/environmentSwitchService.ts` coordinates an environment change with Keychain,
+session-state, and authenticated React Query cleanup.
+
+Debug builds default to Development and release/store builds default to Production. A valid saved selection can be
+restored before authentication so the owner can reach the Development login screen. After authentication, only the
+normalized owner email `mishanovikov14@gmail.com` may remain on Development. Any other user is forced to Production,
+the saved Development override and invalid session are cleared, and login is required again.
+
+The Profile environment control is screen-specific and lives under
+`modules/profile/ui/ProfileView/components/EnvironmentSection`. Its behavior stays in the Profile presenter. Root
+navigation remains declarative: clearing the user store moves the app from the authenticated stack to the guest stack.
+
+Client-side owner checks prevent accidental access only. The Development backend must use separate credentials,
+database, S3 bucket or isolated prefixes, Redis, OpenAI project/key, rate limits, and secrets. Backend secrets must
+never be shipped in the mobile application.
