@@ -212,6 +212,8 @@ export interface TranslationResources {
     description: string;
     showError: string;
     showSuccess: string;
+    successMessage: string;
+    successTitle: string;
     title: string;
   };
 }

@@ -3,7 +3,7 @@ import type { TranslationResources } from './types';
 export const es: TranslationResources = {
   auth: {
     forgotPassword: {
-      codeSent: 'Si existe una cuenta con este correo, hemos enviado un código de verificación.',
+      codeSent: 'Código de verificación enviado',
       email: 'Correo electrónico',
       explanation: 'Introduce tu correo para recibir un código de verificación de seis dígitos.',
       sendCode: 'Enviar código',
@@ -56,7 +56,7 @@ export const es: TranslationResources = {
     registrationVerification: {
       accountAlreadyExists: 'Ya existe una cuenta con este correo. Vuelve para iniciar sesión.',
       codeAccessibilityLabel: 'Código de verificación de registro de seis dígitos',
-      codeResent: 'Se ha enviado un nuevo código de verificación.',
+      codeResent: 'Nuevo código de verificación enviado',
       confirm: 'Confirmar correo',
       correctDetails: 'Corregir los datos de registro',
       description: 'Introduce el código de seis dígitos que enviamos a tu correo.',
@@ -74,8 +74,7 @@ export const es: TranslationResources = {
       title: 'Verifica tu correo',
     },
     otp: {
-      codeAccessibilityLabel: 'Código de verificación de seis dígitos para recuperar la contraseña',
-      codeResent: 'Si existe una cuenta con este correo, hemos enviado un código nuevo.',
+      codeResent: 'Nuevo código de verificación enviado',
       codeSentTo: 'Código enviado a {{email}}',
       explanation: 'Introduce el código de seis dígitos enviado a tu correo.',
       invalidCodeFormat: 'Introduce exactamente seis dígitos.',
@@ -99,7 +98,7 @@ export const es: TranslationResources = {
       explanation: 'Elige una contraseña nueva para tu cuenta de FastRep.',
       newPassword: 'Contraseña nueva',
       resetPassword: 'Restablecer contraseña',
-      success: 'Tu contraseña se ha restablecido. Inicia sesión con la contraseña nueva.',
+      success: 'Contraseña cambiada',
       title: 'Restablecer contraseña',
       validation: {
         confirmPasswordRequired: 'Confirma tu contraseña nueva.',
@@ -145,14 +144,14 @@ export const es: TranslationResources = {
     },
     create: {
       action: 'Crear informe',
-      success: 'Informe creado correctamente.',
+      success: 'Informe creado',
       title: 'Crear informe',
     },
     delete: {
       action: 'Eliminar',
       alreadyDeleted: 'El informe ya se había eliminado.',
       confirmation: 'Esta acción no se puede deshacer. El informe se eliminará permanentemente.',
-      success: 'Informe eliminado correctamente.',
+      success: 'Informe eliminado',
       title: '¿Eliminar informe?',
     },
     details: {
@@ -167,7 +166,7 @@ export const es: TranslationResources = {
     },
     edit: {
       action: 'Editar',
-      success: 'Informe actualizado correctamente.',
+      success: 'Informe actualizado',
       title: 'Editar informe',
     },
     errors: {
@@ -214,6 +213,8 @@ export const es: TranslationResources = {
     description: 'Demostración de la base reutilizable de la aplicación',
     showError: 'Mostrar error',
     showSuccess: 'Mostrar éxito',
+    successMessage: 'Los avisos de éxito de dos líneas admiten detalles adicionales.',
+    successTitle: 'Cambios guardados',
     title: 'Base FastRep',
   },
 };

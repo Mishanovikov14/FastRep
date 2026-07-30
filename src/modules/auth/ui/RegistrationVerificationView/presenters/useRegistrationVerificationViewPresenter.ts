@@ -175,10 +175,7 @@ export const useRegistrationVerificationViewPresenter = ({ t }: IPresenterInput)
       setCode('');
       setCodeError(undefined);
       onStartCountdown(DEFAULT_RESEND_COOLDOWN_SECONDS);
-      toastService.showSuccess(
-        String(t('common.success')),
-        String(t('auth.registrationVerification.codeResent')),
-      );
+      toastService.showSuccess(String(t('auth.registrationVerification.codeResent')));
     } catch (error: unknown) {
       console.error('Unexpected registration-code resend failure', error);
       toastService.showError(

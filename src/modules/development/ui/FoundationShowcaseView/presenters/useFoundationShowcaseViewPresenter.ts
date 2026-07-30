@@ -24,7 +24,7 @@ export const useFoundationShowcaseViewPresenter = ({ language, languages, setLan
   const onPressNoop = useCallback(() => undefined, []);
 
   const onPressShowSuccess = useCallback(() => {
-    toastService.showSuccess(String(t('common.success')), String(t('showcase.showSuccess')));
+    toastService.showSuccess(String(t('showcase.successTitle')), String(t('showcase.successMessage')));
   }, [t]);
 
   const onPressShowError = useCallback(() => {
