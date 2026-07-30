@@ -39,3 +39,18 @@ Rules:
 - Prevent concurrent refresh storms with a single-flight mechanism.
 - Temporary network, timeout, and backend failures preserve tokens and return a retryable startup result.
 - Navigation remains declarative: user-store authorization selects the guest or app stack.
+
+## Environment changes
+
+Development and Production are separate account systems. A confirmed owner environment switch:
+
+1. persists the new environment;
+2. blocks auth-token attachment during the transition;
+3. clears the Keychain access and refresh tokens;
+4. resets the authenticated user store;
+5. cancels active React Query queries and clears query/mutation caches;
+6. returns to the guest navigation stack and requires login against the selected backend.
+
+The selected environment is not reset by normal logout. If a non-owner authenticates while Development is selected,
+the Development response tokens are never saved: the app forces Production, clears any local session and authenticated
+caches, and requires a new Production login.

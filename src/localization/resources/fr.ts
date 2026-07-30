@@ -2,6 +2,9 @@ import type { TranslationResources } from './types';
 
 export const fr: TranslationResources = {
   auth: {
+    environment: {
+      productionRequired: 'Ce compte peut uniquement utiliser l’environnement de Production. Reconnectez-vous.',
+    },
     forgotPassword: {
       codeSent: 'Code de vérification envoyé',
       email: 'E-mail',
@@ -134,6 +137,14 @@ export const fr: TranslationResources = {
     yes: 'Oui',
   },
   profile: {
+    environment: {
+      confirmationMessage: 'Vous serez déconnecté et relié à l’environnement {{environment}}.',
+      confirmationTitle: 'Changer d’environnement ?',
+      developmentIndicator: 'Environnement de Développement',
+      selectionMessage: 'Choisissez l’environnement API de votre prochaine session.',
+      switchAction: 'Changer',
+      title: 'Environnement',
+    },
     logout: 'Se déconnecter',
     logoutError: "Vous avez été déconnecté sur cet appareil, mais le serveur n'a pas pu être averti.",
     title: 'Profil',

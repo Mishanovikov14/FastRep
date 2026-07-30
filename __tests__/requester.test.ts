@@ -1,8 +1,7 @@
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, RawAxiosHeaders } from 'axios';
 import { AxiosHeaders } from 'axios';
 
-import { axiosClient, AxiosRequester } from '@/libs/requester';
-import { resolveApiBaseUrl } from '@/libs/requester/requester';
+import { AxiosRequester } from '@/libs/requester';
 
 jest.mock('@/localization/i18n', () => ({
   i18n: {
@@ -25,17 +24,6 @@ const createClient = () => {
 };
 
 describe('AxiosRequester', () => {
-  it('uses the configured API URL', () => {
-    expect(axiosClient.defaults.baseURL).toBe('https://api.fastrep.app');
-    expect(axiosClient.getUri({ url: '/auth/login' })).toBe('https://api.fastrep.app/auth/login');
-  });
-
-  it('normalizes the configured API URL without a localhost fallback', () => {
-    expect(resolveApiBaseUrl(' https://api.fastrep.app/ ', true)).toBe('https://api.fastrep.app');
-    expect(() => resolveApiBaseUrl(undefined, true)).toThrow('API_URL is required.');
-    expect(resolveApiBaseUrl(undefined, false)).toBeUndefined();
-  });
-
   it('maps a successful response to IResponse<T>', async () => {
     const { client, request } = createClient();
     const response: AxiosResponse<SuccessPayload> = {
@@ -56,6 +44,58 @@ describe('AxiosRequester', () => {
       isError: false,
       message: '',
     });
+  });
+
+  it('resolves the active base URL for every request after an environment switch', async () => {
+    const { client, request } = createClient();
+    let baseUrl = 'https://api.fastrep.app';
+    request.mockResolvedValue({
+      data: { id: 7 },
+    });
+    const environmentCallbacks = {
+      getBaseUrl: () => baseUrl,
+    };
+    const dynamicRequester = new AxiosRequester(client, undefined, environmentCallbacks);
+
+    await dynamicRequester.request({ requiresAuth: false, url: '/health' });
+    baseUrl = 'https://fastrep-api-development.up.railway.app';
+    await dynamicRequester.request({ requiresAuth: false, url: '/health' });
+
+    expect(request).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        baseURL: 'https://api.fastrep.app',
+      }),
+    );
+    expect(request).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        baseURL: 'https://fastrep-api-development.up.railway.app',
+      }),
+    );
+  });
+
+  it('does not send old environment tokens while an environment switch is active', async () => {
+    const { client, request } = createClient();
+    const switchingRequester = new AxiosRequester(
+      client,
+      {
+        getAuthState: async () => ({
+          accessToken: 'old-environment-token',
+          version: 3,
+        }),
+      },
+      {
+        getBaseUrl: () => {
+          throw new Error('Environment switch in progress');
+        },
+      },
+    );
+
+    const result = await switchingRequester.request({ url: '/reports' });
+
+    expect(request).not.toHaveBeenCalled();
+    expect(result.isError).toBe(true);
   });
 
   it('maps a backend error without throwing', async () => {

@@ -1,4 +1,5 @@
 import { refresh } from '@/entities/user/API/userApi';
+import { isAppEnvironmentSwitching } from '@/entities/environment/services/appEnvironmentService';
 import type { ITokenPair } from '@/entities/user/types/auth';
 import type { ITokenSnapshot } from '@/entities/user/types/session';
 import type { IRequesterAuthState } from '@/libs/requester/IRequester';
@@ -294,6 +295,10 @@ export const initializeTokenRefreshService = (): void => {
   isRequesterConfigured = true;
   configureRequesterAuth({
     getAuthState: async () => {
+      if (isAppEnvironmentSwitching()) {
+        return null;
+      }
+
       const snapshot = await userTokenStorage.getTokenSnapshot();
 
       return {
@@ -302,7 +307,7 @@ export const initializeTokenRefreshService = (): void => {
       };
     },
     refreshAuthState: async (failedAuthState) => {
-      if (!failedAuthState) {
+      if (!failedAuthState || isAppEnvironmentSwitching()) {
         return null;
       }
 

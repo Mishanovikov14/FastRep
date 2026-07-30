@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import Config from 'react-native-config';
 
+import { useAppEnvironmentStore } from '@/entities/environment/model/appEnvironmentStore';
 import { toastService } from '@/libs/toast';
 
 import type { IFontLanguageSample, IFontWeightSample, ILanguageControl, IPresenterInput } from '../types';
@@ -21,6 +21,7 @@ const fontLanguageSamples: readonly IFontLanguageSample[] = [
 ];
 
 export const useFoundationShowcaseViewPresenter = ({ language, languages, setLanguage, t }: IPresenterInput) => {
+  const apiUrl = useAppEnvironmentStore((state) => state.activeEnvironment.apiBaseUrl);
   const onPressNoop = useCallback(() => undefined, []);
 
   const onPressShowSuccess = useCallback(() => {
@@ -60,7 +61,7 @@ export const useFoundationShowcaseViewPresenter = ({ language, languages, setLan
   );
 
   return {
-    apiUrl: Config.API_URL,
+    apiUrl,
     fontLanguageSamples,
     fontWeightSamples,
     languageControls,

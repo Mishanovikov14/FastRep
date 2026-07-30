@@ -2,6 +2,9 @@ import type { TranslationResources } from './types';
 
 export const en: TranslationResources = {
   auth: {
+    environment: {
+      productionRequired: 'This account can only use the Production environment. Please log in again.',
+    },
     forgotPassword: {
       codeSent: 'Verification code sent',
       email: 'Email',
@@ -134,6 +137,14 @@ export const en: TranslationResources = {
     yes: 'Yes',
   },
   profile: {
+    environment: {
+      confirmationMessage: 'You will be signed out and connected to the {{environment}} environment.',
+      confirmationTitle: 'Switch environment?',
+      developmentIndicator: 'Development environment',
+      selectionMessage: 'Choose the API environment for your next session.',
+      switchAction: 'Switch',
+      title: 'Environment',
+    },
     logout: 'Log out',
     logoutError: "You were logged out on this device, but we couldn't notify the server.",
     title: 'Profile',

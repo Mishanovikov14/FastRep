@@ -1,5 +1,8 @@
 export interface TranslationResources {
   auth: {
+    environment: {
+      productionRequired: string;
+    };
     forgotPassword: {
       codeSent: string;
       email: string;
@@ -132,6 +135,14 @@ export interface TranslationResources {
     yes: string;
   };
   profile: {
+    environment: {
+      confirmationMessage: string;
+      confirmationTitle: string;
+      developmentIndicator: string;
+      selectionMessage: string;
+      switchAction: string;
+      title: string;
+    };
     logout: string;
     logoutError: string;
     title: string;
