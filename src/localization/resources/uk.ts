@@ -74,6 +74,7 @@ export const uk: TranslationResources = {
       title: 'Підтвердьте пошту',
     },
     otp: {
+      codeAccessibilityLabel: 'Шестизначний код підтвердження для відновлення пароля',
       codeResent: 'Новий код підтвердження надіслано',
       codeSentTo: 'Код надіслано на {{email}}',
       explanation: 'Введіть шестизначний код із листа.',

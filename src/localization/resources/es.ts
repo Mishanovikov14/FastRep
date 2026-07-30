@@ -74,6 +74,7 @@ export const es: TranslationResources = {
       title: 'Verifica tu correo',
     },
     otp: {
+      codeAccessibilityLabel: 'Código de verificación de recuperación de contraseña de seis dígitos',
       codeResent: 'Nuevo código de verificación enviado',
       codeSentTo: 'Código enviado a {{email}}',
       explanation: 'Introduce el código de seis dígitos enviado a tu correo.',
