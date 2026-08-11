@@ -63,8 +63,16 @@ jest.mock('react-native-fs', () => ({
     downloadFile: jest.fn(() => ({ promise: Promise.resolve({ statusCode: 200 }) })),
     exists: jest.fn(async () => false),
     readDir: jest.fn(async () => []),
+    read: jest.fn(async (_path, length, position) => {
+      if (length === 8 && position === 4) {
+        return 'ftypmp42';
+      }
+
+      return 'M4A ';
+    }),
     stat: jest.fn(async () => ({ size: 1 })),
     unlink: jest.fn(async () => undefined),
+    write: jest.fn(async () => undefined),
   },
 }));
 jest.mock('react-native-file-viewer', () => ({ __esModule: true, default: { open: jest.fn() } }));

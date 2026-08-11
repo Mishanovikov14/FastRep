@@ -12,6 +12,7 @@ import { pickReportImage } from '@/entities/report/services/reportFilePickerServ
 import type { IReportAsset } from '@/entities/report/types/reportAsset';
 import { logger } from '@/libs/logger/logger';
 import { queryClient } from '@/libs/query/QueryClient';
+import { toastService } from '@/libs/toast/toastService';
 import { useDeleteReportAssetMutation, useReportAssetsQuery } from '@/modules/reports/presenters/reportAssetQueries';
 import { useReportAttachmentsPresenter } from '@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentsPresenter';
 
@@ -20,29 +21,29 @@ jest.mock('@/entities/report/API/reportAssetsApi', () => ({
   deleteReportAsset: jest.fn(),
   requestReportAssetUpload: jest.fn(),
 }));
-jest.mock('@/entities/report/services/reportAssetUploadService', () => ({
-  uploadReportAssetToStorage: jest.fn(),
-}));
+jest.mock('@/entities/report/services/reportAssetUploadService', () => {
+  class ReportStorageUploadError extends Error {}
+
+  return { ReportStorageUploadError, uploadReportAssetToStorage: jest.fn() };
+});
 jest.mock('@/entities/report/services/reportAudioRecordingService', () => ({
   cancelReportAudioRecording: jest.fn(),
   requestMicrophonePermission: jest.fn(),
   startReportAudioRecording: jest.fn(),
   stopReportAudioRecording: jest.fn(),
 }));
-jest.mock('@/entities/report/services/reportFilePickerService', () => {
-  class ReportFilePickerError extends Error {}
-
-  return {
-    pickReportDocument: jest.fn(),
-    pickReportImage: jest.fn(),
-    ReportFilePickerError,
-  };
-});
+jest.mock('@/entities/report/services/reportFilePickerService', () => ({
+  pickReportDocument: jest.fn(),
+  pickReportImage: jest.fn(),
+}));
 jest.mock('@/libs/logger/logger', () => ({
   logger: { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() },
 }));
 jest.mock('@/libs/query/QueryClient', () => ({
   queryClient: { invalidateQueries: jest.fn(), setQueryData: jest.fn() },
+}));
+jest.mock('@/libs/toast/toastService', () => ({
+  toastService: { showError: jest.fn() },
 }));
 jest.mock('@/modules/reports/presenters/reportAssetQueries', () => ({
   useDeleteReportAssetMutation: jest.fn(),
@@ -89,6 +90,7 @@ describe('report attachments presenter upload state machine', () => {
     jest.mocked(pickReportImage).mockResolvedValue({
       fileName: 'roof.jpg',
       mimeType: 'image/jpeg',
+      ownership: 'SYSTEM_OWNED',
       size: 1024,
       type: 'IMAGE',
       uri: 'file:///cache/roof.jpg',
@@ -129,7 +131,7 @@ describe('report attachments presenter upload state machine', () => {
       await flushPromises();
     });
 
-    expect(presenter?.localAssets[0]).toMatchObject({ errorCode: 'confirmFailed', status: 'FAILED' });
+    expect(presenter?.localAssets[0]).toMatchObject({ errorCode: 'IMAGE_CONFIRM_FAILED', status: 'FAILED' });
     const localAssetId = presenter?.localAssets[0]?.id as string;
 
     await ReactTestRenderer.act(async () => {
@@ -141,6 +143,26 @@ describe('report attachments presenter upload state machine', () => {
     expect(requestReportAssetUpload).toHaveBeenCalledTimes(1);
     expect(uploadReportAssetToStorage).toHaveBeenCalledTimes(1);
     expect(confirmReportAssetUpload).toHaveBeenCalledTimes(2);
+    expect(toastService.showError).toHaveBeenCalledWith(
+      'reports.attachments.confirmFailed',
+      'reports.attachments.tryAgain\nIMAGE_CONFIRM_FAILED',
+    );
+    expect(
+      jest
+        .mocked(logger.debug)
+        .mock.calls.filter(([event]) => event === 'report.attachment_stage')
+        .map(([, metadata]) => metadata?.stage),
+    ).toEqual([
+      'VALIDATING',
+      'UPLOAD_REQUEST_STARTED',
+      'UPLOAD_REQUEST_SUCCEEDED',
+      'STORAGE_UPLOAD_STARTED',
+      'STORAGE_UPLOAD_SUCCEEDED',
+      'CONFIRM_STARTED',
+      'CONFIRM_STARTED',
+      'CONFIRM_SUCCEEDED',
+      'READY',
+    ]);
     expect(presenter?.localAssets).toEqual([]);
     expect(queryClient.setQueryData).toHaveBeenCalledTimes(1);
   });
@@ -178,7 +200,7 @@ describe('report attachments presenter upload state machine', () => {
     });
 
     const localAssetId = presenter?.localAssets[0]?.id as string;
-    expect(presenter?.localAssets[0]).toMatchObject({ errorCode: 'uploadFailed', status: 'FAILED' });
+    expect(presenter?.localAssets[0]).toMatchObject({ errorCode: 'IMAGE_STORAGE_UPLOAD_FAILED', status: 'FAILED' });
 
     await ReactTestRenderer.act(async () => {
       presenter?.onRetryUpload(localAssetId);
@@ -192,10 +214,11 @@ describe('report attachments presenter upload state machine', () => {
     expect(presenter?.localAssets).toEqual([]);
   });
 
-  it('treats local validation as a debug event rather than an infrastructure error', async () => {
+  it('classifies local validation with the deterministic image error code', async () => {
     jest.mocked(pickReportImage).mockResolvedValue({
       fileName: 'oversized.jpg',
       mimeType: 'image/jpeg',
+      ownership: 'SYSTEM_OWNED',
       size: 11 * 1024 * 1024,
       type: 'IMAGE',
       uri: 'file:///cache/oversized.jpg',
@@ -207,10 +230,9 @@ describe('report attachments presenter upload state machine', () => {
     });
 
     expect(requestReportAssetUpload).not.toHaveBeenCalled();
-    expect(logger.debug).toHaveBeenCalledWith(
-      'report.asset_validation_failed',
-      expect.objectContaining({ assetType: 'IMAGE', errorCode: 'fileTooLarge' }),
+    expect(logger.error).toHaveBeenCalledWith(
+      'report.photo_add_failed',
+      expect.objectContaining({ assetType: 'IMAGE', errorCode: 'IMAGE_VALIDATION_FAILED', stage: 'VALIDATING' }),
     );
-    expect(logger.error).not.toHaveBeenCalled();
   });
 });

@@ -82,17 +82,17 @@ describe('direct report asset upload', () => {
     const timeoutOperation = uploadReportAssetToStorage(input);
     MockXMLHttpRequest.instance.upload.onprogress({ lengthComputable: true, loaded: 5, total: 10 });
     MockXMLHttpRequest.instance.ontimeout();
-    await expect(timeoutOperation).rejects.toThrow('presigned_upload_timeout');
+    await expect(timeoutOperation).rejects.toMatchObject({ failureType: 'timeout_error' });
     expect(onProgress).toHaveBeenCalledWith(50);
 
     const statusOperation = uploadReportAssetToStorage(input);
     MockXMLHttpRequest.instance.status = 403;
     MockXMLHttpRequest.instance.onload();
-    await expect(statusOperation).rejects.toThrow('presigned_upload_status_403');
+    await expect(statusOperation).rejects.toMatchObject({ failureType: 'http_error', httpStatus: 403 });
 
     const networkOperation = uploadReportAssetToStorage(input);
     MockXMLHttpRequest.instance.onerror();
-    await expect(networkOperation).rejects.toThrow('presigned_upload_failed');
+    await expect(networkOperation).rejects.toMatchObject({ failureType: 'network_error' });
 
     MockXMLHttpRequest.autoLoad = true;
     globalThis.XMLHttpRequest = previous;

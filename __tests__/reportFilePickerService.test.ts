@@ -5,7 +5,6 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import {
   pickReportDocument,
   pickReportImage,
-  ReportFilePickerError,
 } from '@/entities/report/services/reportFilePickerService';
 import { logger } from '@/libs/logger/logger';
 
@@ -33,6 +32,7 @@ describe('report file picker service', () => {
     await expect(pickReportImage('library')).resolves.toMatchObject({
       fileName: 'roof.jpg',
       mimeType: 'image/jpeg',
+      ownership: 'SYSTEM_OWNED',
       size: 2048,
       type: 'IMAGE',
       uri: 'file:///cache/roof.jpg',
@@ -51,7 +51,7 @@ describe('report file picker service', () => {
     await expect(pickReportImage('library')).resolves.toMatchObject({
       fileName: expect.stringMatching(/^photo-\d+\.png$/u),
       mimeType: 'image/png',
-      size: 1024,
+      size: 2048,
       type: 'IMAGE',
     });
   });
@@ -61,7 +61,32 @@ describe('report file picker service', () => {
 
     await expect(pickReportImage('camera')).resolves.toBeUndefined();
     expect(logger.error).not.toHaveBeenCalled();
-    await expect(pickReportImage('camera')).rejects.toMatchObject({ code: 'picker_failed' });
+    await expect(pickReportImage('camera')).rejects.toMatchObject({ code: 'IMAGE_PICKER_FAILED' });
+  });
+
+  it('normalizes the actual Android camera result shape into a readable candidate', async () => {
+    mockLaunchCamera.mockResolvedValue({
+      assets: [
+        {
+          fileName: 'rn_image_picker_lib_temp_42.jpg',
+          fileSize: 179915,
+          height: 1080,
+          type: 'image/jpeg',
+          uri: 'file:///data/user/0/com.fastrep/cache/rn_image_picker_lib_temp_42.jpg',
+          width: 1080,
+        },
+      ],
+    });
+    mockStat.mockResolvedValue({ size: 179915 });
+
+    await expect(pickReportImage('camera')).resolves.toMatchObject({
+      height: 1080,
+      mimeType: 'image/jpeg',
+      ownership: 'SYSTEM_OWNED',
+      size: 179915,
+      type: 'IMAGE',
+      width: 1080,
+    });
   });
 
   it('rejects HEIC when the native compatible conversion does not return JPEG bytes', async () => {
@@ -69,7 +94,7 @@ describe('report file picker service', () => {
       assets: [{ fileName: 'roof.heic', fileSize: 4096, type: 'image/heic', uri: 'file:///cache/roof.heic' }],
     });
 
-    await expect(pickReportImage('library')).rejects.toEqual(new ReportFilePickerError('heic_conversion_failed'));
+    await expect(pickReportImage('library')).rejects.toMatchObject({ code: 'IMAGE_HEIC_CONVERSION_FAILED' });
   });
 
   it('uses the converted JPEG extension when Android preserves the original HEIC display name', async () => {
@@ -103,6 +128,7 @@ describe('report file picker service', () => {
     await expect(pickReportDocument()).resolves.toEqual({
       fileName: 'inspection.pdf',
       mimeType: 'application/pdf',
+      ownership: 'APP_TEMPORARY',
       size: 8192,
       type: 'DOCUMENT',
       uri: 'file:///cache/inspection.pdf',
@@ -144,7 +170,7 @@ describe('report file picker service', () => {
       },
     ]);
 
-    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'unsupported_type' });
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'DOCUMENT_UNSUPPORTED_TYPE' });
     expect(mockKeepLocalCopy).not.toHaveBeenCalled();
   });
 
@@ -153,7 +179,7 @@ describe('report file picker service', () => {
 
     await expect(pickReportDocument()).resolves.toBeUndefined();
     expect(logger.error).not.toHaveBeenCalled();
-    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'picker_failed' });
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'DOCUMENT_PICKER_FAILED' });
   });
 
   it('surfaces local-copy failures', async () => {
@@ -170,7 +196,7 @@ describe('report file picker service', () => {
       { copyError: 'provider unavailable', sourceUri: 'content://provider/inspection', status: 'error' },
     ]);
 
-    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'copy_failed' });
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'DOCUMENT_COPY_FAILED' });
   });
 
   it('removes a copied document when its filesystem metadata cannot be read', async () => {
@@ -189,7 +215,7 @@ describe('report file picker service', () => {
     mockStat.mockRejectedValue(new Error('stat failed'));
     (RNFS.exists as jest.Mock).mockResolvedValue(true);
 
-    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'file_unreadable' });
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'DOCUMENT_FILE_UNREADABLE' });
     expect(RNFS.unlink).toHaveBeenCalledWith('/cache/inspection.pdf');
   });
 });

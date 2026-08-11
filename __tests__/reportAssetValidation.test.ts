@@ -10,6 +10,7 @@ const image: IReportAssetCandidate = {
   fileName: 'photo.jpg',
   height: 1200,
   mimeType: 'image/jpeg',
+  ownership: 'SYSTEM_OWNED',
   size: 1024,
   type: 'IMAGE',
   uri: 'file:///photo.jpg',
@@ -31,7 +32,7 @@ describe('report asset validation', () => {
   ] as const)('enforces the %s file-size limit', (type, mimeType, maxBytes) => {
     expect(
       validateReportAssetCandidate(
-        { fileName: 'file', mimeType, size: maxBytes + 1, type, uri: 'file:///file' },
+        { fileName: 'file', mimeType, ownership: 'SYSTEM_OWNED', size: maxBytes + 1, type, uri: 'file:///file' },
         [],
       ),
     ).toBe('fileTooLarge');
@@ -51,6 +52,7 @@ describe('report asset validation', () => {
           durationSeconds: reportAssetLimits.audioMaxDurationSeconds + 1,
           fileName: 'audio.m4a',
           mimeType: 'audio/x-m4a',
+          ownership: 'APP_TEMPORARY',
           size: 1024,
           type: 'AUDIO',
           uri: 'file:///audio.m4a',

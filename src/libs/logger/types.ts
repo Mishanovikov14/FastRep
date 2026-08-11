@@ -2,9 +2,14 @@ export type LogLevel = 'debug' | 'error' | 'info' | 'warn';
 
 export interface ISafeLogMetadata {
   assetType?: 'AUDIO' | 'DOCUMENT' | 'IMAGE';
+  declaredMimeType?: string;
   durationSeconds?: number;
   errorCode?: string;
   generationStatus?: string;
+  hasFileName?: boolean;
+  hasFileSize?: boolean;
+  hasUri?: boolean;
+  height?: number;
   httpStatus?: number;
   mimeType?: string;
   operation?: string;
@@ -14,7 +19,9 @@ export interface ISafeLogMetadata {
   size?: number;
   source?: string;
   stage?: string;
+  status?: string;
   uriScheme?: string;
+  width?: number;
 }
 
 export interface ILoggerAdapter {
