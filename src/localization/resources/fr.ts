@@ -150,6 +150,11 @@ export const fr: TranslationResources = {
     title: 'Profil',
   },
   reports: {
+    attachments: {
+      audio: 'Audio', camera: 'Appareil photo', cameraPermission: "Autorisez l’accès à l’appareil photo pour prendre une photo.", confirmFailed: 'Impossible de vérifier la pièce jointe', empty: 'Aucune pièce jointe', file: 'Fichier', invalid: 'Pièce jointe non prise en charge', microphonePermission: "Autorisez l’accès au microphone pour enregistrer un audio.", permissionTitle: 'Autorisation requise', photo: 'Photo', photoFailed: 'Impossible d’ajouter la photo', recording: 'Enregistrement · {{duration}}', recordingFailed: 'Impossible d’enregistrer l’audio', remove: 'Supprimer', removeFailed: 'Impossible de supprimer la pièce jointe',
+      states: { CONFIRMING: 'Vérification', FAILED: 'Échec du transfert', LOCAL: 'En attente', READY: 'Prêt', REQUESTING_UPLOAD: 'Préparation', UPLOADING: 'Transfert' }, stop: 'Arrêter', title: 'Pièces jointes', tryAgain: 'Réessayez.', types: { AUDIO: 'Audio', DOCUMENT: 'Fichier', IMAGE: 'Photo' }, uploadFailed: 'Échec du transfert de la pièce jointe',
+      validation: { audioDurationTooLong: 'Les enregistrements audio sont limités à 20 minutes.', fileTooLarge: 'Ce fichier est trop volumineux.', imageDimensionsTooLarge: 'Les images sont limitées à 4096 × 4096 pixels.', missingFileMetadata: 'Le fichier sélectionné est illisible.', reportTotalTooLarge: 'Les pièces jointes d’un rapport sont limitées à 150 Mo.', tooManyFiles: 'La limite pour ce type de pièce jointe est atteinte.', unsupportedType: 'Choisissez un format de fichier pris en charge.' },
+    },
     card: {
       created: 'Créé le {{date}}',
       updated: 'Mis à jour le {{date}}',
@@ -194,6 +199,11 @@ export const fr: TranslationResources = {
       title: 'Titre',
       titlePlaceholder: 'Titre du rapport',
     },
+    generation: {
+      cancel: 'Annuler la génération', cancelFailed: 'Impossible d’annuler la génération', credits: '{{count}} crédits',
+      errors: { GENERATION_ALREADY_ACTIVE: 'Une génération est déjà en cours pour ce rapport.', GENERATION_CREDITS_EXHAUSTED: 'Aucun crédit de génération disponible.', GENERATION_CREDIT_RESERVATION_FAILED: 'Impossible de réserver un crédit. Réessayez.', GENERATION_DAILY_LIMIT_REACHED: 'La limite quotidienne de génération est atteinte.', GENERATION_DISABLED: 'La génération de rapports est temporairement indisponible.', GENERATION_QUEUE_UNAVAILABLE: 'Le service de génération est temporairement indisponible.', GENERATION_RATE_LIMITED: 'Trop de demandes. Patientez puis réessayez.', REPORT_HAS_NO_CONTENT: 'Ajoutez d’abord des notes ou une pièce jointe.', REPORT_HAS_PENDING_UPLOADS: 'Attendez la fin du transfert de toutes les pièces jointes.', REPORT_HAS_REJECTED_ASSETS: 'Supprimez les pièces jointes rejetées.', REPORT_NOT_EDITABLE: 'Ce rapport ne peut pas être généré dans son état actuel.', REPORT_TEMPORARILY_LOCKED: 'Ce rapport est temporairement indisponible après plusieurs échecs.', generic: 'Le rapport n’a pas pu être généré. Réessayez.' },
+      failedDescription: 'La génération a échoué. Modifiez les sources et réessayez.', generate: 'Générer le rapport', generated: 'Rapport généré', lock: { message: 'Ce rapport a échoué plusieurs fois. Réessayez dans {{minutes}} minutes.', title: 'Rapport temporairement indisponible' }, regenerate: 'Régénérer', retry: 'Réessayer la génération', stages: { analyzing: 'Analyse des pièces jointes…', completed: 'Terminé', creatingPdf: 'Création du PDF…', finalizing: 'Finalisation…', generating: 'Génération du rapport…', preparing: 'Préparation…', transcribing: 'Transcription audio…' }, startFailed: 'Échec de la génération', title: 'Rapport IA',
+    },
     list: {
       emptyDescription: 'Créez votre premier rapport pour suivre sa progression et ses notes au même endroit.',
       emptyTitle: 'Aucun rapport',
@@ -201,6 +211,7 @@ export const fr: TranslationResources = {
       errorTitle: 'Impossible de charger les rapports',
       title: 'Rapports',
     },
+    output: { open: 'Ouvrir le rapport', openFailed: 'Impossible d’ouvrir le rapport', share: 'Partager le rapport', shareFailed: 'Impossible de partager le rapport', tryAgain: 'Téléchargez à nouveau le PDF puis réessayez.' },
     status: {
       draft: 'Brouillon',
       failed: 'Échec',

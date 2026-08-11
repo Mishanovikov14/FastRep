@@ -24,6 +24,47 @@ jest.mock('react-native-config', () => ({
   API_URL: 'https://api.fastrep.app',
 }));
 jest.mock('react-native-device-info', () => require('react-native-device-info/jest/react-native-device-info-mock'));
+jest.mock('@react-native-community/netinfo', () => ({
+  __esModule: true,
+  default: {
+    fetch: jest.fn(async () => ({ isConnected: true, isInternetReachable: true })),
+  },
+}));
+jest.mock('@react-native-documents/picker', () => ({ pick: jest.fn() }));
+jest.mock('react-native-image-picker', () => ({ launchCamera: jest.fn(), launchImageLibrary: jest.fn() }));
+jest.mock('react-native-nitro-sound', () => ({
+  __esModule: true,
+  AudioEncoderAndroidType: { AAC: 3 },
+  AudioSourceAndroidType: { MIC: 1 },
+  AVEncoderAudioQualityIOSType: { high: 96 },
+  OutputFormatAndroidType: { MPEG_4: 2 },
+  default: {
+    addRecordBackListener: jest.fn(),
+    removeRecordBackListener: jest.fn(),
+    setSubscriptionDuration: jest.fn(),
+    startRecorder: jest.fn(),
+    stopRecorder: jest.fn(),
+  },
+}));
+jest.mock('react-native-permissions', () => ({
+  PERMISSIONS: { ANDROID: { CAMERA: 'camera', RECORD_AUDIO: 'record_audio' }, IOS: { CAMERA: 'camera', MICROPHONE: 'microphone' } },
+  request: jest.fn(async () => 'granted'),
+  RESULTS: { GRANTED: 'granted', LIMITED: 'limited' },
+}));
+jest.mock('react-native-fs', () => ({
+  __esModule: true,
+  default: {
+    CachesDirectoryPath: '/cache',
+    downloadFile: jest.fn(() => ({ promise: Promise.resolve({ statusCode: 200 }) })),
+    exists: jest.fn(async () => false),
+    readDir: jest.fn(async () => []),
+    stat: jest.fn(async () => ({ size: 1 })),
+    unlink: jest.fn(async () => undefined),
+  },
+}));
+jest.mock('react-native-file-viewer', () => ({ __esModule: true, default: { open: jest.fn() } }));
+jest.mock('react-native-share', () => ({ __esModule: true, default: { open: jest.fn() } }));
+jest.mock('uuid', () => ({ v4: jest.fn(() => '00000000-0000-4000-8000-000000000001') }));
 jest.mock('react-native-localize', () => ({
   getLocales: () => [
     {

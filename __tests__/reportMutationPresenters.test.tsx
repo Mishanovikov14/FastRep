@@ -27,6 +27,21 @@ jest.mock('@/modules/reports/presenters/reportQueries', () => ({
   useReportDetailsQuery: jest.fn(),
   useUpdateReportMutation: jest.fn(),
 }));
+jest.mock('@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentsPresenter', () => ({
+  useReportAttachmentsPresenter: jest.fn(() => ({
+    assets: [],
+    canEdit: false,
+    hasReadyAssets: false,
+    hasUnresolvedAssets: false,
+    isLoadingAssets: false,
+    isRecording: false,
+    localAssets: [],
+    recordingDuration: 0,
+  })),
+}));
+jest.mock('@/modules/reports/ui/ReportDetailsView/presenters/useReportGenerationPresenter', () => ({
+  useReportGenerationPresenter: jest.fn(() => ({})),
+}));
 jest.mock('@/libs/toast/toastService', () => ({
   toastService: {
     showError: jest.fn(),

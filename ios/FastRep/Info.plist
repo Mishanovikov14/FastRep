@@ -33,6 +33,12 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>FastRep uses the camera to attach photos to your reports.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>FastRep uses the microphone to record audio notes for your reports.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>FastRep uses your photo library to attach selected photos to your reports.</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UIAppFonts</key>

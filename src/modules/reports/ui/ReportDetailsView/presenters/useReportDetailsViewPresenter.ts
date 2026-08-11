@@ -17,6 +17,9 @@ import { useCustomAlert } from '@/UIKit/CustomAlert/presenters/useCustomAlert';
 import type { ICustomAlertAction } from '@/UIKit/CustomAlert/types';
 import { formatLocalizedDate } from '@/utils/formatLocalizedDate';
 
+import { useReportAttachmentsPresenter } from './useReportAttachmentsPresenter';
+import { useReportGenerationPresenter } from './useReportGenerationPresenter';
+
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'ReportDetails'>;
 
 interface IInput {
@@ -34,6 +37,22 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     onHide: onHideDeleteAlert,
     onShow: onShowDeleteAlert,
   } = useCustomAlert();
+  const reportForGeneration = query.data ?? {
+    createdAt: '',
+    id: reportId,
+    notes: '',
+    status: 'DRAFT' as const,
+    title: '',
+    updatedAt: '',
+  };
+  const canEditSources = query.data?.status === 'DRAFT' || query.data?.status === 'FAILED';
+  const attachments = useReportAttachmentsPresenter({ canEdit: canEditSources, reportId, t });
+  const generation = useReportGenerationPresenter({
+    hasReadyAssets: attachments.hasReadyAssets,
+    hasUnresolvedAssets: attachments.hasUnresolvedAssets,
+    report: reportForGeneration,
+    t,
+  });
 
   const onBack = useCallback(() => {
     navigation.goBack();
@@ -116,6 +135,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
   );
 
   return {
+    attachments,
     createdAtLabel,
     deleteActions,
     isDeleteConfirmationVisible,
@@ -132,6 +152,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     onRetry,
     onShowDeleteConfirmation,
     report: query.data,
+    generation,
     updatedAtLabel,
   };
 };

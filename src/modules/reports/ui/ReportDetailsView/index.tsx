@@ -13,6 +13,9 @@ import { ScreenContainer } from '@/UIKit/ScreenContainer';
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
+import { AttachmentsSection } from './components/AttachmentsSection';
+import { GenerationSection } from './components/GenerationSection';
+
 import { useReportDetailsViewPresenter } from './presenters/useReportDetailsViewPresenter';
 import { getStyles } from './styles';
 
@@ -21,6 +24,7 @@ export const ReportDetailsView = () => {
   const { colors, language, radius, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const {
+    attachments,
     createdAtLabel,
     deleteActions,
     isDeleteConfirmationVisible,
@@ -28,6 +32,7 @@ export const ReportDetailsView = () => {
     isLoading,
     isNotFound,
     isRefreshing,
+    generation,
     onBack,
     onEdit,
     onHideDeleteConfirmation,
@@ -74,46 +79,87 @@ export const ReportDetailsView = () => {
             )}
           </>
         ) : (
-          <View style={styles.card}>
-            <Typography selectable variant="heading">
-              {report.title}
-            </Typography>
-            <ReportStatusBadge status={report.status} />
-            <View>
-              <Typography color={colors.textSecondary} variant="caption">
-                {t('reports.form.notes')}
+          <>
+            <View style={styles.card}>
+              <Typography selectable variant="heading">
+                {report.title}
               </Typography>
-              <Typography selectable style={styles.notes}>
-                {report.notes || t('reports.details.noNotes')}
-              </Typography>
+              <ReportStatusBadge status={report.status} />
+              <View>
+                <Typography color={colors.textSecondary} variant="caption">
+                  {t('reports.form.notes')}
+                </Typography>
+                <Typography selectable style={styles.notes}>
+                  {report.notes || t('reports.details.noNotes')}
+                </Typography>
+              </View>
+              <View style={styles.dateRow}>
+                <Typography color={colors.textSecondary} variant="caption">
+                  {t('reports.details.createdAt')}
+                </Typography>
+                <Typography>{createdAtLabel}</Typography>
+              </View>
+              <View style={styles.dateRow}>
+                <Typography color={colors.textSecondary} variant="caption">
+                  {t('reports.details.updatedAt')}
+                </Typography>
+                <Typography>{updatedAtLabel}</Typography>
+              </View>
+              <View style={styles.actions}>
+                <Button
+                  disabled={report.status === 'PROCESSING'}
+                  onPress={onEdit}
+                  style={styles.action}
+                  title={String(t('reports.edit.action'))}
+                  variant="secondary"
+                />
+                <Button
+                  onPress={onShowDeleteConfirmation}
+                  style={styles.action}
+                  title={String(t('reports.delete.action'))}
+                  variant="danger"
+                />
+              </View>
             </View>
-            <View style={styles.dateRow}>
-              <Typography color={colors.textSecondary} variant="caption">
-                {t('reports.details.createdAt')}
-              </Typography>
-              <Typography>{createdAtLabel}</Typography>
-            </View>
-            <View style={styles.dateRow}>
-              <Typography color={colors.textSecondary} variant="caption">
-                {t('reports.details.updatedAt')}
-              </Typography>
-              <Typography>{updatedAtLabel}</Typography>
-            </View>
-            <View style={styles.actions}>
-              <Button
-                onPress={onEdit}
-                style={styles.action}
-                title={String(t('reports.edit.action'))}
-                variant="secondary"
+            <View style={styles.card}>
+              <AttachmentsSection
+                assets={attachments.assets}
+                canEdit={attachments.canEdit}
+                isLoading={attachments.isLoadingAssets}
+                isRecording={attachments.isRecording}
+                localAssets={attachments.localAssets}
+                onAddDocument={attachments.onAddDocument}
+                onAddPhoto={attachments.onAddPhoto}
+                onCancelRecording={attachments.onCancelRecording}
+                onRemoveLocalAsset={attachments.onRemoveLocalAsset}
+                onRemoveServerAsset={attachments.onRemoveServerAsset}
+                onRetryUpload={attachments.onRetryUpload}
+                onStartRecording={attachments.onStartRecording}
+                onStopRecording={attachments.onStopRecording}
+                onTakePhoto={attachments.onTakePhoto}
+                recordingDuration={attachments.recordingDuration}
               />
-              <Button
-                onPress={onShowDeleteConfirmation}
-                style={styles.action}
-                title={String(t('reports.delete.action'))}
-                variant="danger"
+            </View>
+            <View style={styles.card}>
+              <GenerationSection
+                canCancel={generation.canCancel}
+                canGenerate={generation.canGenerate}
+                creditsAvailable={generation.creditsAvailable}
+                generation={generation.generation}
+                hasOutput={generation.hasOutput}
+                isCancelling={generation.isCancelling}
+                isGenerating={generation.isGenerating}
+                isOpeningOutput={generation.isOpeningOutput}
+                isSharingOutput={generation.isSharingOutput}
+                lockRemainingSeconds={generation.lockRemainingSeconds}
+                onCancelGeneration={generation.onCancelGeneration}
+                onOpenOutput={generation.onOpenOutput}
+                onShareOutput={generation.onShareOutput}
+                onStartGeneration={generation.onStartGeneration}
+                stageKey={generation.stageKey}
               />
             </View>
-          </View>
+          </>
         )}
       </ScreenContainer>
       <CustomAlert
