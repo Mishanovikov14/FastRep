@@ -148,6 +148,7 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
 
       pendingIdempotencyKeyRef.current = undefined;
     } catch {
+      pendingIdempotencyKeyRef.current = undefined;
       toastService.showError(String(t('reports.generation.startFailed')), String(t('reports.generation.errors.generic')));
     }
   }, [lockedUntil, startMutation, t]);

@@ -7,6 +7,7 @@ import { createReportOutputDownloadUrl } from '@/entities/report/API/reportGener
 
 const CACHE_PREFIX = 'FastRep-output-';
 const MAX_CACHED_OUTPUTS = 10;
+const INVALID_FILENAME_CHARACTERS = new Set(['<', '>', ':', '"', '/', '\\', '|', '?', '*']);
 const inFlightDownloads = new Map<string, Promise<string>>();
 
 const downloadOutput = async (reportId: string, cachePath: string): Promise<boolean> => {
@@ -76,17 +77,32 @@ export const openReportOutput = async (reportId: string, generationId: string): 
   await FileViewer.open(path, { showOpenWithDialog: true });
 };
 
+export const getReportOutputShareFileName = (title: string): string => {
+  const normalizedTitle = Array.from(title.normalize('NFC'))
+    .filter((character) => {
+      const codePoint = character.codePointAt(0) ?? 0;
+
+      return codePoint > 31 && codePoint !== 127 && !INVALID_FILENAME_CHARACTERS.has(character);
+    })
+    .join('')
+    .replace(/\s+/gu, ' ')
+    .trim()
+    .replace(/[. ]+$/gu, '');
+  const safeTitle = Array.from(normalizedTitle).slice(0, 80).join('') || 'Report';
+
+  return `FastRep - ${safeTitle}.pdf`;
+};
+
 export const shareReportOutput = async (
   reportId: string,
   generationId: string,
   title: string,
 ): Promise<void> => {
   const path = await ensureReportOutputFile(reportId, generationId);
-  const safeTitle = title.replace(/[^a-zA-Z0-9 _-]/g, '').trim().slice(0, 80) || 'Report';
 
   await Share.open({
     failOnCancel: false,
-    filename: `FastRep - ${safeTitle}.pdf`,
+    filename: getReportOutputShareFileName(title),
     type: 'application/pdf',
     url: `file://${path}`,
     useInternalStorage: true,
