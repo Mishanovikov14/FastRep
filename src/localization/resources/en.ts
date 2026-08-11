@@ -152,9 +152,9 @@ export const en: TranslationResources = {
   reports: {
     attachments: {
       audio: 'Audio', camera: 'Camera', cameraPermission: 'Allow camera access to take a photo.',
-      confirmFailed: 'Could not verify attachment', empty: 'No attachments yet', file: 'File',
+      confirmFailed: 'Could not verify attachment', documentFailed: 'Could not add file', empty: 'No attachments yet', file: 'File',
       invalid: 'Attachment not supported', microphonePermission: 'Allow microphone access to record audio.',
-      permissionTitle: 'Permission required', photo: 'Photo', photoFailed: 'Could not add photo',
+      permissionTitle: 'Permission required', photo: 'Photo', photoConversionFailed: 'Could not convert this photo to a supported format', photoFailed: 'Could not add photo',
       recording: 'Recording · {{duration}}', recordingFailed: 'Could not record audio', remove: 'Remove',
       removeFailed: 'Could not remove attachment',
       states: { CONFIRMING: 'Verifying', FAILED: 'Upload failed', LOCAL: 'Waiting', READY: 'Ready', REQUESTING_UPLOAD: 'Preparing', UPLOADING: 'Uploading' },
@@ -212,7 +212,7 @@ export const en: TranslationResources = {
       titlePlaceholder: 'Report title',
     },
     generation: {
-      cancel: 'Cancel generation', cancelFailed: 'Could not cancel generation', credits: '{{count}} credits',
+      cancel: 'Cancel generation', cancelFailed: 'Could not cancel generation', credits: '{{count}} credits', description: 'Turn your notes and attachments into a polished PDF report.',
       errors: {
         GENERATION_ALREADY_ACTIVE: 'A generation is already running for this report.', GENERATION_CREDITS_EXHAUSTED: 'You have no generation credits available.',
         GENERATION_CREDIT_RESERVATION_FAILED: 'A generation credit could not be reserved. Try again.', GENERATION_DAILY_LIMIT_REACHED: 'The daily generation limit has been reached.',
@@ -223,7 +223,7 @@ export const en: TranslationResources = {
         generic: 'The report could not be generated. Try again.',
       },
       failedDescription: 'Generation failed. You can edit the sources and try again.', generate: 'Generate report', generated: 'Report generated',
-      lock: { message: 'This report failed several times. Try again in {{minutes}} minutes.', title: 'Report temporarily unavailable' },
+      lock: { message: 'This report failed several times. Try again in {{minutes}} minutes.', title: 'Report temporarily unavailable' }, outputReady: 'Your report is ready',
       regenerate: 'Regenerate', retry: 'Retry generation',
       stages: { analyzing: 'Analyzing attachments…', completed: 'Completed', creatingPdf: 'Creating PDF…', finalizing: 'Finalizing…', generating: 'Generating report…', preparing: 'Preparing…', transcribing: 'Transcribing audio…' },
       startFailed: 'Generation failed', title: 'AI report',

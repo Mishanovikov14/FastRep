@@ -1,12 +1,17 @@
 import { useMemo } from 'react';
 import { Image, View } from 'react-native';
 
+import { CameraIcon } from '@/assets/icons/CameraIcon';
+import { DocumentIcon } from '@/assets/icons/DocumentIcon';
+import { MicrophoneIcon } from '@/assets/icons/MicrophoneIcon';
+import { PhotoIcon } from '@/assets/icons/PhotoIcon';
 import { formatAudioDuration, formatFileSize } from '@/entities/report/model/reportAssetValidation';
 import type { ILocalReportAsset, IReportAsset } from '@/entities/report/types/reportAsset';
 import { Button } from '@/UIKit/Button';
 import { Loader } from '@/UIKit/Loader';
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
+import { scaleHorizontal } from '@/utils/scaling';
 
 import { getStyles } from './styles';
 
@@ -47,18 +52,67 @@ export const AttachmentsSection = ({
 }: IProps) => {
   const { colors, radius, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
+  const attachmentCount = assets.length + localAssets.length;
+  const iconSize = scaleHorizontal(20);
+
+  const getTypeIcon = (type: IReportAsset['type']) => {
+    if (type === 'IMAGE') {
+      return <PhotoIcon color={colors.primary} height={iconSize} width={iconSize} />;
+    }
+    if (type === 'AUDIO') {
+      return <MicrophoneIcon color={colors.primary} height={iconSize} width={iconSize} />;
+    }
+
+    return <DocumentIcon color={colors.primary} height={iconSize} width={iconSize} />;
+  };
 
   return (
     <View style={styles.section}>
-      <Typography variant="heading">{t('reports.attachments.title')}</Typography>
+      <View style={styles.headingRow}>
+        <Typography variant="heading">{t('reports.attachments.title')}</Typography>
+        {attachmentCount > 0 ? (
+          <Typography color={colors.textSecondary} variant="caption">
+            {attachmentCount}
+          </Typography>
+        ) : null}
+      </View>
       {canEdit ? (
         <View style={styles.addActions}>
-          <Button onPress={onAddPhoto} size="small" title={String(t('reports.attachments.photo'))} variant="secondary" />
-          <Button onPress={onTakePhoto} size="small" title={String(t('reports.attachments.camera'))} variant="secondary" />
-          <Button onPress={onAddDocument} size="small" title={String(t('reports.attachments.file'))} variant="secondary" />
           <Button
+            leftElement={<PhotoIcon color={colors.primary} height={iconSize} width={iconSize} />}
+            onPress={onAddPhoto}
+            size="small"
+            style={styles.addAction}
+            title={String(t('reports.attachments.photo'))}
+            variant="secondary"
+          />
+          <Button
+            leftElement={<CameraIcon color={colors.primary} height={iconSize} width={iconSize} />}
+            onPress={onTakePhoto}
+            size="small"
+            style={styles.addAction}
+            title={String(t('reports.attachments.camera'))}
+            variant="secondary"
+          />
+          <Button
+            leftElement={<DocumentIcon color={colors.primary} height={iconSize} width={iconSize} />}
+            onPress={onAddDocument}
+            size="small"
+            style={styles.addAction}
+            title={String(t('reports.attachments.file'))}
+            variant="secondary"
+          />
+          <Button
+            leftElement={
+              <MicrophoneIcon
+                color={isRecording ? colors.textOnPrimary : colors.primary}
+                height={iconSize}
+                width={iconSize}
+              />
+            }
             onPress={isRecording ? onStopRecording : onStartRecording}
             size="small"
+            style={styles.addAction}
             title={String(t(isRecording ? 'reports.attachments.stop' : 'reports.attachments.audio'))}
             variant={isRecording ? 'danger' : 'secondary'}
           />
@@ -79,11 +133,7 @@ export const AttachmentsSection = ({
       {assets.map((asset) => (
         <View key={asset.id} style={styles.assetCard}>
           <View style={styles.assetInfo}>
-            <View style={styles.typeBadge}>
-              <Typography color={colors.primary} variant="caption">
-                {t(`reports.attachments.types.${asset.type}`)}
-              </Typography>
-            </View>
+            <View style={styles.typeIcon}>{getTypeIcon(asset.type)}</View>
             <View style={styles.assetText}>
               <Typography numberOfLines={1}>{asset.originalFileName}</Typography>
               <Typography color={colors.textSecondary} variant="caption">
@@ -104,7 +154,11 @@ export const AttachmentsSection = ({
       ))}
       {localAssets.map((asset) => (
         <View key={asset.id} style={styles.assetCard}>
-          {asset.type === 'IMAGE' ? <Image source={{ uri: asset.uri }} style={styles.thumbnail} /> : null}
+          {asset.type === 'IMAGE' ? (
+            <Image source={{ uri: asset.uri }} style={styles.thumbnail} />
+          ) : (
+            <View style={styles.typeIcon}>{getTypeIcon(asset.type)}</View>
+          )}
           <View style={styles.assetText}>
             <Typography numberOfLines={1}>{asset.fileName}</Typography>
             <Typography color={asset.status === 'FAILED' ? colors.error : colors.textSecondary} variant="caption">
@@ -127,6 +181,7 @@ export const AttachmentsSection = ({
               />
             ) : null}
             <Button
+              disabled={asset.status !== 'FAILED' && asset.status !== 'LOCAL'}
               onPress={() => onRemoveLocalAsset(asset.id)}
               size="small"
               title={String(t('reports.attachments.remove'))}

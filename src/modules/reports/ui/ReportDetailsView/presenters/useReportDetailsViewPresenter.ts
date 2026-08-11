@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 import { useCallback, useMemo } from 'react';
 
 import { ReportRequestError } from '@/entities/report/model/ReportRequestError';
+import { logger } from '@/libs/logger/logger';
 import type { SupportedLanguage } from '@/localization/types';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
@@ -99,8 +100,8 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
       );
       navigation.popTo('Tabs', { screen: 'Reports' });
       removeReportDetailsCache(reportId);
-    } catch (error: unknown) {
-      console.error('Unexpected report deletion failure', error);
+    } catch {
+      logger.error('report.deletion_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     }
   }, [deleteMutation, navigation, onHideDeleteAlert, reportId, t]);

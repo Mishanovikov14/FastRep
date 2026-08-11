@@ -43,23 +43,29 @@ export const Button = ({
 
   return (
     <Pressable
+      accessibilityLabel={title}
       accessibilityRole="button"
-      accessibilityState={{ disabled: isDisabled }}
+      accessibilityState={{ busy: loading, disabled: isDisabled }}
       disabled={isDisabled}
       onPress={onPress}
       style={getContainerStyle}
     >
+      <View
+        accessibilityElementsHidden={loading}
+        importantForAccessibility={loading ? 'no-hide-descendants' : 'auto'}
+        style={[styles.content, loading && styles.loadingContent]}
+      >
+        {leftElement}
+        <Typography color={foregroundColor} variant="button">
+          {title}
+        </Typography>
+        {rightElement}
+      </View>
       {loading ? (
-        <Loader color={foregroundColor} />
-      ) : (
-        <View style={styles.content}>
-          {leftElement}
-          <Typography color={foregroundColor} variant="button">
-            {title}
-          </Typography>
-          {rightElement}
+        <View pointerEvents="none" style={styles.loaderOverlay}>
+          <Loader color={foregroundColor} />
         </View>
-      )}
+      ) : null}
     </Pressable>
   );
 };

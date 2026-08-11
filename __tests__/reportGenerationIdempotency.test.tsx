@@ -28,6 +28,9 @@ jest.mock('@/entities/report/services/reportOutputService', () => ({
   openReportOutput: jest.fn(),
   shareReportOutput: jest.fn(),
 }));
+jest.mock('@/libs/logger/logger', () => ({
+  logger: { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() },
+}));
 
 const t = ((key: string) => key) as unknown as TFunction;
 const report: IReport = {
@@ -101,6 +104,22 @@ describe('report generation idempotency', () => {
 
     expect(mutateAsync).toHaveBeenNthCalledWith(1, 'network-key');
     expect(mutateAsync).toHaveBeenNthCalledWith(2, 'network-key');
+    expect(uuidv4).toHaveBeenCalledTimes(1);
+  });
+
+  it('reuses the key after a dispatched request times out with no certain result', async () => {
+    uuidV4Mock.mockReturnValueOnce('timeout-key');
+    mutateAsync
+      .mockRejectedValueOnce({ type: 'timeout_error' })
+      .mockResolvedValueOnce({ data: generation, isError: false, message: '' });
+
+    await ReactTestRenderer.act(async () => {
+      await presenter?.onStartGeneration();
+      await presenter?.onStartGeneration();
+    });
+
+    expect(mutateAsync).toHaveBeenNthCalledWith(1, 'timeout-key');
+    expect(mutateAsync).toHaveBeenNthCalledWith(2, 'timeout-key');
     expect(uuidv4).toHaveBeenCalledTimes(1);
   });
 

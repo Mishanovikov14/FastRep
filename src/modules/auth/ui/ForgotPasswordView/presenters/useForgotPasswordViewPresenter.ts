@@ -3,6 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useRef, useState } from 'react';
 
 import { forgotPassword } from '@/entities/user/API/userApi';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import { getForgotPasswordErrorMessage } from '@/modules/auth/presenters/passwordRecoveryErrors';
 import type { GuestStackParamList } from '@/navigation/types';
@@ -57,7 +58,7 @@ export const useForgotPasswordViewPresenter = ({ t }: IPresenterInput) => {
         email: request.email,
       });
     } catch {
-      console.error('Unexpected forgot-password failure');
+      logger.error('auth.forgot_password_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;

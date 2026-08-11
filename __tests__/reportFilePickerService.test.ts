@@ -1,0 +1,195 @@
+import { keepLocalCopy, pick } from '@react-native-documents/picker';
+import RNFS from 'react-native-fs';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+
+import {
+  pickReportDocument,
+  pickReportImage,
+  ReportFilePickerError,
+} from '@/entities/report/services/reportFilePickerService';
+import { logger } from '@/libs/logger/logger';
+
+jest.mock('@/libs/logger/logger', () => ({
+  logger: { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() },
+}));
+
+const mockPick = pick as unknown as jest.Mock;
+const mockKeepLocalCopy = keepLocalCopy as unknown as jest.Mock;
+const mockLaunchCamera = launchCamera as unknown as jest.Mock;
+const mockLaunchImageLibrary = launchImageLibrary as unknown as jest.Mock;
+const mockStat = RNFS.stat as jest.Mock;
+
+describe('report file picker service', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockStat.mockResolvedValue({ size: 2048 });
+  });
+
+  it('uses filesystem metadata when image-picker omits optional size metadata', async () => {
+    mockLaunchImageLibrary.mockResolvedValue({
+      assets: [{ fileName: 'roof.jpg', type: 'image/jpeg', uri: 'file:///cache/roof.jpg' }],
+    });
+
+    await expect(pickReportImage('library')).resolves.toMatchObject({
+      fileName: 'roof.jpg',
+      mimeType: 'image/jpeg',
+      size: 2048,
+      type: 'IMAGE',
+      uri: 'file:///cache/roof.jpg',
+    });
+    expect(mockStat).toHaveBeenCalledWith('/cache/roof.jpg');
+    expect(mockLaunchImageLibrary).toHaveBeenCalledWith(
+      expect.objectContaining({ assetRepresentationMode: 'compatible', conversionQuality: 0.9 }),
+    );
+  });
+
+  it('generates a safe image filename and resolves MIME from the URI when metadata is missing', async () => {
+    mockLaunchImageLibrary.mockResolvedValue({
+      assets: [{ fileSize: 1024, uri: 'file:///cache/selected-image.png' }],
+    });
+
+    await expect(pickReportImage('library')).resolves.toMatchObject({
+      fileName: expect.stringMatching(/^photo-\d+\.png$/u),
+      mimeType: 'image/png',
+      size: 1024,
+      type: 'IMAGE',
+    });
+  });
+
+  it('returns silently when image selection is cancelled and surfaces picker errors', async () => {
+    mockLaunchCamera.mockResolvedValueOnce({ didCancel: true }).mockResolvedValueOnce({ errorCode: 'camera_unavailable' });
+
+    await expect(pickReportImage('camera')).resolves.toBeUndefined();
+    expect(logger.error).not.toHaveBeenCalled();
+    await expect(pickReportImage('camera')).rejects.toMatchObject({ code: 'picker_failed' });
+  });
+
+  it('rejects HEIC when the native compatible conversion does not return JPEG bytes', async () => {
+    mockLaunchImageLibrary.mockResolvedValue({
+      assets: [{ fileName: 'roof.heic', fileSize: 4096, type: 'image/heic', uri: 'file:///cache/roof.heic' }],
+    });
+
+    await expect(pickReportImage('library')).rejects.toEqual(new ReportFilePickerError('heic_conversion_failed'));
+  });
+
+  it('uses the converted JPEG extension when Android preserves the original HEIC display name', async () => {
+    mockLaunchImageLibrary.mockResolvedValue({
+      assets: [{ fileName: 'roof.heic', fileSize: 4096, type: 'image/jpeg', uri: 'file:///cache/converted.jpg' }],
+    });
+
+    await expect(pickReportImage('library')).resolves.toMatchObject({
+      fileName: 'roof.jpg',
+      mimeType: 'image/jpeg',
+      uri: 'file:///cache/converted.jpg',
+    });
+  });
+
+  it('copies a picked document to cache and stats the uploadable local file', async () => {
+    mockPick.mockResolvedValue([
+      {
+        error: null,
+        hasRequestedType: true,
+        name: 'inspection.pdf',
+        size: null,
+        type: 'application/pdf',
+        uri: 'content://provider/inspection',
+      },
+    ]);
+    mockKeepLocalCopy.mockResolvedValue([
+      { localUri: 'file:///cache/inspection.pdf', sourceUri: 'content://provider/inspection', status: 'success' },
+    ]);
+    mockStat.mockResolvedValue({ size: 8192 });
+
+    await expect(pickReportDocument()).resolves.toEqual({
+      fileName: 'inspection.pdf',
+      mimeType: 'application/pdf',
+      size: 8192,
+      type: 'DOCUMENT',
+      uri: 'file:///cache/inspection.pdf',
+    });
+    expect(mockKeepLocalCopy).toHaveBeenCalledWith({
+      destination: 'cachesDirectory',
+      files: [{ fileName: 'inspection.pdf', uri: 'content://provider/inspection' }],
+    });
+  });
+
+  it('resolves an exact supported document MIME when a provider returns octet-stream', async () => {
+    mockPick.mockResolvedValue([
+      {
+        error: null,
+        hasRequestedType: true,
+        name: 'inspection.docx',
+        type: 'application/octet-stream',
+        uri: 'content://provider/inspection',
+      },
+    ]);
+    mockKeepLocalCopy.mockResolvedValue([
+      { localUri: 'file:///cache/inspection.docx', sourceUri: 'content://provider/inspection', status: 'success' },
+    ]);
+
+    await expect(pickReportDocument()).resolves.toMatchObject({
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      size: 2048,
+    });
+  });
+
+  it('rejects unsupported document types before copying them', async () => {
+    mockPick.mockResolvedValue([
+      {
+        error: null,
+        hasRequestedType: false,
+        name: 'legacy.doc',
+        type: 'application/msword',
+        uri: 'content://provider/legacy',
+      },
+    ]);
+
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'unsupported_type' });
+    expect(mockKeepLocalCopy).not.toHaveBeenCalled();
+  });
+
+  it('treats only the document-picker cancellation code as a silent cancellation', async () => {
+    mockPick.mockRejectedValueOnce({ code: 'OPERATION_CANCELED' }).mockRejectedValueOnce({ code: 'IN_PROGRESS' });
+
+    await expect(pickReportDocument()).resolves.toBeUndefined();
+    expect(logger.error).not.toHaveBeenCalled();
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'picker_failed' });
+  });
+
+  it('surfaces local-copy failures', async () => {
+    mockPick.mockResolvedValue([
+      {
+        error: null,
+        hasRequestedType: true,
+        name: 'inspection.pdf',
+        type: 'application/pdf',
+        uri: 'content://provider/inspection',
+      },
+    ]);
+    mockKeepLocalCopy.mockResolvedValue([
+      { copyError: 'provider unavailable', sourceUri: 'content://provider/inspection', status: 'error' },
+    ]);
+
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'copy_failed' });
+  });
+
+  it('removes a copied document when its filesystem metadata cannot be read', async () => {
+    mockPick.mockResolvedValue([
+      {
+        error: null,
+        hasRequestedType: true,
+        name: 'inspection.pdf',
+        type: 'application/pdf',
+        uri: 'content://provider/inspection',
+      },
+    ]);
+    mockKeepLocalCopy.mockResolvedValue([
+      { localUri: 'file:///cache/inspection.pdf', sourceUri: 'content://provider/inspection', status: 'success' },
+    ]);
+    mockStat.mockRejectedValue(new Error('stat failed'));
+    (RNFS.exists as jest.Mock).mockResolvedValue(true);
+
+    await expect(pickReportDocument()).rejects.toMatchObject({ code: 'file_unreadable' });
+    expect(RNFS.unlink).toHaveBeenCalledWith('/cache/inspection.pdf');
+  });
+});

@@ -153,12 +153,14 @@ export interface TranslationResources {
       camera: string;
       cameraPermission: string;
       confirmFailed: string;
+      documentFailed: string;
       empty: string;
       file: string;
       invalid: string;
       microphonePermission: string;
       permissionTitle: string;
       photo: string;
+      photoConversionFailed: string;
       photoFailed: string;
       recording: string;
       recordingFailed: string;
@@ -229,6 +231,7 @@ export interface TranslationResources {
       cancel: string;
       cancelFailed: string;
       credits: string;
+      description: string;
       errors: Record<
         | 'GENERATION_ALREADY_ACTIVE'
         | 'GENERATION_CREDITS_EXHAUSTED'
@@ -249,6 +252,7 @@ export interface TranslationResources {
       generate: string;
       generated: string;
       lock: { message: string; title: string };
+      outputReady: string;
       regenerate: string;
       retry: string;
       stages: Record<'analyzing' | 'completed' | 'creatingPdf' | 'finalizing' | 'generating' | 'preparing' | 'transcribing', string>;

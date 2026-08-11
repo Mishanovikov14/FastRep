@@ -30,7 +30,12 @@ jest.mock('@react-native-community/netinfo', () => ({
     fetch: jest.fn(async () => ({ isConnected: true, isInternetReachable: true })),
   },
 }));
-jest.mock('@react-native-documents/picker', () => ({ pick: jest.fn() }));
+jest.mock('@react-native-documents/picker', () => ({
+  errorCodes: { OPERATION_CANCELED: 'OPERATION_CANCELED' },
+  isErrorWithCode: (error) => typeof error === 'object' && error !== null && 'code' in error,
+  keepLocalCopy: jest.fn(),
+  pick: jest.fn(),
+}));
 jest.mock('react-native-image-picker', () => ({ launchCamera: jest.fn(), launchImageLibrary: jest.fn() }));
 jest.mock('react-native-nitro-sound', () => ({
   __esModule: true,

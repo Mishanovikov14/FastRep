@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useUserStore } from '@/entities/user/model/userStore';
 import { restoreUserSession } from '@/entities/user/services/userSessionService';
 import type { SessionRestoreResult } from '@/entities/user/types/session';
+import { logger } from '@/libs/logger/logger';
 
 import type { IPresenterInput, IUseSplashViewPresenterResult } from '../types';
 
@@ -60,8 +61,8 @@ export const useSplashViewPresenter = ({ t }: IPresenterInput): IUseSplashViewPr
           setErrorMessage(getTemporaryErrorMessage(result, t));
           break;
       }
-    } catch (error: unknown) {
-      console.error('Unexpected splash restoration failure', error);
+    } catch {
+      logger.error('auth.splash_restoration_failed');
       setErrorMessage(String(t('auth.session.genericError')));
     } finally {
       isRestoringRef.current = false;
@@ -76,8 +77,8 @@ export const useSplashViewPresenter = ({ t }: IPresenterInput): IUseSplashViewPr
 
     hasStartedRef.current = true;
 
-    onRetry().catch((error: unknown) => {
-      console.error('Unable to finish splash session restoration', error);
+    onRetry().catch(() => {
+      logger.error('auth.splash_retry_failed');
     });
   }, [onRetry]);
 

@@ -3,6 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useRef, useState } from 'react';
 
 import { resetPassword } from '@/entities/user/API/userApi';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import { getResetPasswordErrorMessage } from '@/modules/auth/presenters/passwordRecoveryErrors';
 import type { GuestStackParamList } from '@/navigation/types';
@@ -84,7 +85,7 @@ export const useResetPasswordViewPresenter = ({ t }: IPresenterInput) => {
         routes: [{ name: 'Login' }],
       });
     } catch {
-      console.error('Unexpected reset-password failure');
+      logger.error('auth.password_reset_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;

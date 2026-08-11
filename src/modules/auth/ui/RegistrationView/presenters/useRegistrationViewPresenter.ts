@@ -3,6 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useRef, useState } from 'react';
 
 import { register } from '@/entities/user/API/userApi';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import type { IPresenterInput, RegistrationFormErrors } from '@/modules/auth/ui/RegistrationView/types';
 import type { GuestStackParamList } from '@/navigation/types';
@@ -119,8 +120,8 @@ export const useRegistrationViewPresenter = ({ language, t }: IPresenterInput) =
         email: response.data.email,
         resendAvailableInSeconds: response.data.resendAvailableInSeconds,
       });
-    } catch (error: unknown) {
-      console.error('Unexpected registration failure', error);
+    } catch {
+      logger.error('auth.registration_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;

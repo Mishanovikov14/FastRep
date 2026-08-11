@@ -3,6 +3,7 @@ import { useUserStore } from '@/entities/user/model/userStore';
 import type { IAuthenticationResponse } from '@/entities/user/types/auth';
 import type { SessionRestoreResult } from '@/entities/user/types/session';
 import { enforceAppEnvironmentForAuthenticatedUser } from '@/entities/environment/services/appEnvironmentService';
+import { logger } from '@/libs/logger/logger';
 
 import { clearAuthenticatedResources } from './authenticatedResourcesService';
 import { getTokenRefreshErrorDetails, isInvalidTokenRefreshError, refreshTokenPair } from './tokenRefreshService';
@@ -110,7 +111,7 @@ export const restoreUserSession = async (): Promise<SessionRestoreResult> => {
 
     return getTemporaryErrorResult(retryResponse.message, retryResponse.type, retryResponse.status);
   } catch (error: unknown) {
-    console.error('Unexpected session restoration failure', error);
+    logger.error('auth.session_restoration_failed', { errorCode: 'unexpected_error' });
 
     return getTemporaryErrorResult(error instanceof Error ? error.message : undefined, 'unexpected_error');
   }

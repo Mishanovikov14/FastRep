@@ -6,6 +6,7 @@ import { useCallback, useRef, useState } from 'react';
 import { login } from '@/entities/user/API/userApi';
 import { applyAuthenticationResponse } from '@/entities/user/services/userSessionService';
 import type { ILoginRequest } from '@/entities/user/types/auth';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import type { GuestStackParamList } from '@/navigation/types';
 
@@ -56,8 +57,8 @@ export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
   });
 
   const onUnexpectedFailure = useCallback(
-    (error: unknown) => {
-      console.error('Unexpected login failure', error);
+    () => {
+      logger.error('auth.login_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     },
     [t],
@@ -107,8 +108,8 @@ export const useLoginViewPresenter = ({ t }: IPresenterInput) => {
           String(t('auth.environment.productionRequired')),
         );
       }
-    } catch (error: unknown) {
-      onUnexpectedFailure(error);
+    } catch {
+      onUnexpectedFailure();
     } finally {
       isSubmittingRef.current = false;
       setIsSubmitting(false);

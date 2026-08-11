@@ -17,6 +17,10 @@ libs
 - `entities/` contains domain data, APIs, models, state, services, and domain types.
 - `libs/` contains generic technical infrastructure.
 
+Cross-cutting diagnostics live in `libs/logger`. Feature code depends on the
+typed logger contract and never on a concrete monitoring SDK or `console.*`.
+Production monitoring is replaced at the logger-adapter boundary.
+
 Modules may import entities and libs. Entities may import libs but never modules. Generic libs must not import modules and should not depend on entities. UIKit must not depend on modules or entities. Navigation may read entity state and render modules.
 
 ## Module UI ownership

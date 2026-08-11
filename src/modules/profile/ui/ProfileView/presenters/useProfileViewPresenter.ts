@@ -9,6 +9,7 @@ import { useUserStore } from '@/entities/user/model/userStore';
 import { switchAppEnvironment } from '@/entities/user/services/environmentSwitchService';
 import { useLogout } from '@/hooks/useLogout';
 import type { ICustomAlertAction } from '@/UIKit/CustomAlert/types';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 
 interface IInput {
@@ -63,8 +64,8 @@ export const useProfileViewPresenter = ({ t }: IInput) => {
         currentUserEmail: userEmail,
         targetEnvironment: pendingEnvironment,
       });
-    } catch (error: unknown) {
-      console.error('Unable to switch application environment', error);
+    } catch {
+      logger.error('environment.switch_failed');
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isConfirmingRef.current = false;
@@ -88,8 +89,8 @@ export const useProfileViewPresenter = ({ t }: IInput) => {
           key: 'switch',
           loading: isEnvironmentSwitching,
           onPress: () => {
-            onConfirmEnvironmentSwitch().catch((error: unknown) => {
-              console.error('Unexpected environment switch failure', error);
+            onConfirmEnvironmentSwitch().catch(() => {
+              logger.error('environment.switch_failed');
             });
           },
           title: String(t('profile.environment.switchAction')),

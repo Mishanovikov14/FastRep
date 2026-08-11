@@ -6,6 +6,7 @@ import { AppState } from 'react-native';
 
 import { resendRegistrationCode, verifyRegistration } from '@/entities/user/API/userApi';
 import { applyAuthenticationResponse } from '@/entities/user/services/userSessionService';
+import { logger } from '@/libs/logger/logger';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { toastService } from '@/libs/toast/toastService';
 import type { GuestStackParamList } from '@/navigation/types';
@@ -142,8 +143,8 @@ export const useRegistrationVerificationViewPresenter = ({ t }: IPresenterInput)
           String(t('auth.environment.productionRequired')),
         );
       }
-    } catch (error: unknown) {
-      console.error('Unexpected registration verification failure', error);
+    } catch {
+      logger.error('auth.registration_verification_failed', { errorCode: 'unexpected_error' });
       toastService.showError(
         String(t('common.error')),
         String(t('auth.registrationVerification.genericError')),
@@ -183,8 +184,8 @@ export const useRegistrationVerificationViewPresenter = ({ t }: IPresenterInput)
       setCodeError(undefined);
       onStartCountdown(DEFAULT_RESEND_COOLDOWN_SECONDS);
       toastService.showSuccess(String(t('auth.registrationVerification.codeResent')));
-    } catch (error: unknown) {
-      console.error('Unexpected registration-code resend failure', error);
+    } catch {
+      logger.error('auth.registration_code_resend_failed', { errorCode: 'unexpected_error' });
       toastService.showError(
         String(t('common.error')),
         String(t('auth.registrationVerification.genericError')),
