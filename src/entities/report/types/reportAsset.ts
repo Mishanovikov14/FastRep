@@ -69,6 +69,7 @@ export interface IReportAsset {
   id: string;
   originalFileName: string;
   position: number;
+  rejectionReason?: string | null;
   reportId: string;
   status: ReportAssetStatus;
   type: ReportAssetType;
@@ -100,6 +101,7 @@ export interface IReportAssetUploadRequest {
 export interface ILocalReportAsset {
   assetId?: string;
   durationSeconds?: number;
+  displayName: string;
   errorCode?: ReportAssetValidationErrorCode | ReportAttachmentErrorCode;
   fileName: string;
   height?: number;
@@ -125,6 +127,7 @@ export type ReportAssetValidationErrorCode =
   | 'missingFileMetadata';
 
 export interface IReportAssetCandidate {
+  displayName?: string;
   durationSeconds?: number;
   fileName: string;
   height?: number;
@@ -134,4 +137,9 @@ export interface IReportAssetCandidate {
   type: ReportAssetType;
   uri: string;
   width?: number;
+}
+
+export interface IReportAssetDownloadUrl {
+  expiresAt: string;
+  url: string;
 }

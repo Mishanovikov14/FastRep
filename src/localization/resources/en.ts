@@ -151,6 +151,29 @@ export const en: TranslationResources = {
   },
   reports: {
     attachments: {
+      accessFailed: 'Could not open attachment',
+      attentionRequired: 'Attachment needs attention',
+      audioRecordingName: 'Audio recording',
+      delete: 'Remove',
+      deleteAccessibility: 'Delete {{name}}',
+      deleteConfirmation: 'This file will no longer be included in future report generations.',
+      deleteTitle: 'Remove attachment?',
+      fileName: 'File',
+      pauseAccessibility: 'Pause {{name}}',
+      photoName: 'Photo',
+      playFailed: 'Could not play audio',
+      playAccessibility: 'Play {{name}}',
+      rejectionReasons: {
+        expired: 'The upload expired. Add this attachment again.',
+        invalidContent: 'The file contents could not be processed.',
+        limitExceeded: 'The attachment limit was exceeded.',
+        processingFailed: 'This attachment could not be processed.',
+        storageUnavailable: 'Storage was temporarily unavailable.',
+        tooLarge: 'This attachment is too large.',
+        unsupportedType: 'This file type is not supported.',
+      },
+      removed: 'Attachment deleted',
+      retryAccessibility: 'Retry {{name}}',
       audio: 'Audio', camera: 'Camera', cameraPermission: 'Allow camera access to take a photo.',
       confirmFailed: 'Could not verify attachment', documentFailed: 'Could not add file', empty: 'No attachments yet', file: 'File',
       invalid: 'Attachment not supported', microphonePermission: 'Allow microphone access to record audio.',
@@ -167,6 +190,7 @@ export const en: TranslationResources = {
         unsupportedType: 'Choose a supported file format.',
       },
     },
+    fallbackTitle: 'New report',
     card: {
       created: 'Created {{date}}',
       updated: 'Updated {{date}}',
@@ -213,6 +237,7 @@ export const en: TranslationResources = {
     },
     generation: {
       cancel: 'Cancel generation', cancelFailed: 'Could not cancel generation', credits: '{{count}} credits', description: 'Turn your notes and attachments into a polished PDF report.',
+      rejectedAttachments: 'Retry or delete the marked attachment before generating the report.',
       errors: {
         GENERATION_ALREADY_ACTIVE: 'A generation is already running for this report.', GENERATION_CREDITS_EXHAUSTED: 'You have no generation credits available.',
         GENERATION_CREDIT_RESERVATION_FAILED: 'A generation credit could not be reserved. Try again.', GENERATION_DAILY_LIMIT_REACHED: 'The daily generation limit has been reached.',

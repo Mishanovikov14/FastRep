@@ -1,5 +1,6 @@
 import {
   confirmReportAssetUpload,
+  createReportAssetDownloadUrl,
   deleteReportAsset,
   getReportAssets,
   requestReportAssetUpload,
@@ -19,6 +20,7 @@ describe('report assets API', () => {
     await requestReportAssetUpload('report-1', payload);
     await confirmReportAssetUpload('report-1', 'asset-1');
     await getReportAssets('report-1');
+    await createReportAssetDownloadUrl('report-1', 'asset-1');
     await deleteReportAsset('report-1', 'asset-1');
 
     expect(requester.request).toHaveBeenNthCalledWith(1, {
@@ -29,6 +31,7 @@ describe('report assets API', () => {
     expect(jest.mocked(requester.request).mock.calls.slice(1).map(([request]) => request)).toEqual([
       { method: 'POST', url: '/reports/report-1/assets/asset-1/confirm' },
       { method: 'GET', url: '/reports/report-1/assets' },
+      { method: 'POST', url: '/reports/report-1/assets/asset-1/download-url' },
       { method: 'DELETE', url: '/reports/report-1/assets/asset-1' },
     ]);
   });

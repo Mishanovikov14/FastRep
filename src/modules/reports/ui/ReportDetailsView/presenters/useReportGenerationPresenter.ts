@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 import { v4 as uuidv4 } from 'uuid';
 
+import { getReportDisplayTitle } from '@/entities/report/model/reportDisplayNames';
 import { openReportOutput, shareReportOutput } from '@/entities/report/services/reportOutputService';
 import type { IReport } from '@/entities/report/types/report';
 import type { IReportGeneration } from '@/entities/report/types/reportGeneration';
@@ -21,7 +22,9 @@ import {
 
 interface IInput {
   hasReadyAssets: boolean;
+  hasRejectedAssets?: boolean;
   hasUnresolvedAssets: boolean;
+  onRejectedAssetsBlocked?(): void;
   report: IReport;
   t: TFunction;
 }
@@ -77,7 +80,14 @@ const isUncertainGenerationError = (error: unknown): boolean => {
   return error.type === 'network_error' || error.type === 'timeout_error';
 };
 
-export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAssets, report, t }: IInput) => {
+export const useReportGenerationPresenter = ({
+  hasReadyAssets,
+  hasRejectedAssets = false,
+  hasUnresolvedAssets,
+  onRejectedAssetsBlocked,
+  report,
+  t,
+}: IInput) => {
   const latestQuery = useLatestReportGenerationQuery(report.id);
   const entitlementsQuery = useEntitlementsQuery();
   const startMutation = useStartReportGenerationMutation(report.id);
@@ -171,6 +181,16 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
   }, [latestQuery.data, report.id, t]);
 
   const onStartGeneration = useCallback(async () => {
+    if (hasRejectedAssets) {
+      logger.warn('report.generation_start_blocked', { errorCode: 'rejected_assets' });
+      toastService.showWarning(
+        String(t('reports.attachments.attentionRequired')),
+        String(t('reports.generation.rejectedAttachments')),
+      );
+      onRejectedAssetsBlocked?.();
+      return;
+    }
+
     if (lockedUntil && new Date(lockedUntil).getTime() > Date.now()) {
       return;
     }
@@ -236,7 +256,7 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
       });
       toastService.showError(String(t('reports.generation.startFailed')), String(t('reports.generation.errors.generic')));
     }
-  }, [lockedUntil, startMutation, t]);
+  }, [hasRejectedAssets, lockedUntil, onRejectedAssetsBlocked, startMutation, t]);
 
   const onCancelGeneration = useCallback(async () => {
     const generation = latestQuery.data;
@@ -286,7 +306,11 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
 
     setIsSharingOutput(true);
     try {
-      await shareReportOutput(report.id, output.generationId, report.title);
+      await shareReportOutput(
+        report.id,
+        output.generationId,
+        getReportDisplayTitle(report.title, String(t('reports.fallbackTitle'))),
+      );
       logger.info('report.output_shared', { operation: 'share_pdf' });
     } catch {
       logger.error('report.output_share_failed', { operation: 'share_pdf' });
@@ -298,7 +322,7 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
 
   const generation = latestQuery.data;
   const isActive = generation?.status === 'QUEUED' || generation?.status === 'PROCESSING';
-  const canGenerateSource = Boolean(report.notes?.trim()) || hasReadyAssets;
+  const canGenerateSource = Boolean(report.notes?.trim()) || hasReadyAssets || hasRejectedAssets;
   const lockRemainingSeconds = lockedUntil
     ? Math.max(0, Math.ceil((new Date(lockedUntil).getTime() - now) / 1_000))
     : 0;

@@ -15,6 +15,7 @@ import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { AttachmentsSection } from './components/AttachmentsSection';
 import { GenerationSection } from './components/GenerationSection';
+import { ImagePreviewModal } from './components/ImagePreviewModal';
 
 import { useReportDetailsViewPresenter } from './presenters/useReportDetailsViewPresenter';
 import { getStyles } from './styles';
@@ -25,6 +26,7 @@ export const ReportDetailsView = () => {
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const {
     attachments,
+    attachmentAccess,
     createdAtLabel,
     deleteActions,
     isDeleteConfirmationVisible,
@@ -34,12 +36,15 @@ export const ReportDetailsView = () => {
     isRefreshing,
     generation,
     onBack,
+    onAttachmentsLayout,
     onEdit,
     onHideDeleteConfirmation,
     onRefresh,
     onRetry,
     onShowDeleteConfirmation,
     report,
+    reportTitle,
+    scrollRef,
     updatedAtLabel,
   } = useReportDetailsViewPresenter({
     language,
@@ -61,6 +66,7 @@ export const ReportDetailsView = () => {
           ) : undefined
         }
         scrollEnabled={isContentVisible}
+        scrollRef={scrollRef}
       >
         {isLoading ? (
           <Loader size="large" />
@@ -83,7 +89,7 @@ export const ReportDetailsView = () => {
             <View style={styles.card}>
               <View style={styles.titleRow}>
                 <Typography selectable style={styles.reportTitle} variant="heading">
-                  {report.title}
+                  {reportTitle}
                 </Typography>
                 <ReportStatusBadge status={report.status} />
               </View>
@@ -125,10 +131,13 @@ export const ReportDetailsView = () => {
                 />
               </View>
             </View>
-            <View style={styles.card}>
+            <View onLayout={onAttachmentsLayout} style={styles.card}>
               <AttachmentsSection
+                accessingAssetId={attachmentAccess.accessingAssetId}
                 assets={attachments.assets}
                 canEdit={attachments.canEdit}
+                deletingAssetId={attachmentAccess.deletingAssetId}
+                imageUris={attachmentAccess.imageUris}
                 isLoading={attachments.isLoadingAssets}
                 isRecording={attachments.isRecording}
                 localAssets={attachments.localAssets}
@@ -136,12 +145,17 @@ export const ReportDetailsView = () => {
                 onAddPhoto={attachments.onAddPhoto}
                 onCancelRecording={attachments.onCancelRecording}
                 onRemoveLocalAsset={attachments.onRemoveLocalAsset}
-                onRemoveServerAsset={attachments.onRemoveServerAsset}
+                onOpenAsset={attachmentAccess.onOpenAsset}
+                onRemoveServerAsset={attachmentAccess.onRequestDelete}
+                onRetryRejectedAsset={attachments.onRetryRejectedAsset}
                 onRetryUpload={attachments.onRetryUpload}
                 onStartRecording={attachments.onStartRecording}
                 onStopRecording={attachments.onStopRecording}
                 onTakePhoto={attachments.onTakePhoto}
+                onToggleAudio={attachmentAccess.onToggleAudio}
+                playback={attachmentAccess.playback}
                 recordingDuration={attachments.recordingDuration}
+                retryingRejectedAssetId={attachments.retryingRejectedAssetId}
               />
             </View>
             <View style={styles.card}>
@@ -172,6 +186,18 @@ export const ReportDetailsView = () => {
         onDismiss={onHideDeleteConfirmation}
         title={String(t('reports.delete.title'))}
         visible={isDeleteConfirmationVisible}
+      />
+      <CustomAlert
+        actions={attachmentAccess.deleteActions}
+        description={String(t('reports.attachments.deleteConfirmation'))}
+        onDismiss={attachmentAccess.onDismissDeleteConfirmation}
+        title={String(t('reports.attachments.deleteTitle'))}
+        visible={attachmentAccess.isDeleteConfirmationVisible}
+      />
+      <ImagePreviewModal
+        images={attachmentAccess.previewImages}
+        onClose={attachmentAccess.onClosePreview}
+        selectedAssetId={attachmentAccess.previewAssetId}
       />
     </>
   );

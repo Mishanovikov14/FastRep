@@ -149,23 +149,47 @@ export interface TranslationResources {
   };
   reports: {
     attachments: {
+      accessFailed: string;
+      attentionRequired: string;
       audio: string;
+      audioRecordingName: string;
       camera: string;
       cameraPermission: string;
       confirmFailed: string;
+      delete: string;
+      deleteAccessibility: string;
+      deleteConfirmation: string;
+      deleteTitle: string;
       documentFailed: string;
       empty: string;
       file: string;
+      fileName: string;
       invalid: string;
       microphonePermission: string;
+      pauseAccessibility: string;
       permissionTitle: string;
       photo: string;
+      photoName: string;
+      playFailed: string;
+      playAccessibility: string;
       photoConversionFailed: string;
       photoFailed: string;
       recording: string;
       recordingFailed: string;
+      rejectionReasons: Record<
+        | 'expired'
+        | 'invalidContent'
+        | 'limitExceeded'
+        | 'processingFailed'
+        | 'storageUnavailable'
+        | 'tooLarge'
+        | 'unsupportedType',
+        string
+      >;
       remove: string;
       removeFailed: string;
+      removed: string;
+      retryAccessibility: string;
       states: Record<'CONFIRMING' | 'FAILED' | 'LOCAL' | 'READY' | 'REQUESTING_UPLOAD' | 'UPLOADING', string>;
       stop: string;
       title: string;
@@ -183,6 +207,7 @@ export interface TranslationResources {
         string
       >;
     };
+    fallbackTitle: string;
     card: {
       created: string;
       updated: string;
@@ -253,6 +278,7 @@ export interface TranslationResources {
       generated: string;
       lock: { message: string; title: string };
       outputReady: string;
+      rejectedAttachments: string;
       regenerate: string;
       retry: string;
       stages: Record<'analyzing' | 'completed' | 'creatingPdf' | 'finalizing' | 'generating' | 'preparing' | 'transcribing', string>;
