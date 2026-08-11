@@ -81,11 +81,13 @@ export const ReportDetailsView = () => {
         ) : (
           <>
             <View style={styles.card}>
-              <Typography selectable variant="heading">
-                {report.title}
-              </Typography>
-              <ReportStatusBadge status={report.status} />
-              <View>
+              <View style={styles.titleRow}>
+                <Typography selectable style={styles.reportTitle} variant="heading">
+                  {report.title}
+                </Typography>
+                <ReportStatusBadge status={report.status} />
+              </View>
+              <View style={styles.notesCard}>
                 <Typography color={colors.textSecondary} variant="caption">
                   {t('reports.form.notes')}
                 </Typography>
@@ -93,17 +95,19 @@ export const ReportDetailsView = () => {
                   {report.notes || t('reports.details.noNotes')}
                 </Typography>
               </View>
-              <View style={styles.dateRow}>
-                <Typography color={colors.textSecondary} variant="caption">
-                  {t('reports.details.createdAt')}
-                </Typography>
-                <Typography>{createdAtLabel}</Typography>
-              </View>
-              <View style={styles.dateRow}>
-                <Typography color={colors.textSecondary} variant="caption">
-                  {t('reports.details.updatedAt')}
-                </Typography>
-                <Typography>{updatedAtLabel}</Typography>
+              <View style={styles.metadataRow}>
+                <View style={styles.dateRow}>
+                  <Typography color={colors.textSecondary} variant="caption">
+                    {t('reports.details.createdAt')}
+                  </Typography>
+                  <Typography variant="caption">{createdAtLabel}</Typography>
+                </View>
+                <View style={styles.dateRow}>
+                  <Typography color={colors.textSecondary} variant="caption">
+                    {t('reports.details.updatedAt')}
+                  </Typography>
+                  <Typography variant="caption">{updatedAtLabel}</Typography>
+                </View>
               </View>
               <View style={styles.actions}>
                 <Button
@@ -117,7 +121,7 @@ export const ReportDetailsView = () => {
                   onPress={onShowDeleteConfirmation}
                   style={styles.action}
                   title={String(t('reports.delete.action'))}
-                  variant="danger"
+                  variant="text"
                 />
               </View>
             </View>

@@ -1,10 +1,13 @@
 import NetInfo from '@react-native-community/netinfo';
 import type { TFunction } from 'i18next';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AppState } from 'react-native';
 import { v4 as uuidv4 } from 'uuid';
 
 import { openReportOutput, shareReportOutput } from '@/entities/report/services/reportOutputService';
 import type { IReport } from '@/entities/report/types/report';
+import type { IReportGeneration } from '@/entities/report/types/reportGeneration';
+import { logger } from '@/libs/logger/logger';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { toastService } from '@/libs/toast/toastService';
 import {
@@ -66,6 +69,14 @@ const getLockedUntil = (response: IResponse<unknown>): string | undefined => {
   return typeof value === 'string' ? value : undefined;
 };
 
+const isUncertainGenerationError = (error: unknown): boolean => {
+  if (!isRecord(error)) {
+    return false;
+  }
+
+  return error.type === 'network_error' || error.type === 'timeout_error';
+};
+
 export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAssets, report, t }: IInput) => {
   const latestQuery = useLatestReportGenerationQuery(report.id);
   const entitlementsQuery = useEntitlementsQuery();
@@ -73,7 +84,9 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
   const cancelMutation = useCancelReportGenerationMutation(report.id);
   const outputQuery = useReportOutputQuery(report.id, true);
   const pendingIdempotencyKeyRef = useRef<string | undefined>(undefined);
-  const processedTerminalGenerationRef = useRef<string | undefined>(undefined);
+  const activeGenerationIdRef = useRef<string | undefined>(undefined);
+  const isAppActiveRef = useRef(AppState.currentState === 'active');
+  const previousGenerationRef = useRef<Pick<IReportGeneration, 'id' | 'status'> | undefined>(undefined);
   const [lockedUntil, setLockedUntil] = useState<string | undefined>(undefined);
   const [now, setNow] = useState(Date.now());
   const [isOpeningOutput, setIsOpeningOutput] = useState(false);
@@ -95,21 +108,66 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
   }, [lockedUntil, now]);
 
   useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      isAppActiveRef.current = nextState === 'active';
+      if (!isAppActiveRef.current) {
+        activeGenerationIdRef.current = undefined;
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
     const generation = latestQuery.data;
-    if (!generation || !['COMPLETED', 'FAILED', 'CANCELLED'].includes(generation.status)) {
+
+    if (!generation) {
+      previousGenerationRef.current = undefined;
       return;
     }
 
-    if (processedTerminalGenerationRef.current === `${generation.id}:${generation.status}`) {
+    const previous = previousGenerationRef.current;
+    previousGenerationRef.current = { id: generation.id, status: generation.status };
+
+    if (
+      (generation.status === 'QUEUED' || generation.status === 'PROCESSING') &&
+      pendingIdempotencyKeyRef.current &&
+      isAppActiveRef.current
+    ) {
+      activeGenerationIdRef.current = generation.id;
+    }
+
+    if (previous?.id !== generation.id || previous.status === generation.status) {
       return;
     }
 
-    processedTerminalGenerationRef.current = `${generation.id}:${generation.status}`;
-    refreshGenerationResources(report.id).catch(() => undefined);
+    logger.info('report.generation_status_changed', {
+      generationStatus: generation.status,
+      stage: generation.stage ?? undefined,
+    });
 
-    if (generation.status === 'COMPLETED') {
+    const wasActive = previous.status === 'QUEUED' || previous.status === 'PROCESSING';
+    const isTerminal = generation.status === 'COMPLETED' || generation.status === 'FAILED' || generation.status === 'CANCELLED';
+
+    if (!wasActive || !isTerminal) {
+      return;
+    }
+
+    refreshGenerationResources(report.id).catch(() => {
+      logger.warn('report.generation_resources_refresh_failed', { generationStatus: generation.status });
+    });
+
+    const ownsActiveGeneration = isAppActiveRef.current && activeGenerationIdRef.current === generation.id;
+    if (generation.status === 'COMPLETED' && ownsActiveGeneration) {
       toastService.showSuccess(String(t('reports.generation.generated')));
+    } else if (generation.status === 'FAILED' && ownsActiveGeneration) {
+      toastService.showError(
+        String(t('reports.generation.startFailed')),
+        String(t('reports.generation.failedDescription')),
+      );
     }
+
+    activeGenerationIdRef.current = undefined;
   }, [latestQuery.data, report.id, t]);
 
   const onStartGeneration = useCallback(async () => {
@@ -117,16 +175,29 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
       return;
     }
 
-    const network = await NetInfo.fetch();
-    if (network.isConnected === false || network.isInternetReachable === false) {
+    let network;
+
+    try {
+      network = await NetInfo.fetch();
+    } catch {
+      logger.error('report.generation_preflight_failed', { errorCode: 'network_state_unavailable' });
       toastService.showError(String(t('reports.generation.startFailed')), String(t('reports.errors.network')));
       return;
     }
 
-    const idempotencyKey = pendingIdempotencyKeyRef.current ?? uuidv4();
-    pendingIdempotencyKeyRef.current = idempotencyKey;
+    if (network.isConnected === false || network.isInternetReachable === false) {
+      logger.warn('report.generation_start_blocked', { errorCode: 'offline' });
+      toastService.showError(String(t('reports.generation.startFailed')), String(t('reports.errors.network')));
+      return;
+    }
 
     try {
+      const isUncertainRetry = Boolean(pendingIdempotencyKeyRef.current);
+      const idempotencyKey = pendingIdempotencyKeyRef.current ?? uuidv4();
+      pendingIdempotencyKeyRef.current = idempotencyKey;
+      logger.debug('report.generation_idempotency_classified', {
+        operation: isUncertainRetry ? 'uncertain_retry' : 'new_generation',
+      });
       const response = await startMutation.mutateAsync(idempotencyKey);
 
       if (response.isError || !response.data) {
@@ -135,9 +206,15 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
           setLockedUntil(getLockedUntil(response));
         }
 
-        if (response.type !== 'network_error' && response.type !== 'timeout_error') {
+        const isUncertainResult = response.type === 'network_error' || response.type === 'timeout_error';
+        if (!isUncertainResult) {
           pendingIdempotencyKeyRef.current = undefined;
         }
+
+        logger.warn('report.generation_start_failed', {
+          errorCode: code ?? response.type ?? 'unknown',
+          httpStatus: response.status,
+        });
 
         const key = generationErrorCodes.includes(code as (typeof generationErrorCodes)[number])
           ? `reports.generation.errors.${code}`
@@ -147,8 +224,16 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
       }
 
       pendingIdempotencyKeyRef.current = undefined;
-    } catch {
-      pendingIdempotencyKeyRef.current = undefined;
+      activeGenerationIdRef.current = isAppActiveRef.current ? response.data.id : undefined;
+      logger.info('report.generation_started', { generationStatus: response.data.status });
+    } catch (error) {
+      const isUncertainResult = isUncertainGenerationError(error);
+      if (!isUncertainResult) {
+        pendingIdempotencyKeyRef.current = undefined;
+      }
+      logger.error('report.generation_start_failed', {
+        errorCode: isUncertainResult ? 'uncertain_request_result' : 'local_exception',
+      });
       toastService.showError(String(t('reports.generation.startFailed')), String(t('reports.generation.errors.generic')));
     }
   }, [lockedUntil, startMutation, t]);
@@ -159,13 +244,20 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
       return;
     }
 
-    const response = await cancelMutation.mutateAsync(generation.id);
-    if (response.isError) {
-      toastService.showError(String(t('reports.generation.cancelFailed')));
-      return;
-    }
+    try {
+      const response = await cancelMutation.mutateAsync(generation.id);
+      if (response.isError) {
+        logger.warn('report.generation_cancel_failed', { errorCode: response.type ?? 'request_failed' });
+        toastService.showError(String(t('reports.generation.cancelFailed')));
+        return;
+      }
 
-    await Promise.all([latestQuery.refetch(), refreshGenerationResources(report.id)]);
+      logger.info('report.generation_cancelled', { generationStatus: response.data?.status ?? 'CANCELLED' });
+      await Promise.all([latestQuery.refetch(), refreshGenerationResources(report.id)]);
+    } catch {
+      logger.error('report.generation_cancel_failed', { errorCode: 'local_exception' });
+      toastService.showError(String(t('reports.generation.cancelFailed')));
+    }
   }, [cancelMutation, latestQuery, report.id, t]);
 
   const onOpenOutput = useCallback(async () => {
@@ -177,7 +269,9 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
     setIsOpeningOutput(true);
     try {
       await openReportOutput(report.id, output.generationId);
+      logger.info('report.output_opened', { operation: 'open_pdf' });
     } catch {
+      logger.error('report.output_open_failed', { operation: 'open_pdf' });
       toastService.showError(String(t('reports.output.openFailed')), String(t('reports.output.tryAgain')));
     } finally {
       setIsOpeningOutput(false);
@@ -193,7 +287,9 @@ export const useReportGenerationPresenter = ({ hasReadyAssets, hasUnresolvedAsse
     setIsSharingOutput(true);
     try {
       await shareReportOutput(report.id, output.generationId, report.title);
+      logger.info('report.output_shared', { operation: 'share_pdf' });
     } catch {
+      logger.error('report.output_share_failed', { operation: 'share_pdf' });
       toastService.showError(String(t('reports.output.shareFailed')), String(t('reports.output.tryAgain')));
     } finally {
       setIsSharingOutput(false);

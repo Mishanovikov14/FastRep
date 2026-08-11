@@ -151,9 +151,9 @@ export const uk: TranslationResources = {
   },
   reports: {
     attachments: {
-      audio: 'Аудіо', camera: 'Камера', cameraPermission: 'Дозвольте доступ до камери, щоб зробити фото.', confirmFailed: 'Не вдалося перевірити вкладення',
+      audio: 'Аудіо', camera: 'Камера', cameraPermission: 'Дозвольте доступ до камери, щоб зробити фото.', confirmFailed: 'Не вдалося перевірити вкладення', documentFailed: 'Не вдалося додати файл',
       empty: 'Вкладень ще немає', file: 'Файл', invalid: 'Вкладення не підтримується', microphonePermission: 'Дозвольте доступ до мікрофона для запису аудіо.',
-      permissionTitle: 'Потрібен дозвіл', photo: 'Фото', photoFailed: 'Не вдалося додати фото', recording: 'Запис · {{duration}}', recordingFailed: 'Не вдалося записати аудіо',
+      permissionTitle: 'Потрібен дозвіл', photo: 'Фото', photoConversionFailed: 'Не вдалося перетворити це фото на підтримуваний формат', photoFailed: 'Не вдалося додати фото', recording: 'Запис · {{duration}}', recordingFailed: 'Не вдалося записати аудіо',
       remove: 'Видалити', removeFailed: 'Не вдалося видалити вкладення',
       states: { CONFIRMING: 'Перевірка', FAILED: 'Помилка завантаження', LOCAL: 'Очікування', READY: 'Готово', REQUESTING_UPLOAD: 'Підготовка', UPLOADING: 'Завантаження' },
       stop: 'Зупинити', title: 'Вкладення', tryAgain: 'Спробуйте ще раз.', types: { AUDIO: 'Аудіо', DOCUMENT: 'Файл', IMAGE: 'Фото' }, uploadFailed: 'Не вдалося завантажити вкладення',
@@ -204,10 +204,10 @@ export const uk: TranslationResources = {
       titlePlaceholder: 'Назва звіту',
     },
     generation: {
-      cancel: 'Скасувати генерацію', cancelFailed: 'Не вдалося скасувати генерацію', credits: 'Кредитів: {{count}}',
+      cancel: 'Скасувати генерацію', cancelFailed: 'Не вдалося скасувати генерацію', credits: 'Кредитів: {{count}}', description: 'Перетворіть нотатки та вкладення на готовий PDF-звіт.',
       errors: { GENERATION_ALREADY_ACTIVE: 'Генерація цього звіту вже виконується.', GENERATION_CREDITS_EXHAUSTED: 'Немає доступних кредитів генерації.', GENERATION_CREDIT_RESERVATION_FAILED: 'Не вдалося зарезервувати кредит. Спробуйте ще раз.', GENERATION_DAILY_LIMIT_REACHED: 'Досягнуто денного ліміту генерацій.', GENERATION_DISABLED: 'Генерація звітів тимчасово недоступна.', GENERATION_QUEUE_UNAVAILABLE: 'Сервіс генерації тимчасово недоступний.', GENERATION_RATE_LIMITED: 'Забагато запитів. Зачекайте та повторіть.', REPORT_HAS_NO_CONTENT: 'Спочатку додайте нотатки або вкладення.', REPORT_HAS_PENDING_UPLOADS: 'Дочекайтеся завершення завантаження вкладень.', REPORT_HAS_REJECTED_ASSETS: 'Видаліть відхилені вкладення.', REPORT_NOT_EDITABLE: 'Звіт не можна згенерувати в поточному стані.', REPORT_TEMPORARILY_LOCKED: 'Звіт тимчасово недоступний після повторних помилок.', generic: 'Не вдалося згенерувати звіт. Спробуйте ще раз.' },
       failedDescription: 'Генерація не вдалася. Відредагуйте джерела та повторіть.', generate: 'Згенерувати звіт', generated: 'Звіт згенеровано',
-      lock: { message: 'Цей звіт кілька разів не вдалося створити. Повторіть через {{minutes}} хв.', title: 'Звіт тимчасово недоступний' }, regenerate: 'Згенерувати знову', retry: 'Повторити генерацію',
+      lock: { message: 'Цей звіт кілька разів не вдалося створити. Повторіть через {{minutes}} хв.', title: 'Звіт тимчасово недоступний' }, outputReady: 'Ваш звіт готовий', regenerate: 'Згенерувати знову', retry: 'Повторити генерацію',
       stages: { analyzing: 'Аналіз вкладень…', completed: 'Завершено', creatingPdf: 'Створення PDF…', finalizing: 'Завершення…', generating: 'Генерація звіту…', preparing: 'Підготовка…', transcribing: 'Розшифровка аудіо…' }, startFailed: 'Помилка генерації', title: 'AI-звіт',
     },
     list: {

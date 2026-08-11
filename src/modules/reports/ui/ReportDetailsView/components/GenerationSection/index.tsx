@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { View } from 'react-native';
 
+import { PdfIcon } from '@/assets/icons/PdfIcon';
 import type { IReportGeneration } from '@/entities/report/types/reportGeneration';
 import { Button } from '@/UIKit/Button';
 import { Typography } from '@/UIKit/Typography';
@@ -46,6 +47,7 @@ export const GenerationSection = ({
   const { colors, radius, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const progress = Math.max(0, Math.min(100, generation?.progress ?? 0));
+  const isActive = generation?.status === 'QUEUED' || generation?.status === 'PROCESSING';
 
   return (
     <View style={styles.section}>
@@ -65,10 +67,13 @@ export const GenerationSection = ({
           </Typography>
         </View>
       ) : null}
-      {generation ? (
+      {isActive || (isGenerating && !generation) ? (
         <View style={styles.statusCard}>
-          <Typography>{t(`reports.generation.stages.${stageKey}`)}</Typography>
-          {(generation.status === 'QUEUED' || generation.status === 'PROCESSING') && progress > 0 ? (
+          <View style={styles.statusHeading}>
+            <View style={styles.processingDot} />
+            <Typography>{t(`reports.generation.stages.${stageKey}`)}</Typography>
+          </View>
+          {progress > 0 ? (
             <>
               <View style={styles.progressTrack}>
                 <View style={[styles.progressFill, { width: `${progress}%` }]} />
@@ -76,50 +81,71 @@ export const GenerationSection = ({
               <Typography color={colors.textSecondary} variant="caption">{progress}%</Typography>
             </>
           ) : null}
-          {generation.status === 'FAILED' ? (
-            <Typography color={colors.error}>{t('reports.generation.failedDescription')}</Typography>
-          ) : null}
         </View>
       ) : null}
-      <View style={styles.actions}>
-        {hasOutput ? (
-          <>
+      {generation?.status === 'FAILED' ? (
+        <View style={styles.failureCard}>
+          <Typography color={colors.error}>{t('reports.generation.failedDescription')}</Typography>
+        </View>
+      ) : null}
+      {hasOutput ? (
+        <View style={styles.outputCard}>
+          <View style={styles.outputHeading}>
+            <View style={styles.outputIcon}>
+              <PdfIcon color={colors.primary} />
+            </View>
+            <View style={styles.outputText}>
+              <Typography variant="heading">{t('reports.generation.outputReady')}</Typography>
+              <Typography color={colors.textSecondary} variant="caption">
+                PDF
+              </Typography>
+            </View>
+          </View>
+          <View style={styles.outputActions}>
             <Button
               loading={isOpeningOutput}
               onPress={onOpenOutput}
-              style={styles.action}
+              style={styles.outputAction}
               title={String(t('reports.output.open'))}
-              variant="secondary"
             />
             <Button
               loading={isSharingOutput}
               onPress={onShareOutput}
-              style={styles.action}
+              style={styles.outputAction}
               title={String(t('reports.output.share'))}
               variant="secondary"
             />
-          </>
-        ) : null}
-        {canCancel ? (
-          <Button
-            loading={isCancelling}
-            onPress={onCancelGeneration}
-            style={styles.action}
-            title={String(t('reports.generation.cancel'))}
-            variant="secondary"
-          />
-        ) : null}
-        {!isGenerating ? (
-          <Button
-            disabled={!canGenerate}
-            onPress={onStartGeneration}
-            style={styles.action}
-            title={String(
-              t(generation?.status === 'FAILED' ? 'reports.generation.retry' : hasOutput ? 'reports.generation.regenerate' : 'reports.generation.generate'),
-            )}
-          />
-        ) : null}
-      </View>
+          </View>
+        </View>
+      ) : !isGenerating && generation?.status !== 'FAILED' ? (
+        <Typography color={colors.textSecondary}>{t('reports.generation.description')}</Typography>
+      ) : null}
+      {canCancel ? (
+        <Button
+          fullWidth
+          loading={isCancelling}
+          onPress={onCancelGeneration}
+          title={String(t('reports.generation.cancel'))}
+          variant="secondary"
+        />
+      ) : null}
+      {!isGenerating ? (
+        <Button
+          disabled={!canGenerate}
+          fullWidth
+          onPress={onStartGeneration}
+          title={String(
+            t(
+              generation?.status === 'FAILED'
+                ? 'reports.generation.retry'
+                : hasOutput
+                  ? 'reports.generation.regenerate'
+                  : 'reports.generation.generate',
+            ),
+          )}
+          variant={hasOutput ? 'secondary' : 'primary'}
+        />
+      ) : null}
     </View>
   );
 };

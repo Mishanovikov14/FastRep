@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { normalizeUpdateReportRequest, validateReportForm } from '@/entities/report/model/reportValidation';
 import type { ReportFormErrors } from '@/entities/report/model/reportValidation';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
 import { getReportErrorMessage, getReportFieldErrors } from '@/modules/reports/presenters/reportErrors';
@@ -79,8 +80,8 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
 
       toastService.showSuccess(String(t('reports.edit.success')));
       navigation.goBack();
-    } catch (error: unknown) {
-      console.error('Unexpected report update failure', error);
+    } catch {
+      logger.error('report.update_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;

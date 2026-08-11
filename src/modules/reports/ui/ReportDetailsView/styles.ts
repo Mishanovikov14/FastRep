@@ -16,7 +16,7 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       backgroundColor: colors.surface,
       borderColor: colors.border,
       borderRadius: scaleHorizontal(radius.lg),
-      borderWidth: 1,
+      borderWidth: StyleSheet.hairlineWidth,
       gap: scaleVertical(spacing.lg),
       padding: scaleHorizontal(spacing.lg),
     },
@@ -34,10 +34,30 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       paddingTop: scaleVertical(spacing.md),
     },
     dateRow: {
+      flex: 1,
       gap: scaleVertical(spacing.xs),
+    },
+    metadataRow: {
+      flexDirection: 'row',
+      gap: scaleHorizontal(spacing.lg),
     },
     notes: {
       lineHeight: scaleVertical(24),
+    },
+    notesCard: {
+      backgroundColor: colors.background,
+      borderRadius: scaleHorizontal(radius.md),
+      gap: scaleVertical(spacing.sm),
+      padding: scaleHorizontal(spacing.md),
+    },
+    reportTitle: {
+      flex: 1,
+    },
+    titleRow: {
+      alignItems: 'flex-start',
+      flexDirection: 'row',
+      gap: scaleHorizontal(spacing.sm),
+      justifyContent: 'space-between',
     },
   });
 
