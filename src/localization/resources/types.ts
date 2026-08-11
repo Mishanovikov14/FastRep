@@ -148,6 +148,39 @@ export interface TranslationResources {
     title: string;
   };
   reports: {
+    attachments: {
+      audio: string;
+      camera: string;
+      cameraPermission: string;
+      confirmFailed: string;
+      empty: string;
+      file: string;
+      invalid: string;
+      microphonePermission: string;
+      permissionTitle: string;
+      photo: string;
+      photoFailed: string;
+      recording: string;
+      recordingFailed: string;
+      remove: string;
+      removeFailed: string;
+      states: Record<'CONFIRMING' | 'FAILED' | 'LOCAL' | 'READY' | 'REQUESTING_UPLOAD' | 'UPLOADING', string>;
+      stop: string;
+      title: string;
+      tryAgain: string;
+      types: Record<'AUDIO' | 'DOCUMENT' | 'IMAGE', string>;
+      uploadFailed: string;
+      validation: Record<
+        | 'audioDurationTooLong'
+        | 'fileTooLarge'
+        | 'imageDimensionsTooLarge'
+        | 'missingFileMetadata'
+        | 'reportTotalTooLarge'
+        | 'tooManyFiles'
+        | 'unsupportedType',
+        string
+      >;
+    };
     card: {
       created: string;
       updated: string;
@@ -192,12 +225,49 @@ export interface TranslationResources {
       title: string;
       titlePlaceholder: string;
     };
+    generation: {
+      cancel: string;
+      cancelFailed: string;
+      credits: string;
+      errors: Record<
+        | 'GENERATION_ALREADY_ACTIVE'
+        | 'GENERATION_CREDITS_EXHAUSTED'
+        | 'GENERATION_CREDIT_RESERVATION_FAILED'
+        | 'GENERATION_DAILY_LIMIT_REACHED'
+        | 'GENERATION_DISABLED'
+        | 'GENERATION_QUEUE_UNAVAILABLE'
+        | 'GENERATION_RATE_LIMITED'
+        | 'REPORT_HAS_NO_CONTENT'
+        | 'REPORT_HAS_PENDING_UPLOADS'
+        | 'REPORT_HAS_REJECTED_ASSETS'
+        | 'REPORT_NOT_EDITABLE'
+        | 'REPORT_TEMPORARILY_LOCKED'
+        | 'generic',
+        string
+      >;
+      failedDescription: string;
+      generate: string;
+      generated: string;
+      lock: { message: string; title: string };
+      regenerate: string;
+      retry: string;
+      stages: Record<'analyzing' | 'completed' | 'creatingPdf' | 'finalizing' | 'generating' | 'preparing' | 'transcribing', string>;
+      startFailed: string;
+      title: string;
+    };
     list: {
       emptyDescription: string;
       emptyTitle: string;
       errorDescription: string;
       errorTitle: string;
       title: string;
+    };
+    output: {
+      open: string;
+      openFailed: string;
+      share: string;
+      shareFailed: string;
+      tryAgain: string;
     };
     status: {
       draft: string;

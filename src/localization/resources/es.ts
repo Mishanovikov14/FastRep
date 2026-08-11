@@ -150,6 +150,11 @@ export const es: TranslationResources = {
     title: 'Perfil',
   },
   reports: {
+    attachments: {
+      audio: 'Audio', camera: 'Cámara', cameraPermission: 'Permite el acceso a la cámara para tomar una foto.', confirmFailed: 'No se pudo verificar el archivo adjunto', empty: 'Aún no hay archivos adjuntos', file: 'Archivo', invalid: 'Archivo adjunto no compatible', microphonePermission: 'Permite el acceso al micrófono para grabar audio.', permissionTitle: 'Permiso necesario', photo: 'Foto', photoFailed: 'No se pudo añadir la foto', recording: 'Grabando · {{duration}}', recordingFailed: 'No se pudo grabar el audio', remove: 'Eliminar', removeFailed: 'No se pudo eliminar el archivo adjunto',
+      states: { CONFIRMING: 'Verificando', FAILED: 'Error de carga', LOCAL: 'En espera', READY: 'Listo', REQUESTING_UPLOAD: 'Preparando', UPLOADING: 'Cargando' }, stop: 'Detener', title: 'Archivos adjuntos', tryAgain: 'Inténtalo de nuevo.', types: { AUDIO: 'Audio', DOCUMENT: 'Archivo', IMAGE: 'Foto' }, uploadFailed: 'Error al cargar el archivo adjunto',
+      validation: { audioDurationTooLong: 'Las grabaciones de audio pueden durar hasta 20 minutos.', fileTooLarge: 'Este archivo es demasiado grande.', imageDimensionsTooLarge: 'Las imágenes pueden tener hasta 4096 × 4096 píxeles.', missingFileMetadata: 'No se pudo leer el archivo seleccionado.', reportTotalTooLarge: 'Los archivos adjuntos de un informe pueden sumar hasta 150 MB.', tooManyFiles: 'Este informe alcanzó el límite para este tipo de archivo.', unsupportedType: 'Elige un formato de archivo compatible.' },
+    },
     card: {
       created: 'Creado el {{date}}',
       updated: 'Actualizado el {{date}}',
@@ -194,6 +199,11 @@ export const es: TranslationResources = {
       title: 'Título',
       titlePlaceholder: 'Título del informe',
     },
+    generation: {
+      cancel: 'Cancelar generación', cancelFailed: 'No se pudo cancelar la generación', credits: '{{count}} créditos',
+      errors: { GENERATION_ALREADY_ACTIVE: 'Ya hay una generación en curso para este informe.', GENERATION_CREDITS_EXHAUSTED: 'No tienes créditos de generación disponibles.', GENERATION_CREDIT_RESERVATION_FAILED: 'No se pudo reservar un crédito. Inténtalo de nuevo.', GENERATION_DAILY_LIMIT_REACHED: 'Se alcanzó el límite diario de generación.', GENERATION_DISABLED: 'La generación de informes no está disponible temporalmente.', GENERATION_QUEUE_UNAVAILABLE: 'El servicio de generación no está disponible temporalmente.', GENERATION_RATE_LIMITED: 'Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.', REPORT_HAS_NO_CONTENT: 'Añade notas o al menos un archivo adjunto.', REPORT_HAS_PENDING_UPLOADS: 'Espera a que terminen de cargarse todos los archivos.', REPORT_HAS_REJECTED_ASSETS: 'Elimina los archivos adjuntos rechazados.', REPORT_NOT_EDITABLE: 'Este informe no se puede generar en su estado actual.', REPORT_TEMPORARILY_LOCKED: 'Este informe no está disponible temporalmente tras varios errores.', generic: 'No se pudo generar el informe. Inténtalo de nuevo.' },
+      failedDescription: 'La generación falló. Edita las fuentes e inténtalo de nuevo.', generate: 'Generar informe', generated: 'Informe generado', lock: { message: 'Este informe falló varias veces. Inténtalo de nuevo en {{minutes}} minutos.', title: 'Informe no disponible temporalmente' }, regenerate: 'Regenerar', retry: 'Reintentar generación', stages: { analyzing: 'Analizando archivos adjuntos…', completed: 'Completado', creatingPdf: 'Creando PDF…', finalizing: 'Finalizando…', generating: 'Generando informe…', preparing: 'Preparando…', transcribing: 'Transcribiendo audio…' }, startFailed: 'Error de generación', title: 'Informe con IA',
+    },
     list: {
       emptyDescription: 'Crea tu primer informe para guardar su progreso y sus notas en un solo lugar.',
       emptyTitle: 'Aún no hay informes',
@@ -201,6 +211,7 @@ export const es: TranslationResources = {
       errorTitle: 'No se pudieron cargar los informes',
       title: 'Informes',
     },
+    output: { open: 'Abrir informe', openFailed: 'No se pudo abrir el informe', share: 'Compartir informe', shareFailed: 'No se pudo compartir el informe', tryAgain: 'Descarga el PDF de nuevo y vuelve a intentarlo.' },
     status: {
       draft: 'Borrador',
       failed: 'Fallido',

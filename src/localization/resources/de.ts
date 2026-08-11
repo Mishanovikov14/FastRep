@@ -150,6 +150,11 @@ export const de: TranslationResources = {
     title: 'Profil',
   },
   reports: {
+    attachments: {
+      audio: 'Audio', camera: 'Kamera', cameraPermission: 'Erlaube den Kamerazugriff, um ein Foto aufzunehmen.', confirmFailed: 'Anhang konnte nicht geprüft werden', empty: 'Noch keine Anhänge', file: 'Datei', invalid: 'Anhang wird nicht unterstützt', microphonePermission: 'Erlaube den Mikrofonzugriff für Audioaufnahmen.', permissionTitle: 'Berechtigung erforderlich', photo: 'Foto', photoFailed: 'Foto konnte nicht hinzugefügt werden', recording: 'Aufnahme · {{duration}}', recordingFailed: 'Audio konnte nicht aufgenommen werden', remove: 'Entfernen', removeFailed: 'Anhang konnte nicht entfernt werden',
+      states: { CONFIRMING: 'Prüfen', FAILED: 'Upload fehlgeschlagen', LOCAL: 'Warten', READY: 'Bereit', REQUESTING_UPLOAD: 'Vorbereiten', UPLOADING: 'Hochladen' }, stop: 'Stoppen', title: 'Anhänge', tryAgain: 'Versuche es erneut.', types: { AUDIO: 'Audio', DOCUMENT: 'Datei', IMAGE: 'Foto' }, uploadFailed: 'Upload des Anhangs fehlgeschlagen',
+      validation: { audioDurationTooLong: 'Audioaufnahmen dürfen bis zu 20 Minuten lang sein.', fileTooLarge: 'Diese Datei ist zu groß.', imageDimensionsTooLarge: 'Bilder dürfen höchstens 4096 × 4096 Pixel groß sein.', missingFileMetadata: 'Die ausgewählte Datei konnte nicht gelesen werden.', reportTotalTooLarge: 'Anhänge eines Berichts dürfen insgesamt 150 MB groß sein.', tooManyFiles: 'Das Limit für diesen Anhangstyp ist erreicht.', unsupportedType: 'Wähle ein unterstütztes Dateiformat.' },
+    },
     card: {
       created: 'Erstellt {{date}}',
       updated: 'Aktualisiert {{date}}',
@@ -194,6 +199,11 @@ export const de: TranslationResources = {
       title: 'Titel',
       titlePlaceholder: 'Berichtstitel',
     },
+    generation: {
+      cancel: 'Generierung abbrechen', cancelFailed: 'Generierung konnte nicht abgebrochen werden', credits: '{{count}} Credits',
+      errors: { GENERATION_ALREADY_ACTIVE: 'Für diesen Bericht läuft bereits eine Generierung.', GENERATION_CREDITS_EXHAUSTED: 'Keine Generierungs-Credits verfügbar.', GENERATION_CREDIT_RESERVATION_FAILED: 'Ein Credit konnte nicht reserviert werden. Versuche es erneut.', GENERATION_DAILY_LIMIT_REACHED: 'Das tägliche Generierungslimit ist erreicht.', GENERATION_DISABLED: 'Die Berichtsgenerierung ist vorübergehend nicht verfügbar.', GENERATION_QUEUE_UNAVAILABLE: 'Der Generierungsdienst ist vorübergehend nicht verfügbar.', GENERATION_RATE_LIMITED: 'Zu viele Anfragen. Warte kurz und versuche es erneut.', REPORT_HAS_NO_CONTENT: 'Füge zuerst Notizen oder einen Anhang hinzu.', REPORT_HAS_PENDING_UPLOADS: 'Warte, bis alle Anhänge hochgeladen sind.', REPORT_HAS_REJECTED_ASSETS: 'Entferne abgelehnte Anhänge.', REPORT_NOT_EDITABLE: 'Dieser Bericht kann in seinem aktuellen Zustand nicht generiert werden.', REPORT_TEMPORARILY_LOCKED: 'Dieser Bericht ist nach wiederholten Fehlern vorübergehend gesperrt.', generic: 'Der Bericht konnte nicht generiert werden. Versuche es erneut.' },
+      failedDescription: 'Die Generierung ist fehlgeschlagen. Bearbeite die Quellen und versuche es erneut.', generate: 'Bericht generieren', generated: 'Bericht generiert', lock: { message: 'Dieser Bericht ist mehrfach fehlgeschlagen. Versuche es in {{minutes}} Minuten erneut.', title: 'Bericht vorübergehend nicht verfügbar' }, regenerate: 'Neu generieren', retry: 'Generierung wiederholen', stages: { analyzing: 'Anhänge analysieren…', completed: 'Abgeschlossen', creatingPdf: 'PDF erstellen…', finalizing: 'Abschließen…', generating: 'Bericht generieren…', preparing: 'Vorbereiten…', transcribing: 'Audio transkribieren…' }, startFailed: 'Generierung fehlgeschlagen', title: 'KI-Bericht',
+    },
     list: {
       emptyDescription: 'Erstellen Sie Ihren ersten Bericht, um Fortschritt und Notizen an einem Ort zu verwalten.',
       emptyTitle: 'Noch keine Berichte',
@@ -201,6 +211,7 @@ export const de: TranslationResources = {
       errorTitle: 'Berichte können nicht geladen werden',
       title: 'Berichte',
     },
+    output: { open: 'Bericht öffnen', openFailed: 'Bericht konnte nicht geöffnet werden', share: 'Bericht teilen', shareFailed: 'Bericht konnte nicht geteilt werden', tryAgain: 'Lade das PDF erneut und versuche es noch einmal.' },
     status: {
       draft: 'Entwurf',
       failed: 'Fehlgeschlagen',
