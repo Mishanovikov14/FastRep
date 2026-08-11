@@ -1,31 +1,23 @@
-import {
-  errorCodes,
-  isErrorWithCode,
-  keepLocalCopy,
-  pick,
-} from '@react-native-documents/picker';
-import RNFS from 'react-native-fs';
+import { errorCodes, isErrorWithCode, keepLocalCopy, pick } from '@react-native-documents/picker';
+import { Platform } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import type { Asset } from 'react-native-image-picker';
 
 import { reportAssetLimits, supportedAssetMimeTypes } from '@/entities/report/config/reportAssetLimits';
+import { ReportAttachmentError } from '@/entities/report/model/ReportAttachmentError';
 import { sanitizeAssetFileName } from '@/entities/report/model/reportAssetValidation';
+import {
+  getUriScheme,
+  logAttachmentStage,
+} from '@/entities/report/services/reportAttachmentDiagnostics';
+import {
+  cleanupOwnedLocalFile,
+  getReadableLocalFileSize,
+  normalizeLocalFilePath,
+  ReportLocalFileError,
+} from '@/entities/report/services/reportLocalFileService';
 import type { IReportAssetCandidate } from '@/entities/report/types/reportAsset';
 import { logger } from '@/libs/logger/logger';
-
-export type ReportFilePickerErrorCode =
-  | 'copy_failed'
-  | 'file_unreadable'
-  | 'heic_conversion_failed'
-  | 'picker_failed'
-  | 'unsupported_type';
-
-export class ReportFilePickerError extends Error {
-  constructor(public readonly code: ReportFilePickerErrorCode) {
-    super(code);
-    this.name = 'ReportFilePickerError';
-  }
-}
 
 const extensionByMimeType: Record<string, string> = {
   'application/pdf': 'pdf',
@@ -46,61 +38,56 @@ const mimeTypeByExtension = Object.fromEntries(
 );
 
 const getExtension = (fileName?: string): string | undefined => {
-  const match = fileName?.toLowerCase().match(/\.([a-z0-9]+)$/u);
+  const match = fileName?.toLowerCase().match(/\.([a-z0-9]+)(?:$|[?#])/u);
   return match?.[1];
 };
 
 const getMimeType = (mimeType?: string | null, fileName?: string): string | undefined => {
   const normalizedMimeType = mimeType?.toLowerCase();
-  const extensionMimeType = getExtension(fileName) ? mimeTypeByExtension[getExtension(fileName) as string] : undefined;
+  const extension = getExtension(fileName);
+  const extensionMimeType = extension ? mimeTypeByExtension[extension] : undefined;
 
   return normalizedMimeType && normalizedMimeType !== 'application/octet-stream'
     ? normalizedMimeType
     : extensionMimeType;
 };
 
-const getUriScheme = (uri: string): string => uri.match(/^([a-z][a-z0-9+.-]*):/iu)?.[1]?.toLowerCase() ?? 'path';
-
-const getStatSize = async (uri: string): Promise<number> => {
-  const path = uri.startsWith('file://') ? decodeURI(uri.slice('file://'.length)) : uri;
-  let stat;
-
+const assertReadableImageUri = (uri: string): void => {
   try {
-    stat = await RNFS.stat(path);
-  } catch {
-    throw new ReportFilePickerError('file_unreadable');
+    normalizeLocalFilePath(uri);
+  } catch (error) {
+    if (error instanceof ReportLocalFileError && error.code === 'URI_UNSUPPORTED') {
+      throw new ReportAttachmentError('IMAGE', 'IMAGE_URI_UNSUPPORTED', 'FILE_NORMALIZATION');
+    }
+
+    throw error;
   }
-
-  const size = Number(stat.size);
-
-  if (!Number.isFinite(size) || size <= 0) {
-    throw new ReportFilePickerError('file_unreadable');
-  }
-
-  return size;
 };
 
-const cleanupTemporaryFile = async (uri: string, assetType: 'DOCUMENT' | 'IMAGE'): Promise<void> => {
-  if (!uri.startsWith('file://')) {
-    return;
-  }
-
-  const path = decodeURI(uri.slice('file://'.length));
+const getImageSize = async (uri: string): Promise<number> => {
+  logAttachmentStage('IMAGE', 'FILE_STAT', { platform: Platform.OS, uriScheme: getUriScheme(uri) });
 
   try {
-    if (await RNFS.exists(path)) {
-      await RNFS.unlink(path);
-      logger.debug('report.picker_temporary_file_removed', { assetType, uriScheme: 'file' });
+    return await getReadableLocalFileSize(uri);
+  } catch (error) {
+    if (error instanceof ReportLocalFileError && error.code === 'URI_UNSUPPORTED') {
+      throw new ReportAttachmentError('IMAGE', 'IMAGE_URI_UNSUPPORTED', 'FILE_STAT');
     }
-  } catch {
-    logger.warn('report.picker_temporary_file_cleanup_failed', { assetType, uriScheme: 'file' });
+
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_FILE_UNREADABLE', 'FILE_STAT');
   }
 };
 
 const toImageCandidate = async (asset: Asset): Promise<IReportAssetCandidate> => {
   if (!asset.uri) {
-    throw new ReportFilePickerError('file_unreadable');
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_URI_MISSING', 'PICKER_RETURNED');
   }
+
+  logAttachmentStage('IMAGE', 'METADATA_NORMALIZING', {
+    platform: Platform.OS,
+    uriScheme: getUriScheme(asset.uri),
+  });
+  assertReadableImageUri(asset.uri);
 
   const declaredMimeType = asset.type?.toLowerCase();
   const mimeType = getMimeType(declaredMimeType, asset.fileName ?? asset.uri);
@@ -111,39 +98,30 @@ const toImageCandidate = async (asset: Asset): Promise<IReportAssetCandidate> =>
     declaredMimeType === 'image/heif' ||
     (!declaredMimeType && (extension === 'heic' || extension === 'heif'))
   ) {
-    logger.error('report.image_conversion_failed', { errorCode: 'heic_conversion_failed', source: 'image_picker' });
-    throw new ReportFilePickerError('heic_conversion_failed');
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_HEIC_CONVERSION_FAILED', 'METADATA_NORMALIZING');
   }
 
-  if (!mimeType || !(supportedAssetMimeTypes.IMAGE as readonly string[]).includes(mimeType)) {
-    throw new ReportFilePickerError('unsupported_type');
+  if (!mimeType) {
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_MIME_MISSING', 'METADATA_NORMALIZING');
   }
 
-  if (extension && (extension === 'heic' || extension === 'heif') && mimeType === 'image/jpeg') {
-    logger.info('report.image_conversion_completed', { assetType: 'IMAGE', mimeType, source: 'image_picker' });
+  if (!(supportedAssetMimeTypes.IMAGE as readonly string[]).includes(mimeType)) {
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_UNSUPPORTED_TYPE', 'METADATA_NORMALIZING');
   }
 
-  if (!asset.fileSize || asset.fileSize <= 0) {
-    logger.debug('report.image_file_stat_started', { assetType: 'IMAGE', uriScheme: getUriScheme(asset.uri) });
-  }
-  const size = asset.fileSize && asset.fileSize > 0 ? asset.fileSize : await getStatSize(asset.uri);
+  const size = await getImageSize(asset.uri);
   const resolvedExtension = extensionByMimeType[mimeType] ?? 'jpg';
   const originalFileName = asset.fileName ?? `photo-${Date.now()}.${resolvedExtension}`;
-  const resolvedFileName = extension === resolvedExtension
-    ? originalFileName
-    : `${originalFileName.replace(/\.[^.]+$/u, '')}.${resolvedExtension}`;
-
-  logger.debug('report.image_selected', {
-    assetType: 'IMAGE',
-    mimeType,
-    size,
-    uriScheme: getUriScheme(asset.uri),
-  });
+  const resolvedFileName =
+    extension === resolvedExtension
+      ? originalFileName
+      : `${originalFileName.replace(/\.[^.]+$/u, '')}.${resolvedExtension}`;
 
   return {
     fileName: sanitizeAssetFileName(resolvedFileName, resolvedExtension),
     height: asset.height,
     mimeType,
+    ownership: 'SYSTEM_OWNED',
     size,
     type: 'IMAGE',
     uri: asset.uri,
@@ -163,112 +141,156 @@ const imageOptions = {
 };
 
 export const pickReportImage = async (source: 'camera' | 'library'): Promise<IReportAssetCandidate | undefined> => {
-  logger.debug('report.image_picker_opened', { assetType: 'IMAGE', source });
+  logAttachmentStage('IMAGE', 'PICKER_OPENING', { platform: Platform.OS, source });
   let response;
 
   try {
     response = source === 'camera' ? await launchCamera(imageOptions) : await launchImageLibrary(imageOptions);
   } catch {
-    logger.error('report.image_picker_failed', { assetType: 'IMAGE', errorCode: 'picker_failed', source });
-    throw new ReportFilePickerError('picker_failed');
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_PICKER_FAILED', 'PICKER_OPENING');
   }
 
   if (response.didCancel) {
-    logger.debug('report.image_picker_cancelled', { assetType: 'IMAGE', source });
+    logAttachmentStage('IMAGE', 'PICKER_RETURNED', { platform: Platform.OS, source, status: 'cancelled' });
     return undefined;
   }
 
   if (response.errorCode) {
-    logger.error('report.image_picker_failed', { assetType: 'IMAGE', errorCode: response.errorCode, source });
-    throw new ReportFilePickerError('picker_failed');
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_PICKER_FAILED', 'PICKER_RETURNED');
   }
 
   const asset = response.assets?.[0];
+  logAttachmentStage('IMAGE', 'PICKER_RETURNED', {
+    declaredMimeType: asset?.type?.toLowerCase(),
+    hasFileName: Boolean(asset?.fileName),
+    hasFileSize: typeof asset?.fileSize === 'number' && asset.fileSize > 0,
+    hasUri: Boolean(asset?.uri),
+    height: asset?.height,
+    platform: Platform.OS,
+    source,
+    uriScheme: asset?.uri ? getUriScheme(asset.uri) : undefined,
+    width: asset?.width,
+  });
+
   if (!asset) {
-    logger.error('report.image_picker_failed', { assetType: 'IMAGE', errorCode: 'file_unreadable', source });
-    throw new ReportFilePickerError('file_unreadable');
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_URI_MISSING', 'PICKER_RETURNED');
   }
 
+  return toImageCandidate(asset);
+};
+
+const cleanupCopiedDocument = async (uri: string): Promise<void> => {
   try {
-    return await toImageCandidate(asset);
-  } catch (error) {
-    await cleanupTemporaryFile(asset.uri ?? '', 'IMAGE');
-    const errorCode = error instanceof ReportFilePickerError ? error.code : 'file_unreadable';
-    if (errorCode !== 'heic_conversion_failed') {
-      logger.error('report.image_picker_failed', { assetType: 'IMAGE', errorCode, source });
+    if (await cleanupOwnedLocalFile(uri, 'APP_TEMPORARY')) {
+      logger.debug('report.temporary_asset_removed', { assetType: 'DOCUMENT', uriScheme: getUriScheme(uri) });
     }
-    throw error instanceof ReportFilePickerError ? error : new ReportFilePickerError('file_unreadable');
+  } catch {
+    logger.warn('report.temporary_asset_cleanup_failed', {
+      assetType: 'DOCUMENT',
+      errorCode: 'DOCUMENT_FILE_UNREADABLE',
+      uriScheme: getUriScheme(uri),
+    });
   }
 };
 
 export const pickReportDocument = async (): Promise<IReportAssetCandidate | undefined> => {
-  logger.debug('report.document_picker_opened', { assetType: 'DOCUMENT' });
-  let copiedUri: string | undefined;
+  logAttachmentStage('DOCUMENT', 'PICKER_OPENING', { platform: Platform.OS });
+  let document;
 
   try {
-    const [document] = await pick({
+    [document] = await pick({
       allowMultiSelection: false,
       mode: 'import',
       type: [...supportedAssetMimeTypes.DOCUMENT],
     });
-
-    if (document.error || document.hasRequestedType === false) {
-      throw new ReportFilePickerError(document.hasRequestedType === false ? 'unsupported_type' : 'file_unreadable');
+  } catch (error) {
+    if (isErrorWithCode(error) && error.code === errorCodes.OPERATION_CANCELED) {
+      logAttachmentStage('DOCUMENT', 'PICKER_RETURNED', { platform: Platform.OS, status: 'cancelled' });
+      return undefined;
     }
 
-    const mimeType = getMimeType(document.type, document.name ?? undefined);
-    if (!mimeType || !(supportedAssetMimeTypes.DOCUMENT as readonly string[]).includes(mimeType)) {
-      throw new ReportFilePickerError('unsupported_type');
-    }
+    throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_PICKER_FAILED', 'PICKER_OPENING');
+  }
 
-    const extension = extensionByMimeType[mimeType] ?? 'bin';
-    const fileName = sanitizeAssetFileName(document.name ?? `document-${Date.now()}.${extension}`, extension);
-    logger.debug('report.document_cache_copy_started', {
-      assetType: 'DOCUMENT',
-      mimeType,
-      uriScheme: getUriScheme(document.uri),
-    });
+  logAttachmentStage('DOCUMENT', 'PICKER_RETURNED', {
+    declaredMimeType: document?.type ?? undefined,
+    hasFileName: Boolean(document?.name),
+    hasFileSize: typeof document?.size === 'number' && document.size > 0,
+    hasUri: Boolean(document?.uri),
+    platform: Platform.OS,
+    uriScheme: document?.uri ? getUriScheme(document.uri) : undefined,
+  });
+
+  if (!document?.uri) {
+    throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_URI_MISSING', 'PICKER_RETURNED');
+  }
+
+  if (document.error) {
+    throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_PICKER_FAILED', 'PICKER_RETURNED');
+  }
+
+  logAttachmentStage('DOCUMENT', 'METADATA_NORMALIZING', {
+    platform: Platform.OS,
+    uriScheme: getUriScheme(document.uri),
+  });
+  const mimeType = getMimeType(document.type, document.name ?? undefined);
+
+  if (!mimeType) {
+    throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_MIME_MISSING', 'METADATA_NORMALIZING');
+  }
+
+  if (
+    document.hasRequestedType === false ||
+    !(supportedAssetMimeTypes.DOCUMENT as readonly string[]).includes(mimeType)
+  ) {
+    throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_UNSUPPORTED_TYPE', 'METADATA_NORMALIZING');
+  }
+
+  const extension = extensionByMimeType[mimeType] ?? 'bin';
+  const fileName = sanitizeAssetFileName(document.name ?? `document-${Date.now()}.${extension}`, extension);
+  logAttachmentStage('DOCUMENT', 'FILE_NORMALIZATION', {
+    platform: Platform.OS,
+    uriScheme: getUriScheme(document.uri),
+  });
+  let copiedUri: string | undefined;
+
+  try {
     const [copy] = await keepLocalCopy({
       destination: 'cachesDirectory',
       files: [{ fileName, uri: document.uri }],
     });
 
-    if (copy.status !== 'success') {
-      throw new ReportFilePickerError('copy_failed');
+    if (copy.status !== 'success' || !copy.localUri) {
+      throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_COPY_FAILED', 'FILE_NORMALIZATION');
     }
 
     copiedUri = copy.localUri;
-    logger.debug('report.document_cache_copy_completed', {
-      assetType: 'DOCUMENT',
-      mimeType,
-      uriScheme: getUriScheme(copy.localUri),
-    });
-    const size = await getStatSize(copy.localUri);
-    logger.debug('report.document_selected', {
-      assetType: 'DOCUMENT',
-      mimeType,
-      size,
-      uriScheme: getUriScheme(copy.localUri),
-    });
+  } catch (error) {
+    if (error instanceof ReportAttachmentError) {
+      throw error;
+    }
+
+    throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_COPY_FAILED', 'FILE_NORMALIZATION');
+  }
+
+  logAttachmentStage('DOCUMENT', 'FILE_STAT', {
+    platform: Platform.OS,
+    uriScheme: getUriScheme(copiedUri),
+  });
+
+  try {
+    const size = await getReadableLocalFileSize(copiedUri);
 
     return {
       fileName,
       mimeType,
+      ownership: 'APP_TEMPORARY',
       size,
       type: 'DOCUMENT',
-      uri: copy.localUri,
+      uri: copiedUri,
     };
-  } catch (error) {
-    if (isErrorWithCode(error) && error.code === errorCodes.OPERATION_CANCELED) {
-      logger.debug('report.document_picker_cancelled', { assetType: 'DOCUMENT' });
-      return undefined;
-    }
-
-    if (copiedUri) {
-      await cleanupTemporaryFile(copiedUri, 'DOCUMENT');
-    }
-    const errorCode = error instanceof ReportFilePickerError ? error.code : 'picker_failed';
-    logger.error('report.document_picker_failed', { assetType: 'DOCUMENT', errorCode });
-    throw error instanceof ReportFilePickerError ? error : new ReportFilePickerError('picker_failed');
+  } catch {
+    await cleanupCopiedDocument(copiedUri);
+    throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_FILE_UNREADABLE', 'FILE_STAT');
   }
 };

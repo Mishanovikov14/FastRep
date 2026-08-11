@@ -31,6 +31,7 @@ describe('report audio recording service', () => {
     await expect(stopReportAudioRecording(12.5)).resolves.toMatchObject({
       durationSeconds: 12.5,
       mimeType: 'audio/x-m4a',
+      ownership: 'APP_TEMPORARY',
       size: 4096,
       type: 'AUDIO',
       uri: 'file:///cache/recording.m4a',
@@ -40,6 +41,7 @@ describe('report audio recording service', () => {
       expect.objectContaining({ AudioEncodingBitRate: 128000, AudioSamplingRate: 44100 }),
     );
     expect(RNFS.stat).toHaveBeenCalledWith('/cache/recording.m4a');
+    expect(RNFS.write).toHaveBeenCalledWith('/cache/recording.m4a', 'M4A ', 8, 'ascii');
   });
 
   it('returns false when microphone permission is denied', async () => {
@@ -53,7 +55,7 @@ describe('report audio recording service', () => {
     (Sound.startRecorder as jest.Mock).mockRejectedValue(new Error('native start failed'));
     (RNFS.exists as jest.Mock).mockResolvedValue(true);
 
-    await expect(startReportAudioRecording(jest.fn())).rejects.toThrow('recording_start_failed');
+    await expect(startReportAudioRecording(jest.fn())).rejects.toMatchObject({ code: 'AUDIO_RECORDER_START_FAILED' });
     expect(Sound.removeRecordBackListener).toHaveBeenCalled();
     expect(RNFS.unlink).toHaveBeenCalledWith(expect.stringMatching(/^\/cache\/FastRep-recording-\d+\.m4a$/u));
   });
@@ -61,21 +63,38 @@ describe('report audio recording service', () => {
   it('removes the progress listener when the native stop operation fails', async () => {
     (Sound.stopRecorder as jest.Mock).mockRejectedValue(new Error('native stop failed'));
 
-    await expect(stopReportAudioRecording(4)).rejects.toThrow('native stop failed');
+    await expect(stopReportAudioRecording(4)).rejects.toMatchObject({ code: 'AUDIO_RECORDER_STOP_FAILED' });
     expect(Sound.removeRecordBackListener).toHaveBeenCalled();
   });
 
   it('rejects missing or empty recorder output paths', async () => {
     (Sound.stopRecorder as jest.Mock).mockResolvedValue('');
 
-    await expect(stopReportAudioRecording(1)).rejects.toThrow('recording_path_missing');
+    await expect(stopReportAudioRecording(1)).rejects.toMatchObject({ code: 'AUDIO_PATH_MISSING' });
+  });
+
+  it('accepts the native absolute recorder path format', async () => {
+    (Sound.stopRecorder as jest.Mock).mockResolvedValue('/cache/recording.m4a');
+
+    await expect(stopReportAudioRecording(3)).resolves.toMatchObject({
+      ownership: 'APP_TEMPORARY',
+      uri: 'file:///cache/recording.m4a',
+    });
+    expect(RNFS.stat).toHaveBeenCalledWith('/cache/recording.m4a');
+  });
+
+  it('rejects a recorder output that is not a real M4A container', async () => {
+    (RNFS.read as jest.Mock).mockResolvedValueOnce('not-an-m');
+
+    await expect(stopReportAudioRecording(3)).rejects.toMatchObject({ code: 'AUDIO_INVALID_OUTPUT' });
+    expect(RNFS.stat).not.toHaveBeenCalled();
   });
 
   it('cleans an unreadable normalized output file', async () => {
     (RNFS.stat as jest.Mock).mockRejectedValue(new Error('stat failed'));
     (RNFS.exists as jest.Mock).mockResolvedValue(true);
 
-    await expect(stopReportAudioRecording(4)).rejects.toThrow('recording_file_unreadable');
+    await expect(stopReportAudioRecording(4)).rejects.toMatchObject({ code: 'AUDIO_FILE_UNREADABLE' });
     expect(RNFS.stat).toHaveBeenCalledWith('/cache/recording.m4a');
     expect(RNFS.unlink).toHaveBeenCalledWith('/cache/recording.m4a');
   });
@@ -84,7 +103,7 @@ describe('report audio recording service', () => {
     (RNFS.stat as jest.Mock).mockResolvedValue({ size: 0 });
     (RNFS.exists as jest.Mock).mockResolvedValue(true);
 
-    await expect(stopReportAudioRecording(4)).rejects.toThrow('recording_file_empty');
+    await expect(stopReportAudioRecording(4)).rejects.toMatchObject({ code: 'AUDIO_FILE_UNREADABLE' });
     expect(RNFS.unlink).toHaveBeenCalledWith('/cache/recording.m4a');
   });
 

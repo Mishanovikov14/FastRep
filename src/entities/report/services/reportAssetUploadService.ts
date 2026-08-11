@@ -1,5 +1,16 @@
 import type { IPresignedPostContract } from '@/entities/report/types/reportAsset';
-import { logger } from '@/libs/logger/logger';
+
+export type ReportStorageUploadFailureType = 'http_error' | 'network_error' | 'timeout_error';
+
+export class ReportStorageUploadError extends Error {
+  constructor(
+    public readonly failureType: ReportStorageUploadFailureType,
+    public readonly httpStatus?: number,
+  ) {
+    super(failureType);
+    this.name = 'ReportStorageUploadError';
+  }
+}
 
 interface IUploadInput {
   contract: IPresignedPostContract;
@@ -17,11 +28,6 @@ export const uploadReportAssetToStorage = ({
   uri,
 }: IUploadInput): Promise<void> => {
   return new Promise((resolve, reject) => {
-    logger.info('report.asset_upload_started', {
-      mimeType,
-      operation: 'presigned_post',
-      uriScheme: uri.match(/^([a-z][a-z0-9+.-]*):/iu)?.[1]?.toLowerCase() ?? 'path',
-    });
     const formData = new FormData();
 
     Object.entries(contract.fields).forEach(([key, value]) => formData.append(key, value));
@@ -35,34 +41,25 @@ export const uploadReportAssetToStorage = ({
     );
 
     const request = new XMLHttpRequest();
-    let lastLoggedProgress = 0;
     request.open(contract.method, contract.url);
     request.upload.onprogress = ({ lengthComputable, loaded, total }) => {
       if (lengthComputable && total > 0) {
         const progress = Math.round((loaded / total) * 100);
         onProgress(progress);
-        if (progress >= lastLoggedProgress + 25 && progress < 100) {
-          lastLoggedProgress = progress;
-          logger.debug('report.asset_upload_progress', { mimeType, progress });
-        }
       }
     };
     request.onerror = () => {
-      logger.error('report.asset_upload_failed', { errorCode: 'network_error', mimeType });
-      reject(new Error('presigned_upload_failed'));
+      reject(new ReportStorageUploadError('network_error'));
     };
     request.ontimeout = () => {
-      logger.error('report.asset_upload_failed', { errorCode: 'timeout_error', mimeType });
-      reject(new Error('presigned_upload_timeout'));
+      reject(new ReportStorageUploadError('timeout_error'));
     };
     request.onload = () => {
       if (request.status >= 200 && request.status < 300) {
         onProgress(100);
-        logger.info('report.asset_upload_completed', { httpStatus: request.status, mimeType, progress: 100 });
         resolve();
       } else {
-        logger.error('report.asset_upload_failed', { httpStatus: request.status, mimeType });
-        reject(new Error(`presigned_upload_status_${request.status}`));
+        reject(new ReportStorageUploadError('http_error', request.status));
       }
     };
     request.timeout = 120_000;

@@ -8,6 +8,16 @@ import Sound, {
 } from 'react-native-nitro-sound';
 import { PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 
+import { ReportAttachmentError } from '@/entities/report/model/ReportAttachmentError';
+import {
+  getUriScheme,
+  logAttachmentStage,
+} from '@/entities/report/services/reportAttachmentDiagnostics';
+import {
+  cleanupOwnedLocalFile,
+  getReadableLocalFileSize,
+  normalizeLocalFilePath,
+} from '@/entities/report/services/reportLocalFileService';
 import type { IReportAssetCandidate } from '@/entities/report/types/reportAsset';
 import { logger } from '@/libs/logger/logger';
 
@@ -15,39 +25,58 @@ const getRecordingPath = (): string => `${RNFS.CachesDirectoryPath}/FastRep-reco
 
 let activeRecordingPath: string | undefined;
 
-const cleanupRecordingFile = async (path: string): Promise<void> => {
+const normalizeM4AContainerBrand = async (path: string): Promise<void> => {
   try {
-    if (await RNFS.exists(path)) {
-      await RNFS.unlink(path);
+    const fileTypeHeader = await RNFS.read(path, 8, 4, 'ascii');
+
+    if (!fileTypeHeader.startsWith('ftyp')) {
+      throw new Error('invalid_container');
+    }
+
+    const majorBrand = fileTypeHeader.slice(4, 8);
+
+    if (majorBrand === 'mp42' || majorBrand === 'isom') {
+      await RNFS.write(path, 'M4A ', 8, 'ascii');
+    }
+
+    const normalizedBrand = await RNFS.read(path, 4, 8, 'ascii');
+    if (normalizedBrand !== 'M4A ') {
+      throw new Error('invalid_m4a_brand');
     }
   } catch {
-    logger.warn('report.audio_recording_cleanup_failed', { assetType: 'AUDIO', uriScheme: 'file' });
+    throw new ReportAttachmentError('AUDIO', 'AUDIO_INVALID_OUTPUT', 'FILE_NORMALIZATION');
+  }
+};
+
+const cleanupRecordingFile = async (path: string): Promise<void> => {
+  try {
+    await cleanupOwnedLocalFile(path, 'APP_TEMPORARY');
+  } catch {
+    logger.warn('report.temporary_asset_cleanup_failed', {
+      assetType: 'AUDIO',
+      errorCode: 'AUDIO_FILE_UNREADABLE',
+      uriScheme: getUriScheme(path),
+    });
   }
 };
 
 export const requestMicrophonePermission = async (): Promise<boolean> => {
+  logAttachmentStage('AUDIO', 'PERMISSION_REQUEST', { platform: Platform.OS });
   const permission = Platform.OS === 'ios' ? PERMISSIONS.IOS.MICROPHONE : PERMISSIONS.ANDROID.RECORD_AUDIO;
   const result = await request(permission);
-  const isGranted = result === RESULTS.GRANTED || result === RESULTS.LIMITED;
 
-  logger.debug('report.audio_permission_result', {
-    assetType: 'AUDIO',
-    platform: Platform.OS,
-    source: isGranted ? 'granted' : 'denied',
-  });
-
-  return isGranted;
+  return result === RESULTS.GRANTED || result === RESULTS.LIMITED;
 };
 
 export const startReportAudioRecording = async (onProgress: (seconds: number) => void): Promise<void> => {
   const recordingPath = getRecordingPath();
   activeRecordingPath = recordingPath;
-  logger.debug('report.audio_recording_starting', { assetType: 'AUDIO', platform: Platform.OS });
+  logAttachmentStage('AUDIO', 'RECORDER_START', { platform: Platform.OS });
 
   try {
     Sound.setSubscriptionDuration(0.25);
     Sound.addRecordBackListener((metadata) => onProgress(metadata.currentPosition / 1_000));
-    await Sound.startRecorder(activeRecordingPath, {
+    await Sound.startRecorder(recordingPath, {
       AudioEncoderAndroid: AudioEncoderAndroidType.AAC,
       AudioEncodingBitRate: 128_000,
       AudioSamplingRate: 44_100,
@@ -56,66 +85,71 @@ export const startReportAudioRecording = async (onProgress: (seconds: number) =>
       AVFormatIDKeyIOS: 'aac',
       OutputFormatAndroid: OutputFormatAndroidType.MPEG_4,
     });
-    logger.info('report.audio_recording_started', { assetType: 'AUDIO', platform: Platform.OS });
+    logAttachmentStage('AUDIO', 'RECORDING', { platform: Platform.OS });
   } catch {
     Sound.removeRecordBackListener();
     await cleanupRecordingFile(recordingPath);
     activeRecordingPath = undefined;
-    logger.error('report.audio_recording_start_failed', { assetType: 'AUDIO', platform: Platform.OS });
-    throw new Error('recording_start_failed');
+    throw new ReportAttachmentError('AUDIO', 'AUDIO_RECORDER_START_FAILED', 'RECORDER_START');
   }
 };
 
 export const stopReportAudioRecording = async (durationSeconds: number): Promise<IReportAssetCandidate> => {
-  let path: string;
+  logAttachmentStage('AUDIO', 'RECORDER_STOP', { platform: Platform.OS });
+  let returnedPath: string;
 
   try {
-    path = await Sound.stopRecorder();
+    returnedPath = await Sound.stopRecorder();
+  } catch {
+    if (activeRecordingPath) {
+      await cleanupRecordingFile(activeRecordingPath);
+    }
+    activeRecordingPath = undefined;
+    throw new ReportAttachmentError('AUDIO', 'AUDIO_RECORDER_STOP_FAILED', 'RECORDER_STOP');
   } finally {
     Sound.removeRecordBackListener();
   }
 
-  const normalizedPath = path.startsWith('file://') ? decodeURI(path.slice('file://'.length)) : path || activeRecordingPath;
+  const path = returnedPath || activeRecordingPath;
 
-  if (!normalizedPath) {
-    logger.error('report.audio_recording_stop_failed', { assetType: 'AUDIO', errorCode: 'recording_path_missing' });
-    throw new Error('recording_path_missing');
+  if (!path) {
+    activeRecordingPath = undefined;
+    throw new ReportAttachmentError('AUDIO', 'AUDIO_PATH_MISSING', 'RECORDER_STOP');
   }
 
+  logAttachmentStage('AUDIO', 'FILE_NORMALIZATION', {
+    platform: Platform.OS,
+    uriScheme: getUriScheme(path),
+  });
+  let normalizedPath: string;
+
+  try {
+    normalizedPath = normalizeLocalFilePath(path);
+    await normalizeM4AContainerBrand(normalizedPath);
+  } catch {
+    await cleanupRecordingFile(path);
+    activeRecordingPath = undefined;
+    throw new ReportAttachmentError('AUDIO', 'AUDIO_INVALID_OUTPUT', 'FILE_NORMALIZATION');
+  }
+
+  logAttachmentStage('AUDIO', 'FILE_STAT', { platform: Platform.OS, uriScheme: 'file' });
   let size: number;
 
   try {
-    logger.debug('report.audio_file_stat_started', { assetType: 'AUDIO', uriScheme: 'file' });
-    const stat = await RNFS.stat(normalizedPath);
-    size = Number(stat.size);
+    size = await getReadableLocalFileSize(normalizedPath);
   } catch {
     await cleanupRecordingFile(normalizedPath);
     activeRecordingPath = undefined;
-    logger.error('report.audio_recording_stop_failed', { assetType: 'AUDIO', errorCode: 'recording_file_unreadable' });
-    throw new Error('recording_file_unreadable');
-  }
-
-  if (!Number.isFinite(size) || size <= 0) {
-    await cleanupRecordingFile(normalizedPath);
-    activeRecordingPath = undefined;
-    logger.error('report.audio_recording_stop_failed', { assetType: 'AUDIO', errorCode: 'recording_file_empty' });
-    throw new Error('recording_file_empty');
+    throw new ReportAttachmentError('AUDIO', 'AUDIO_FILE_UNREADABLE', 'FILE_STAT');
   }
 
   activeRecordingPath = undefined;
-
-  logger.info('report.audio_recording_stopped', {
-    assetType: 'AUDIO',
-    durationSeconds,
-    mimeType: 'audio/x-m4a',
-    size,
-    uriScheme: 'file',
-  });
 
   return {
     durationSeconds,
     fileName: `recording-${Date.now()}.m4a`,
     mimeType: 'audio/x-m4a',
+    ownership: 'APP_TEMPORARY',
     size,
     type: 'AUDIO',
     uri: `file://${normalizedPath}`,
@@ -136,5 +170,5 @@ export const cancelReportAudioRecording = async (): Promise<void> => {
   }
 
   activeRecordingPath = undefined;
-  logger.debug('report.audio_recording_cancelled', { assetType: 'AUDIO' });
+  logAttachmentStage('AUDIO', 'RECORDER_STOP', { platform: Platform.OS, status: 'cancelled' });
 };

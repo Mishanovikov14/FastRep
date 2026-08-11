@@ -1,13 +1,13 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useAppSafeAreaInsets } from '@/hooks/useAppSafeAreaInsets';
 import { scaleVertical } from '@/utils/scaling';
 
 const KEYBOARD_SCROLL_GAP = scaleVertical(16);
 
 export const useKeyboardStickyLayout = () => {
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useAppSafeAreaInsets();
   const [stickyHeight, setStickyHeight] = useState(0);
 
   const onStickyLayout = useCallback((event: LayoutChangeEvent) => {
