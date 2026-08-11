@@ -126,6 +126,7 @@ describe('report file picker service', () => {
     mockStat.mockResolvedValue({ size: 8192 });
 
     await expect(pickReportDocument()).resolves.toEqual({
+      displayName: 'inspection.pdf',
       fileName: 'inspection.pdf',
       mimeType: 'application/pdf',
       ownership: 'APP_TEMPORARY',

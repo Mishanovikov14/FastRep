@@ -4,6 +4,7 @@ import ReactTestRenderer from 'react-test-renderer';
 import { v4 as uuidv4 } from 'uuid';
 
 import type { IReport } from '@/entities/report/types/report';
+import { toastService } from '@/libs/toast/toastService';
 import {
   refreshGenerationResources,
   useCancelReportGenerationMutation,
@@ -169,5 +170,39 @@ describe('report generation idempotency', () => {
 
     expect(mutateAsync).toHaveBeenNthCalledWith(1, 'first-generation-key');
     expect(mutateAsync).toHaveBeenNthCalledWith(2, 'regeneration-key');
+  });
+
+  it('intercepts generation and explains rejected attachments before a backend call', async () => {
+    ReactTestRenderer.act(() => renderer?.unmount());
+    const onRejectedAssetsBlocked = jest.fn();
+    const warningSpy = jest.spyOn(toastService, 'showWarning');
+
+    const RejectedHarness = () => {
+      presenter = useReportGenerationPresenter({
+        hasReadyAssets: false,
+        hasRejectedAssets: true,
+        hasUnresolvedAssets: false,
+        onRejectedAssetsBlocked,
+        report,
+        t,
+      });
+      return null;
+    };
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<RejectedHarness />);
+      await Promise.resolve();
+    });
+    await ReactTestRenderer.act(async () => {
+      await presenter?.onStartGeneration();
+    });
+
+    expect(mutateAsync).not.toHaveBeenCalled();
+    expect(onRejectedAssetsBlocked).toHaveBeenCalledTimes(1);
+    expect(warningSpy).toHaveBeenCalledWith(
+      'reports.attachments.attentionRequired',
+      'reports.generation.rejectedAttachments',
+    );
+    warningSpy.mockRestore();
   });
 });

@@ -1,9 +1,12 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { TFunction } from 'i18next';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
+import type { LayoutChangeEvent } from 'react-native';
+import type { KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 
 import { ReportRequestError } from '@/entities/report/model/ReportRequestError';
+import { getReportDisplayTitle } from '@/entities/report/model/reportDisplayNames';
 import { logger } from '@/libs/logger/logger';
 import type { SupportedLanguage } from '@/localization/types';
 import { toastService } from '@/libs/toast/toastService';
@@ -19,6 +22,7 @@ import type { ICustomAlertAction } from '@/UIKit/CustomAlert/types';
 import { formatLocalizedDate } from '@/utils/formatLocalizedDate';
 
 import { useReportAttachmentsPresenter } from './useReportAttachmentsPresenter';
+import { useReportAttachmentAccessPresenter } from './useReportAttachmentAccessPresenter';
 import { useReportGenerationPresenter } from './useReportGenerationPresenter';
 
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'ReportDetails'>;
@@ -31,6 +35,8 @@ interface IInput {
 
 export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput) => {
   const navigation = useNavigation<Navigation>();
+  const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
+  const attachmentsOffsetRef = useRef(0);
   const query = useReportDetailsQuery(reportId);
   const deleteMutation = useDeleteReportMutation(reportId);
   const {
@@ -48,9 +54,23 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
   };
   const canEditSources = query.data?.status === 'DRAFT' || query.data?.status === 'FAILED';
   const attachments = useReportAttachmentsPresenter({ canEdit: canEditSources, reportId, t });
+  const attachmentAccess = useReportAttachmentAccessPresenter({
+    assets: attachments.assets,
+    onDeleteAsset: attachments.onRemoveServerAsset,
+    reportId,
+    t,
+  });
+  const onAttachmentsLayout = useCallback((event: LayoutChangeEvent) => {
+    attachmentsOffsetRef.current = event.nativeEvent.layout.y;
+  }, []);
+  const onRejectedAssetsBlocked = useCallback(() => {
+    scrollRef.current?.scrollTo({ animated: true, y: Math.max(0, attachmentsOffsetRef.current - 16) });
+  }, []);
   const generation = useReportGenerationPresenter({
     hasReadyAssets: attachments.hasReadyAssets,
+    hasRejectedAssets: attachments.hasRejectedAssets,
     hasUnresolvedAssets: attachments.hasUnresolvedAssets,
+    onRejectedAssetsBlocked,
     report: reportForGeneration,
     t,
   });
@@ -134,9 +154,11 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     () => (query.data ? formatLocalizedDate(query.data.updatedAt, language) : undefined),
     [language, query.data],
   );
+  const reportTitle = getReportDisplayTitle(query.data?.title ?? '', String(t('reports.fallbackTitle')));
 
   return {
     attachments,
+    attachmentAccess,
     createdAtLabel,
     deleteActions,
     isDeleteConfirmationVisible,
@@ -150,9 +172,12 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     onEdit,
     onHideDeleteConfirmation,
     onRefresh,
+    onAttachmentsLayout,
     onRetry,
     onShowDeleteConfirmation,
     report: query.data,
+    reportTitle,
+    scrollRef,
     generation,
     updatedAtLabel,
   };

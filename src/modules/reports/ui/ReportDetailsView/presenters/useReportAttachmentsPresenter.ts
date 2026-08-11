@@ -12,6 +12,7 @@ import {
 } from '@/entities/report/API/reportAssetsApi';
 import { reportAssetLimits } from '@/entities/report/config/reportAssetLimits';
 import { ReportAttachmentError } from '@/entities/report/model/ReportAttachmentError';
+import { getLocalReportAssetDisplayName } from '@/entities/report/model/reportDisplayNames';
 import { reportsQueryKeys } from '@/entities/report/model/reportQueryKeys';
 import { validateReportAssetCandidate } from '@/entities/report/model/reportAssetValidation';
 import {
@@ -25,6 +26,9 @@ import {
   logAttachmentFailure,
   logAttachmentStage,
 } from '@/entities/report/services/reportAttachmentDiagnostics';
+import {
+  removeReportAssetCache,
+} from '@/entities/report/services/reportAssetAccessService';
 import {
   ReportStorageUploadError,
   uploadReportAssetToStorage,
@@ -130,6 +134,9 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
   const isMountedRef = useRef(true);
   const isRecordingRef = useRef(false);
   const isStoppingRecordingRef = useRef(false);
+  const activeDeleteIdsRef = useRef(new Set<string>());
+  const rejectedAudioRetryIdRef = useRef<string | undefined>(undefined);
+  const [retryingRejectedAssetId, setRetryingRejectedAssetId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -161,6 +168,36 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
       );
     },
     [t],
+  );
+
+  const deleteServerAsset = useCallback(
+    async (assetId: string): Promise<boolean> => {
+      if (activeDeleteIdsRef.current.has(assetId)) {
+        return false;
+      }
+
+      activeDeleteIdsRef.current.add(assetId);
+      try {
+        const response = await deleteMutation.mutateAsync(assetId);
+        if (response.isError && response.status !== 404) {
+          logger.warn('report.attachment_delete_failed', { httpStatus: response.status });
+          toastService.showError(String(t('reports.attachments.removeFailed')));
+          return false;
+        }
+
+        await removeReportAssetCache(assetId).catch(() => {
+          logger.warn('report.asset_cache_cleanup_failed', { errorCode: 'local_exception' });
+        });
+        return true;
+      } catch {
+        logger.error('report.attachment_delete_failed', { errorCode: 'local_exception' });
+        toastService.showError(String(t('reports.attachments.removeFailed')));
+        return false;
+      } finally {
+        activeDeleteIdsRef.current.delete(assetId);
+      }
+    },
+    [deleteMutation, t],
   );
 
   const onUpload = useCallback(
@@ -210,7 +247,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
           updateLocalAsset(asset.id, { errorCode: undefined, status: 'REQUESTING_UPLOAD' });
           logAttachmentStage(asset.type, stage, { platform: Platform.OS });
           const response = await requestReportAssetUpload(reportId, {
-            fileName: asset.fileName,
+            fileName: asset.displayName,
             mimeType: asset.mimeType,
             size: asset.size,
             type: asset.type,
@@ -280,11 +317,23 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
             status: confirmResponse.data?.status ?? confirmResponse.type,
           });
           const shouldRestartUpload = confirmResponse.status === 404 || confirmResponse.status === 410;
-          updateLocalAsset(asset.id, {
-            errorCode,
-            status: 'FAILED',
-            uploadRequest: shouldRestartUpload ? undefined : uploadRequest,
-          });
+          const isDeterministicRejection =
+            confirmResponse.data?.status === 'REJECTED' ||
+            ((confirmResponse.status ?? 0) >= 400 &&
+              (confirmResponse.status ?? 0) < 500 &&
+              !shouldRestartUpload);
+
+          if (isDeterministicRejection) {
+            setLocalAssets((current) => current.filter((item) => item.id !== asset.id));
+            await cleanupTemporaryAsset(asset);
+            await queryClient.invalidateQueries({ queryKey: reportsQueryKeys.assets(reportId) });
+          } else {
+            updateLocalAsset(asset.id, {
+              errorCode,
+              status: 'FAILED',
+              uploadRequest: shouldRestartUpload ? undefined : uploadRequest,
+            });
+          }
           toastService.showError(
             String(t('reports.attachments.confirmFailed')),
             getDevelopmentErrorDescription(errorCode, String(t('reports.attachments.tryAgain'))),
@@ -329,7 +378,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
   const onAddCandidate = useCallback(
     (candidate: IReportAssetCandidate | undefined) => {
       if (!candidate) {
-        return;
+        return false;
       }
 
       logAttachmentStage(candidate.type, 'VALIDATING', { platform: Platform.OS });
@@ -365,6 +414,15 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
 
       const localAsset: ILocalReportAsset = {
         ...candidate,
+        displayName: getLocalReportAssetDisplayName(
+          candidate,
+          Math.max(-1, ...(assetsQuery.data ?? []).map((asset) => asset.position)) + localAssets.length + 2,
+          {
+            audioRecording: String(t('reports.attachments.audioRecordingName')),
+            file: String(t('reports.attachments.fileName')),
+            photo: String(t('reports.attachments.photoName')),
+          },
+        ),
         id,
         progress: 0,
         status: 'LOCAL',
@@ -440,7 +498,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
     }
   }, [onAddCandidate, showPickerFailure]);
 
-  const onStartRecording = useCallback(async () => {
+  const onStartRecording = useCallback(async (): Promise<boolean> => {
     try {
       if (!(await requestMicrophonePermission())) {
         const error = new ReportAttachmentError('AUDIO', 'AUDIO_PERMISSION_DENIED', 'PERMISSION_REQUEST');
@@ -449,7 +507,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
           String(t('reports.attachments.permissionTitle')),
           getDevelopmentErrorDescription(error.code, String(t('reports.attachments.microphonePermission'))),
         );
-        return;
+        return false;
       }
 
       setRecordingDuration(0);
@@ -462,9 +520,10 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
       if (!isMountedRef.current) {
         await cancelReportAudioRecording();
         isRecordingRef.current = false;
-        return;
+        return false;
       }
       setIsRecording(true);
+      return true;
     } catch (error) {
       isRecordingRef.current = false;
       setIsRecording(false);
@@ -477,6 +536,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
         String(t('reports.attachments.recordingFailed')),
         getDevelopmentErrorDescription(attachmentError.code),
       );
+      return false;
     }
   }, [t]);
 
@@ -490,6 +550,15 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
       const candidate = await stopReportAudioRecording(recordingDuration);
       isRecordingRef.current = false;
       setIsRecording(false);
+      const rejectedAssetId = rejectedAudioRetryIdRef.current;
+      rejectedAudioRetryIdRef.current = undefined;
+      if (rejectedAssetId) {
+        const wasDeleted = await deleteServerAsset(rejectedAssetId);
+        if (!wasDeleted) {
+          await cleanupTemporaryAsset(candidate);
+          return;
+        }
+      }
       onAddCandidate(candidate);
     } catch (error) {
       isRecordingRef.current = false;
@@ -510,9 +579,11 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
         getDevelopmentErrorDescription(attachmentError.code),
       );
     } finally {
+      rejectedAudioRetryIdRef.current = undefined;
+      setRetryingRejectedAssetId(undefined);
       isStoppingRecordingRef.current = false;
     }
-  }, [onAddCandidate, recordingDuration, t]);
+  }, [deleteServerAsset, onAddCandidate, recordingDuration, t]);
 
   useEffect(() => {
     if (isRecording && recordingDuration >= reportAssetLimits.audioMaxDurationSeconds) {
@@ -531,6 +602,8 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
         getDevelopmentErrorDescription(error.code),
       );
     } finally {
+      rejectedAudioRetryIdRef.current = undefined;
+      setRetryingRejectedAssetId(undefined);
       isRecordingRef.current = false;
       setIsRecording(false);
       setRecordingDuration(0);
@@ -564,19 +637,62 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
   }, []);
 
   const onRemoveServerAsset = useCallback(
+    (assetId: string): Promise<boolean> => deleteServerAsset(assetId),
+    [deleteServerAsset],
+  );
+
+  const onRetryRejectedAsset = useCallback(
     async (assetId: string) => {
+      if (retryingRejectedAssetId) {
+        return;
+      }
+
+      const asset = assetsQuery.data?.find((item) => item.id === assetId && item.status === 'REJECTED');
+      if (!asset) {
+        return;
+      }
+
+      setRetryingRejectedAssetId(assetId);
       try {
-        const response = await deleteMutation.mutateAsync(assetId);
-        if (response.isError && response.status !== 404) {
-          logger.warn('report.asset_remove_failed', { httpStatus: response.status });
-          toastService.showError(String(t('reports.attachments.removeFailed')));
+        if (asset.type === 'AUDIO') {
+          rejectedAudioRetryIdRef.current = assetId;
+          if (!(await onStartRecording())) {
+            rejectedAudioRetryIdRef.current = undefined;
+            setRetryingRejectedAssetId(undefined);
+          }
+          return;
         }
-      } catch {
-        logger.error('report.asset_remove_failed', { errorCode: 'local_exception' });
-        toastService.showError(String(t('reports.attachments.removeFailed')));
+
+        const candidate = asset.type === 'IMAGE' ? await pickReportImage('library') : await pickReportDocument();
+        if (!candidate) {
+          return;
+        }
+
+        if (!(await deleteServerAsset(assetId))) {
+          await cleanupTemporaryAsset(candidate);
+          return;
+        }
+
+        onAddCandidate(candidate);
+      } catch (error) {
+        logger.warn('report.attachment_retry_failed', { assetType: asset.type, errorCode: 'picker_failed' });
+        if (asset.type !== 'AUDIO') {
+          showPickerFailure(error, asset.type);
+        }
+      } finally {
+        if (asset.type !== 'AUDIO' || !rejectedAudioRetryIdRef.current) {
+          setRetryingRejectedAssetId(undefined);
+        }
       }
     },
-    [deleteMutation, t],
+    [
+      assetsQuery.data,
+      onAddCandidate,
+      deleteServerAsset,
+      onStartRecording,
+      retryingRejectedAssetId,
+      showPickerFailure,
+    ],
   );
 
   const unresolvedAssets = localAssets.filter((asset) => asset.status !== 'READY');
@@ -587,7 +703,10 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
     hasReadyAssets:
       (assetsQuery.data?.some((asset) => asset.status === 'READY') ?? false) ||
       localAssets.some((asset) => asset.status === 'READY'),
-    hasUnresolvedAssets: unresolvedAssets.length > 0,
+    hasUnresolvedAssets:
+      unresolvedAssets.length > 0 ||
+      (assetsQuery.data?.some((asset) => asset.status === 'PENDING_UPLOAD') ?? false),
+    hasRejectedAssets: assetsQuery.data?.some((asset) => asset.status === 'REJECTED') ?? false,
     isLoadingAssets: assetsQuery.isPending,
     isRecording,
     localAssets,
@@ -597,9 +716,11 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
     onRemoveLocalAsset,
     onRemoveServerAsset,
     onRetryUpload,
+    onRetryRejectedAsset,
     onStartRecording,
     onStopRecording,
     onTakePhoto,
     recordingDuration,
+    retryingRejectedAssetId,
   };
 };

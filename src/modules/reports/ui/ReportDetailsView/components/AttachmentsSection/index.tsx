@@ -1,10 +1,15 @@
 import { useMemo } from 'react';
-import { Image, View } from 'react-native';
+import { Image, Pressable, View } from 'react-native';
 
 import { CameraIcon } from '@/assets/icons/CameraIcon';
 import { DocumentIcon } from '@/assets/icons/DocumentIcon';
+import { ErrorIcon } from '@/assets/icons/ErrorIcon';
 import { MicrophoneIcon } from '@/assets/icons/MicrophoneIcon';
 import { PhotoIcon } from '@/assets/icons/PhotoIcon';
+import { RetryIcon } from '@/assets/icons/RetryIcon';
+import { TrashIcon } from '@/assets/icons/TrashIcon';
+import { getReportAssetRejectionKey } from '@/entities/report/model/reportAssetRejection';
+import { getReportAssetDisplayName } from '@/entities/report/model/reportDisplayNames';
 import { formatAudioDuration, formatFileSize } from '@/entities/report/model/reportAssetValidation';
 import type { ILocalReportAsset, IReportAsset } from '@/entities/report/types/reportAsset';
 import { Button } from '@/UIKit/Button';
@@ -13,11 +18,15 @@ import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
 import { scaleHorizontal } from '@/utils/scaling';
 
+import { AttachmentCard } from '../AttachmentCard';
 import { getStyles } from './styles';
 
 interface IProps {
+  accessingAssetId?: string;
   assets: IReportAsset[];
   canEdit: boolean;
+  deletingAssetId?: string;
+  imageUris: Record<string, string>;
   isLoading: boolean;
   isRecording: boolean;
   localAssets: ILocalReportAsset[];
@@ -25,17 +34,30 @@ interface IProps {
   onAddPhoto(): void;
   onCancelRecording(): void;
   onRemoveLocalAsset(id: string): void;
-  onRemoveServerAsset(id: string): void;
+  onOpenAsset(asset: IReportAsset): void;
+  onRemoveServerAsset(asset: IReportAsset): void;
+  onRetryRejectedAsset(id: string): void;
   onRetryUpload(id: string): void;
   onStartRecording(): void;
   onStopRecording(): void;
   onTakePhoto(): void;
+  onToggleAudio(asset: IReportAsset): void;
+  playback: {
+    assetId?: string;
+    durationSeconds: number;
+    isPlaying: boolean;
+    positionSeconds: number;
+  };
   recordingDuration: number;
+  retryingRejectedAssetId?: string;
 }
 
 export const AttachmentsSection = ({
+  accessingAssetId,
   assets,
   canEdit,
+  deletingAssetId,
+  imageUris,
   isLoading,
   isRecording,
   localAssets,
@@ -43,12 +65,17 @@ export const AttachmentsSection = ({
   onAddPhoto,
   onCancelRecording,
   onRemoveLocalAsset,
+  onOpenAsset,
   onRemoveServerAsset,
+  onRetryRejectedAsset,
   onRetryUpload,
   onStartRecording,
   onStopRecording,
   onTakePhoto,
+  onToggleAudio,
+  playback,
   recordingDuration,
+  retryingRejectedAssetId,
 }: IProps) => {
   const { colors, radius, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
@@ -130,37 +157,51 @@ export const AttachmentsSection = ({
       {assets.length === 0 && localAssets.length === 0 && !isLoading ? (
         <Typography color={colors.textSecondary}>{t('reports.attachments.empty')}</Typography>
       ) : null}
-      {assets.map((asset) => (
-        <View key={asset.id} style={styles.assetCard}>
-          <View style={styles.assetInfo}>
-            <View style={styles.typeIcon}>{getTypeIcon(asset.type)}</View>
-            <View style={styles.assetText}>
-              <Typography numberOfLines={1}>{asset.originalFileName}</Typography>
-              <Typography color={colors.textSecondary} variant="caption">
-                {formatFileSize(asset.verifiedSize ?? asset.declaredSize)}
-                {asset.durationSeconds ? ` · ${formatAudioDuration(asset.durationSeconds)}` : ''}
-              </Typography>
-            </View>
-          </View>
-          {canEdit ? (
-            <Button
-              onPress={() => onRemoveServerAsset(asset.id)}
-              size="small"
-              title={String(t('reports.attachments.remove'))}
-              variant="secondary"
-            />
-          ) : null}
-        </View>
-      ))}
+      {assets.map((asset) => {
+        const displayName = getReportAssetDisplayName(asset, {
+          audioRecording: String(t('reports.attachments.audioRecordingName')),
+          file: String(t('reports.attachments.fileName')),
+          photo: String(t('reports.attachments.photoName')),
+        });
+        const rejectionDescription = String(
+          t(`reports.attachments.rejectionReasons.${getReportAssetRejectionKey(asset.rejectionReason)}`),
+        );
+
+        return (
+          <AttachmentCard
+            asset={asset}
+            canEdit={canEdit}
+            deleting={deletingAssetId === asset.id}
+            displayName={displayName}
+            imageUri={imageUris[asset.id]}
+            isAccessing={accessingAssetId === asset.id || retryingRejectedAssetId === asset.id}
+            isPlaying={playback.assetId === asset.id && playback.isPlaying}
+            key={asset.id}
+            onDelete={() => onRemoveServerAsset(asset)}
+            onOpen={() => onOpenAsset(asset)}
+            onRetry={() => onRetryRejectedAsset(asset.id)}
+            onToggleAudio={() => onToggleAudio(asset)}
+            playbackDurationSeconds={playback.assetId === asset.id ? playback.durationSeconds : 0}
+            playbackPositionSeconds={playback.assetId === asset.id ? playback.positionSeconds : 0}
+            rejectionDescription={rejectionDescription}
+          />
+        );
+      })}
       {localAssets.map((asset) => (
-        <View key={asset.id} style={styles.assetCard}>
-          {asset.type === 'IMAGE' ? (
+        <View key={asset.id} style={[styles.assetCard, asset.status === 'FAILED' && styles.failedAssetCard]}>
+          {asset.status === 'FAILED' ? (
+            <View style={styles.typeIcon}>
+              <ErrorIcon color={colors.error} height={iconSize} width={iconSize} />
+            </View>
+          ) : asset.type === 'IMAGE' ? (
             <Image source={{ uri: asset.uri }} style={styles.thumbnail} />
           ) : (
             <View style={styles.typeIcon}>{getTypeIcon(asset.type)}</View>
           )}
           <View style={styles.assetText}>
-            <Typography numberOfLines={1}>{asset.fileName}</Typography>
+              <Typography ellipsizeMode="middle" numberOfLines={1}>
+                {asset.displayName}
+              </Typography>
             <Typography color={asset.status === 'FAILED' ? colors.error : colors.textSecondary} variant="caption">
               {formatFileSize(asset.size)} · {t(`reports.attachments.states.${asset.status}`)}
               {asset.status === 'UPLOADING' ? ` ${asset.progress}%` : ''}
@@ -173,20 +214,27 @@ export const AttachmentsSection = ({
           </View>
           <View style={styles.itemActions}>
             {asset.status === 'FAILED' ? (
-              <Button
+              <Pressable
+                accessibilityLabel={String(t('reports.attachments.retryAccessibility', { name: asset.displayName }))}
+                accessibilityRole="button"
+                hitSlop={8}
                 onPress={() => onRetryUpload(asset.id)}
-                size="small"
-                title={String(t('common.retry'))}
-                variant="secondary"
-              />
+                style={styles.iconButton}
+              >
+                <RetryIcon color={colors.primary} height={iconSize} width={iconSize} />
+              </Pressable>
             ) : null}
-            <Button
-              disabled={asset.status !== 'FAILED' && asset.status !== 'LOCAL'}
-              onPress={() => onRemoveLocalAsset(asset.id)}
-              size="small"
-              title={String(t('reports.attachments.remove'))}
-              variant="secondary"
-            />
+            {asset.status === 'FAILED' || asset.status === 'LOCAL' ? (
+              <Pressable
+                accessibilityLabel={String(t('reports.attachments.deleteAccessibility', { name: asset.displayName }))}
+                accessibilityRole="button"
+                hitSlop={8}
+                onPress={() => onRemoveLocalAsset(asset.id)}
+                style={styles.iconButton}
+              >
+                <TrashIcon color={colors.error} height={iconSize} width={iconSize} />
+              </Pressable>
+            ) : null}
           </View>
         </View>
       ))}

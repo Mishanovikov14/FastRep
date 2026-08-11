@@ -1,5 +1,6 @@
 import type {
   IReportAsset,
+  IReportAssetDownloadUrl,
   IReportAssetUploadRequest,
   IRequestReportAssetUpload,
 } from '@/entities/report/types/reportAsset';
@@ -26,6 +27,16 @@ export const confirmReportAssetUpload = (reportId: string, assetId: string): Pro
 
 export const getReportAssets = (reportId: string): Promise<IResponse<IReportAsset[]>> => {
   return requester.request<IReportAsset[]>({ method: 'GET', url: `/reports/${reportId}/assets` });
+};
+
+export const createReportAssetDownloadUrl = (
+  reportId: string,
+  assetId: string,
+): Promise<IResponse<IReportAssetDownloadUrl>> => {
+  return requester.request<IReportAssetDownloadUrl>({
+    method: 'POST',
+    url: `/reports/${reportId}/assets/${assetId}/download-url`,
+  });
 };
 
 export const deleteReportAsset = (reportId: string, assetId: string): Promise<IResponse<void>> => {

@@ -25,7 +25,18 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
     },
     assetInfo: { alignItems: 'center', flex: 1, flexDirection: 'row', gap: scaleHorizontal(spacing.sm) },
     assetText: { flex: 1, gap: scaleVertical(spacing.xs) },
+    failedAssetCard: {
+      backgroundColor: `${colors.error}0D`,
+      borderColor: colors.error,
+    },
     headingRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
+    iconButton: {
+      alignItems: 'center',
+      borderRadius: scaleHorizontal(radius.sm),
+      justifyContent: 'center',
+      minHeight: scaleHorizontal(38),
+      minWidth: scaleHorizontal(38),
+    },
     itemActions: { gap: scaleVertical(spacing.xs) },
     progressFill: { backgroundColor: colors.primary, borderRadius: 2, height: 4 },
     progressTrack: { backgroundColor: colors.primaryLight, borderRadius: 2, height: 4, overflow: 'hidden' },

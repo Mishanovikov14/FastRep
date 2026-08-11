@@ -44,10 +44,18 @@ jest.mock('react-native-nitro-sound', () => ({
   AVEncoderAudioQualityIOSType: { high: 96 },
   OutputFormatAndroidType: { MPEG_4: 2 },
   default: {
+    addPlayBackListener: jest.fn(),
+    addPlaybackEndListener: jest.fn(),
     addRecordBackListener: jest.fn(),
+    pausePlayer: jest.fn(async () => 'paused'),
+    removePlayBackListener: jest.fn(),
+    removePlaybackEndListener: jest.fn(),
     removeRecordBackListener: jest.fn(),
+    resumePlayer: jest.fn(async () => 'resumed'),
     setSubscriptionDuration: jest.fn(),
+    startPlayer: jest.fn(async () => 'started'),
     startRecorder: jest.fn(),
+    stopPlayer: jest.fn(async () => 'stopped'),
     stopRecorder: jest.fn(),
   },
 }));

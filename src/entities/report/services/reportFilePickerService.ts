@@ -282,6 +282,7 @@ export const pickReportDocument = async (): Promise<IReportAssetCandidate | unde
     const size = await getReadableLocalFileSize(copiedUri);
 
     return {
+      displayName: document.name ?? undefined,
       fileName,
       mimeType,
       ownership: 'APP_TEMPORARY',

@@ -17,7 +17,7 @@ interface IProps {
 export const ReportCard = ({ onPress, report }: IProps) => {
   const { colors, language, radius, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
-  const { dateLabel, getCardStyle, onPressCard } = useReportCardPresenter({
+  const { dateLabel, displayTitle, getCardStyle, onPressCard } = useReportCardPresenter({
     cardPressedStyle: styles.cardPressed,
     cardStyle: styles.card,
     language,
@@ -29,7 +29,7 @@ export const ReportCard = ({ onPress, report }: IProps) => {
   return (
     <Pressable accessibilityRole="button" onPress={onPressCard} style={getCardStyle}>
       <Typography numberOfLines={2} variant="heading">
-        {report.title}
+        {displayTitle}
       </Typography>
       {report.notes ? (
         <Typography color={colors.textSecondary} numberOfLines={2}>
