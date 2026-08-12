@@ -199,9 +199,9 @@ export const AttachmentsSection = ({
             <View style={styles.typeIcon}>{getTypeIcon(asset.type)}</View>
           )}
           <View style={styles.assetText}>
-              <Typography ellipsizeMode="middle" numberOfLines={1}>
-                {asset.displayName}
-              </Typography>
+            <Typography ellipsizeMode="middle" numberOfLines={1}>
+              {asset.displayName}
+            </Typography>
             <Typography color={asset.status === 'FAILED' ? colors.error : colors.textSecondary} variant="caption">
               {formatFileSize(asset.size)} · {t(`reports.attachments.states.${asset.status}`)}
               {asset.status === 'UPLOADING' ? ` ${asset.progress}%` : ''}
@@ -213,7 +213,7 @@ export const AttachmentsSection = ({
             ) : null}
           </View>
           <View style={styles.itemActions}>
-            {asset.status === 'FAILED' ? (
+            {canEdit && asset.status === 'FAILED' ? (
               <Pressable
                 accessibilityLabel={String(t('reports.attachments.retryAccessibility', { name: asset.displayName }))}
                 accessibilityRole="button"
@@ -224,7 +224,7 @@ export const AttachmentsSection = ({
                 <RetryIcon color={colors.primary} height={iconSize} width={iconSize} />
               </Pressable>
             ) : null}
-            {asset.status === 'FAILED' || asset.status === 'LOCAL' ? (
+            {canEdit && (asset.status === 'FAILED' || asset.status === 'LOCAL') ? (
               <Pressable
                 accessibilityLabel={String(t('reports.attachments.deleteAccessibility', { name: asset.displayName }))}
                 accessibilityRole="button"

@@ -52,7 +52,7 @@ describe('report attachment access presenter', () => {
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
 
   const Harness = () => {
-    presenter = useReportAttachmentAccessPresenter({ assets, onDeleteAsset, reportId: 'report-1', t });
+    presenter = useReportAttachmentAccessPresenter({ assets, canEdit: true, onDeleteAsset, reportId: 'report-1', t });
     return null;
   };
 

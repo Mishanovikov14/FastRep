@@ -11,6 +11,7 @@ import {
   useCreateReportMutation,
   useDeleteReportMutation,
   useReportDetailsQuery,
+  useDuplicateReportMutation,
   useUpdateReportMutation,
 } from '@/modules/reports/presenters/reportQueries';
 import { useCreateReportViewPresenter } from '@/modules/reports/ui/CreateReportView/presenters/useCreateReportViewPresenter';
@@ -25,6 +26,7 @@ jest.mock('@/modules/reports/presenters/reportQueries', () => ({
   useCreateReportMutation: jest.fn(),
   useDeleteReportMutation: jest.fn(),
   useReportDetailsQuery: jest.fn(),
+  useDuplicateReportMutation: jest.fn(),
   useUpdateReportMutation: jest.fn(),
 }));
 jest.mock('@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentsPresenter', () => ({
@@ -67,11 +69,13 @@ describe('report mutation presenters', () => {
     goBack: jest.fn(),
     navigate: jest.fn(),
     popTo: jest.fn(),
+    push: jest.fn(),
     replace: jest.fn(),
   };
   const createMutate = jest.fn();
   const updateMutate = jest.fn();
   const deleteMutate = jest.fn();
+  const duplicateMutate = jest.fn();
   const refetch = jest.fn();
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
 
@@ -89,6 +93,10 @@ describe('report mutation presenters', () => {
     jest.mocked(useDeleteReportMutation).mockReturnValue({
       isPending: false,
       mutateAsync: deleteMutate,
+    } as never);
+    jest.mocked(useDuplicateReportMutation).mockReturnValue({
+      isPending: false,
+      mutateAsync: duplicateMutate,
     } as never);
     jest.mocked(useReportDetailsQuery).mockReturnValue({
       data: report,
@@ -161,10 +169,18 @@ describe('report mutation presenters', () => {
   it('prefills and updates only title and notes before navigating back', async () => {
     let presenter: ReturnType<typeof useEditReportViewPresenter> | undefined;
     updateMutate.mockResolvedValue({
-      data: { ...report, title: 'Updated title' },
+      data: { ...report, status: 'DRAFT', title: 'Updated title' },
       isError: false,
       message: '',
     });
+    jest.mocked(useReportDetailsQuery).mockReturnValue({
+      data: { ...report, status: 'DRAFT' },
+      error: null,
+      isError: false,
+      isPending: false,
+      isRefetching: false,
+      refetch,
+    } as never);
 
     const Harness = () => {
       presenter = useEditReportViewPresenter({ reportId: report.id, t });
@@ -232,7 +248,7 @@ describe('report mutation presenters', () => {
     expect(toastService.showSuccess).toHaveBeenCalledWith('reports.delete.success');
   });
 
-  it('opens edit, retries details, and exposes a 404 not-found state', async () => {
+  it('blocks edit outside editable states, retries details, and exposes a 404 not-found state', async () => {
     let presenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
     jest.mocked(useReportDetailsQuery).mockReturnValue({
       data: undefined,
@@ -268,9 +284,32 @@ describe('report mutation presenters', () => {
       await presenter?.onRetry();
     });
 
-    expect(navigation.navigate).toHaveBeenCalledWith('EditReport', {
-      reportId: 'report-1',
-    });
+    expect(navigation.navigate).not.toHaveBeenCalled();
     expect(refetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('duplicates a ready report and opens the new draft details', async () => {
+    let presenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
+    duplicateMutate.mockResolvedValue({
+      data: { ...report, id: 'report-copy', status: 'DRAFT', title: 'Existing title — Copy' },
+      isError: false,
+      message: '',
+    });
+
+    const Harness = () => {
+      presenter = useReportDetailsViewPresenter({ language: 'en', reportId: report.id, t });
+      return null;
+    };
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<Harness />);
+    });
+    await ReactTestRenderer.act(async () => {
+      await presenter?.onDuplicate();
+    });
+
+    expect(duplicateMutate).toHaveBeenCalledTimes(1);
+    expect(navigation.push).toHaveBeenCalledWith('ReportDetails', { reportId: 'report-copy' });
+    expect(toastService.showSuccess).not.toHaveBeenCalled();
   });
 });

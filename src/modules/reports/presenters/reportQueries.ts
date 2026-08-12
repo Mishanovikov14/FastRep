@@ -1,7 +1,14 @@
 import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import type { InfiniteData } from '@tanstack/react-query';
 
-import { createReport, deleteReport, getReportById, getReports, updateReport } from '@/entities/report/API/reportsApi';
+import {
+  createReport,
+  deleteReport,
+  duplicateReport,
+  getReportById,
+  getReports,
+  updateReport,
+} from '@/entities/report/API/reportsApi';
 import { ReportRequestError } from '@/entities/report/model/ReportRequestError';
 import { reportsQueryKeys } from '@/entities/report/model/reportQueryKeys';
 import type {
@@ -178,10 +185,12 @@ export const useCreateReportMutation = () => {
 
       queryClient.setQueryData(reportsQueryKeys.detail(response.data.id), response.data);
       setReportAcrossLists((data) => prependReportToList(data, response.data as IReport));
-      void queryClient.invalidateQueries({
-        queryKey: reportsQueryKeys.lists(),
-        refetchType: 'none',
-      });
+      queryClient
+        .invalidateQueries({
+          queryKey: reportsQueryKeys.lists(),
+          refetchType: 'none',
+        })
+        .catch(() => undefined);
     },
   });
 };
@@ -196,14 +205,18 @@ export const useUpdateReportMutation = (reportId: string) => {
 
       queryClient.setQueryData(reportsQueryKeys.detail(reportId), response.data);
       setReportAcrossLists((data) => updateReportInList(data, response.data as IReport));
-      void queryClient.invalidateQueries({
-        queryKey: reportsQueryKeys.detail(reportId),
-        refetchType: 'none',
-      });
-      void queryClient.invalidateQueries({
-        queryKey: reportsQueryKeys.lists(),
-        refetchType: 'none',
-      });
+      queryClient
+        .invalidateQueries({
+          queryKey: reportsQueryKeys.detail(reportId),
+          refetchType: 'none',
+        })
+        .catch(() => undefined);
+      queryClient
+        .invalidateQueries({
+          queryKey: reportsQueryKeys.lists(),
+          refetchType: 'none',
+        })
+        .catch(() => undefined);
     },
   });
 };
@@ -217,10 +230,31 @@ export const useDeleteReportMutation = (reportId: string) => {
       }
 
       setReportAcrossLists((data) => removeReportFromList(data, reportId));
-      void queryClient.invalidateQueries({
-        queryKey: reportsQueryKeys.lists(),
-        refetchType: 'none',
-      });
+      queryClient
+        .invalidateQueries({
+          queryKey: reportsQueryKeys.lists(),
+          refetchType: 'none',
+        })
+        .catch(() => undefined);
+    },
+  });
+};
+
+export const useDuplicateReportMutation = (reportId: string) => {
+  return useMutation({
+    mutationFn: () => duplicateReport(reportId),
+    onSuccess: (response) => {
+      if (response.isError || !response.data) {
+        return;
+      }
+
+      queryClient.setQueryData(reportsQueryKeys.detail(response.data.id), response.data);
+      setReportAcrossLists((data) => prependReportToList(data, response.data as IReport));
+      queryClient
+        .invalidateQueries({
+          queryKey: reportsQueryKeys.lists(),
+        })
+        .catch(() => undefined);
     },
   });
 };

@@ -31,6 +31,7 @@ export const ReportDetailsView = () => {
     deleteActions,
     isDeleteConfirmationVisible,
     isError,
+    isDuplicating,
     isLoading,
     isNotFound,
     isRefreshing,
@@ -38,6 +39,7 @@ export const ReportDetailsView = () => {
     onBack,
     onAttachmentsLayout,
     onEdit,
+    onDuplicate,
     onHideDeleteConfirmation,
     onRefresh,
     onRetry,
@@ -116,13 +118,14 @@ export const ReportDetailsView = () => {
                 </View>
               </View>
               <View style={styles.actions}>
-                <Button
-                  disabled={report.status === 'PROCESSING'}
-                  onPress={onEdit}
-                  style={styles.action}
-                  title={String(t('reports.edit.action'))}
-                  variant="secondary"
-                />
+                {report.status === 'DRAFT' || report.status === 'FAILED' ? (
+                  <Button
+                    onPress={onEdit}
+                    style={styles.action}
+                    title={String(t('reports.edit.action'))}
+                    variant="secondary"
+                  />
+                ) : null}
                 <Button
                   onPress={onShowDeleteConfirmation}
                   style={styles.action}
@@ -166,14 +169,17 @@ export const ReportDetailsView = () => {
                 generation={generation.generation}
                 hasOutput={generation.hasOutput}
                 isCancelling={generation.isCancelling}
+                isDuplicating={isDuplicating}
                 isGenerating={generation.isGenerating}
                 isOpeningOutput={generation.isOpeningOutput}
                 isSharingOutput={generation.isSharingOutput}
                 lockRemainingSeconds={generation.lockRemainingSeconds}
                 onCancelGeneration={generation.onCancelGeneration}
+                onDuplicate={onDuplicate}
                 onOpenOutput={generation.onOpenOutput}
                 onShareOutput={generation.onShareOutput}
                 onStartGeneration={generation.onStartGeneration}
+                reportStatus={report.status}
                 stageKey={generation.stageKey}
               />
             </View>

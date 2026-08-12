@@ -52,13 +52,7 @@ export type ReportAttachmentErrorCode =
   | 'AUDIO_UPLOAD_REQUEST_FAILED'
   | 'AUDIO_STORAGE_UPLOAD_FAILED'
   | 'AUDIO_CONFIRM_FAILED';
-export type LocalReportAssetStatus =
-  | 'LOCAL'
-  | 'REQUESTING_UPLOAD'
-  | 'UPLOADING'
-  | 'CONFIRMING'
-  | 'READY'
-  | 'FAILED';
+export type LocalReportAssetStatus = 'LOCAL' | 'REQUESTING_UPLOAD' | 'UPLOADING' | 'CONFIRMING' | 'READY' | 'FAILED';
 
 export interface IReportAsset {
   createdAt: string;
@@ -106,14 +100,25 @@ export interface ILocalReportAsset {
   fileName: string;
   height?: number;
   id: string;
+  isMultiPhotoBatch?: boolean;
   mimeType: string;
   ownership: ReportAssetFileOwnership;
   progress: number;
   size: number;
   status: LocalReportAssetStatus;
   type: ReportAssetType;
+  retryKind?: 'REPICK';
   uploadRequest?: IReportAssetUploadRequest;
   uri: string;
+  width?: number;
+}
+
+export interface IReportImageSelection {
+  fileName?: string;
+  fileSize?: number;
+  height?: number;
+  mimeType?: string;
+  uri?: string;
   width?: number;
 }
 

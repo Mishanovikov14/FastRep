@@ -45,7 +45,8 @@ describe('report asset access service', () => {
   });
 
   it('requests a fresh URL when the first download URL has expired', async () => {
-    jest.mocked(createReportAssetDownloadUrl)
+    jest
+      .mocked(createReportAssetDownloadUrl)
       .mockResolvedValueOnce({
         data: { expiresAt: '2026-08-11T10:00:00.000Z', url: 'https://signed.example/expired' },
         isError: false,
@@ -56,7 +57,8 @@ describe('report asset access service', () => {
         isError: false,
         message: '',
       });
-    jest.mocked(RNFS.downloadFile)
+    jest
+      .mocked(RNFS.downloadFile)
       .mockReturnValueOnce({
         jobId: 1,
         promise: Promise.resolve({ bytesWritten: 0, jobId: 1, statusCode: 403 }),
@@ -78,6 +80,34 @@ describe('report asset access service', () => {
     await openReportDocumentAsset('report-1', { ...asset, id: 'document-2' });
 
     expect(FileViewer.open).toHaveBeenCalledWith(expect.stringContaining('document-2.pdf'), {
+      showOpenWithDialog: true,
+    });
+  });
+
+  it.each([
+    ['application/pdf', 'pdf'],
+    ['text/plain', 'txt'],
+    ['text/csv', 'csv'],
+    ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx'],
+    ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx'],
+  ])('opens supported %s documents from the environment/report/asset cache key', async (mimeType, extension) => {
+    const document = {
+      ...asset,
+      declaredMimeType: mimeType,
+      id: `document-${extension}`,
+      originalFileName: `inspection.${extension}`,
+    };
+
+    await openReportDocumentAsset('report-cache-key', document);
+
+    expect(RNFS.downloadFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toFile: expect.stringContaining(
+          `FastRep-asset-development-report-cache-key-document-${extension}.${extension}`,
+        ),
+      }),
+    );
+    expect(FileViewer.open).toHaveBeenCalledWith(expect.stringContaining(`document-${extension}.${extension}`), {
       showOpenWithDialog: true,
     });
   });

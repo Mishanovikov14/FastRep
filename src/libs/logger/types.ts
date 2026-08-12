@@ -1,6 +1,7 @@
 export type LogLevel = 'debug' | 'error' | 'info' | 'warn';
 
 export interface ISafeLogMetadata {
+  assetCount?: number;
   assetType?: 'AUDIO' | 'DOCUMENT' | 'IMAGE';
   declaredMimeType?: string;
   durationSeconds?: number;

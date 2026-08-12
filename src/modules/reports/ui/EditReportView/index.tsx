@@ -18,12 +18,24 @@ export const EditReportView = () => {
   const route = useRoute<RouteProp<AppStackParamList, 'EditReport'>>();
   const { colors, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(spacing), [spacing]);
-  const { errors, isError, isLoading, isSubmitting, notes, onChangeNotes, onChangeTitle, onRetry, onSubmit, title } =
-    useEditReportViewPresenter({
-      reportId: route.params.reportId,
-      t,
-    });
-  const isFormVisible = !isLoading && !isError;
+  const {
+    errors,
+    isEditable,
+    isError,
+    isLoading,
+    isSubmitting,
+    notes,
+    onBack,
+    onChangeNotes,
+    onChangeTitle,
+    onRetry,
+    onSubmit,
+    title,
+  } = useEditReportViewPresenter({
+    reportId: route.params.reportId,
+    t,
+  });
+  const isFormVisible = !isLoading && !isError && isEditable;
 
   return (
     <ScreenContainer
@@ -45,6 +57,16 @@ export const EditReportView = () => {
             {t('reports.details.errorDescription')}
           </Typography>
           <Button onPress={onRetry} title={String(t('common.retry'))} />
+        </>
+      ) : !isEditable ? (
+        <>
+          <Typography align="center" variant="heading">
+            {t('reports.edit.notEditableTitle')}
+          </Typography>
+          <Typography align="center" color={colors.textSecondary}>
+            {t('reports.edit.notEditableDescription')}
+          </Typography>
+          <Button onPress={onBack} title={String(t('common.back'))} />
         </>
       ) : (
         <ReportForm

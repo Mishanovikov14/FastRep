@@ -15,6 +15,7 @@ import type { ICustomAlertAction } from '@/UIKit/CustomAlert/types';
 
 interface IInput {
   assets: IReportAsset[];
+  canEdit: boolean;
   onDeleteAsset(assetId: string): Promise<boolean>;
   reportId: string;
   t: TFunction;
@@ -33,7 +34,7 @@ const initialPlayback: IAudioPlayback = {
   positionSeconds: 0,
 };
 
-export const useReportAttachmentAccessPresenter = ({ assets, onDeleteAsset, reportId, t }: IInput) => {
+export const useReportAttachmentAccessPresenter = ({ assets, canEdit, onDeleteAsset, reportId, t }: IInput) => {
   const [imageUris, setImageUris] = useState<Record<string, string>>({});
   const [previewAssetId, setPreviewAssetId] = useState<string>();
   const [accessingAssetId, setAccessingAssetId] = useState<string>();
@@ -121,9 +122,7 @@ export const useReportAttachmentAccessPresenter = ({ assets, onDeleteAsset, repo
         operation,
       });
       toastService.showError(
-        String(
-          t(operation === 'play_audio' ? 'reports.attachments.playFailed' : 'reports.attachments.accessFailed'),
-        ),
+        String(t(operation === 'play_audio' ? 'reports.attachments.playFailed' : 'reports.attachments.accessFailed')),
         String(t('reports.attachments.tryAgain')),
       );
     },
@@ -222,14 +221,14 @@ export const useReportAttachmentAccessPresenter = ({ assets, onDeleteAsset, repo
 
   const onRequestDelete = useCallback(
     (asset: IReportAsset) => {
-      if (deletingAssetId) {
+      if (!canEdit || deletingAssetId) {
         return;
       }
 
       setAssetPendingDeletion(asset);
       onShowDeleteConfirmation();
     },
-    [deletingAssetId, onShowDeleteConfirmation],
+    [canEdit, deletingAssetId, onShowDeleteConfirmation],
   );
 
   const onDismissDeleteConfirmation = useCallback(() => {
@@ -240,7 +239,7 @@ export const useReportAttachmentAccessPresenter = ({ assets, onDeleteAsset, repo
   }, [deletingAssetId, onHideDeleteConfirmation]);
 
   const onConfirmDelete = useCallback(async () => {
-    if (!assetPendingDeletion || deletingAssetIdRef.current) {
+    if (!canEdit || !assetPendingDeletion || deletingAssetIdRef.current) {
       return;
     }
 
@@ -267,7 +266,7 @@ export const useReportAttachmentAccessPresenter = ({ assets, onDeleteAsset, repo
       deletingAssetIdRef.current = undefined;
       setDeletingAssetId(undefined);
     }
-  }, [assetPendingDeletion, onDeleteAsset, onHideDeleteConfirmation]);
+  }, [assetPendingDeletion, canEdit, onDeleteAsset, onHideDeleteConfirmation]);
 
   const deleteActions = useMemo<ICustomAlertAction[]>(
     () => [
