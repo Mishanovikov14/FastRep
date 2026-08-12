@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Image, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/UIKit/Button';
 import { Input } from '@/UIKit/Input';
@@ -12,7 +13,8 @@ import { getStyles } from './styles';
 
 export const RegistrationView = () => {
   const { colors, language, spacing, t } = useUIContext();
-  const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
+  const { top } = useSafeAreaInsets();
+  const styles = useMemo(() => getStyles(colors, spacing, top), [colors, spacing, top]);
   const {
     confirmPassword,
     email,
@@ -32,7 +34,7 @@ export const RegistrationView = () => {
   });
 
   return (
-    <ScreenContainer backgroundColor={colors.white} isKeyboardAvoiding scrollEnabled>
+    <ScreenContainer backgroundColor={colors.white} edges={['bottom']} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"

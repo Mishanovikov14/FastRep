@@ -24,6 +24,9 @@ export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
     fullWidth: {
       alignSelf: 'stretch',
     },
+    buttonText: {
+      textAlign: 'center'
+    },
     large: {
       minHeight: scaleVertical(spacing.xxl + spacing.lg),
       paddingHorizontal: scaleHorizontal(spacing.xl),

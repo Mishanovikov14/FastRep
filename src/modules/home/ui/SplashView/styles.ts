@@ -7,7 +7,7 @@ export const getStyles = (colors: Colors, spacing: Spacing) => {
   const styles = StyleSheet.create({
     content: {
       alignItems: 'center',
-      backgroundColor: colors.white,
+      backgroundColor: colors.background,
       gap: scaleVertical(spacing.xl),
       justifyContent: 'center',
       paddingHorizontal: scaleHorizontal(spacing.xl),

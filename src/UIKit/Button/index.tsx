@@ -56,7 +56,7 @@ export const Button = ({
         style={[styles.content, loading && styles.loadingContent]}
       >
         {leftElement}
-        <Typography color={foregroundColor} variant="button">
+        <Typography color={foregroundColor} variant="button" style={styles.buttonText}>
           {title}
         </Typography>
         {rightElement}
