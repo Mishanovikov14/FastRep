@@ -234,8 +234,14 @@ export interface TranslationResources {
       title: string;
       updatedAt: string;
     };
+    duplicate: {
+      action: string;
+      failed: string;
+    };
     edit: {
       action: string;
+      notEditableDescription: string;
+      notEditableTitle: string;
       success: string;
       title: string;
     };
@@ -279,9 +285,11 @@ export interface TranslationResources {
       lock: { message: string; title: string };
       outputReady: string;
       rejectedAttachments: string;
-      regenerate: string;
       retry: string;
-      stages: Record<'analyzing' | 'completed' | 'creatingPdf' | 'finalizing' | 'generating' | 'preparing' | 'transcribing', string>;
+      stages: Record<
+        'analyzing' | 'completed' | 'creatingPdf' | 'finalizing' | 'generating' | 'preparing' | 'transcribing',
+        string
+      >;
       startFailed: string;
       title: string;
     };
@@ -303,6 +311,7 @@ export interface TranslationResources {
       draft: string;
       failed: string;
       processing: string;
+      queued: string;
       ready: string;
     };
     validation: {

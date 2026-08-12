@@ -53,6 +53,7 @@ const createGeneration = (status: IReportGeneration['status']): IReportGeneratio
 
 describe('report generation side effects', () => {
   let currentGeneration: IReportGeneration | null;
+  let currentReport: IReport;
   let presenter: ReturnType<typeof useReportGenerationPresenter> | undefined;
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
   let appStateListener: ((state: string) => void) | undefined;
@@ -61,7 +62,12 @@ describe('report generation side effects', () => {
   let successSpy: jest.SpyInstance;
 
   const Harness = () => {
-    presenter = useReportGenerationPresenter({ hasReadyAssets: true, hasUnresolvedAssets: false, report, t });
+    presenter = useReportGenerationPresenter({
+      hasReadyAssets: true,
+      hasUnresolvedAssets: false,
+      report: currentReport,
+      t,
+    });
     return null;
   };
 
@@ -80,13 +86,18 @@ describe('report generation side effects', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     currentGeneration = null;
+    currentReport = report;
     jest.mocked(refreshGenerationResources).mockResolvedValue(undefined);
-    jest.mocked(useEntitlementsQuery).mockReturnValue({ data: { canGenerate: true, generationCredits: { available: 3 } } } as never);
-    jest.mocked(useLatestReportGenerationQuery).mockImplementation(
-      () => ({ data: currentGeneration, refetch: jest.fn() }) as never,
-    );
+    jest
+      .mocked(useEntitlementsQuery)
+      .mockReturnValue({ data: { canGenerate: true, generationCredits: { available: 3 } } } as never);
+    jest
+      .mocked(useLatestReportGenerationQuery)
+      .mockImplementation(() => ({ data: currentGeneration, refetch: jest.fn() } as never));
     jest.mocked(useReportOutputQuery).mockReturnValue({ data: null } as never);
-    jest.mocked(useCancelReportGenerationMutation).mockReturnValue({ isPending: false, mutateAsync: jest.fn() } as never);
+    jest
+      .mocked(useCancelReportGenerationMutation)
+      .mockReturnValue({ isPending: false, mutateAsync: jest.fn() } as never);
     jest.mocked(useStartReportGenerationMutation).mockReturnValue({
       isPending: false,
       mutateAsync: jest.fn().mockResolvedValue({
@@ -139,12 +150,14 @@ describe('report generation side effects', () => {
   });
 
   it('shows success once for an active queued/processing to completed transition', async () => {
+    currentReport = { ...report, status: 'DRAFT' };
     currentGeneration = createGeneration('QUEUED');
     await render();
     ReactTestRenderer.act(() => appStateListener?.('active'));
     await ReactTestRenderer.act(async () => {
       await presenter?.onStartGeneration();
     });
+    currentReport = report;
     currentGeneration = createGeneration('PROCESSING');
     await rerender();
     currentGeneration = createGeneration('COMPLETED');
@@ -186,12 +199,14 @@ describe('report generation side effects', () => {
   });
 
   it('shows one failure toast for an actively observed transition to failed', async () => {
+    currentReport = { ...report, status: 'DRAFT' };
     currentGeneration = createGeneration('QUEUED');
     await render();
     ReactTestRenderer.act(() => appStateListener?.('active'));
     await ReactTestRenderer.act(async () => {
       await presenter?.onStartGeneration();
     });
+    currentReport = report;
     currentGeneration = createGeneration('PROCESSING');
     await rerender();
     currentGeneration = createGeneration('FAILED');
@@ -199,10 +214,7 @@ describe('report generation side effects', () => {
     await rerender();
 
     expect(errorSpy).toHaveBeenCalledTimes(1);
-    expect(errorSpy).toHaveBeenCalledWith(
-      'reports.generation.startFailed',
-      'reports.generation.failedDescription',
-    );
+    expect(errorSpy).toHaveBeenCalledWith('reports.generation.startFailed', 'reports.generation.failedDescription');
     expect(refreshGenerationResources).toHaveBeenCalledTimes(1);
   });
 });

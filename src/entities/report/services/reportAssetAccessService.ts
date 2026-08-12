@@ -11,10 +11,7 @@ export type ReportAssetAccessErrorCode =
   | 'ASSET_VIEWER_UNAVAILABLE';
 
 export class ReportAssetAccessError extends Error {
-  constructor(
-    public readonly code: ReportAssetAccessErrorCode,
-    public readonly httpStatus?: number,
-  ) {
+  constructor(public readonly code: ReportAssetAccessErrorCode, public readonly httpStatus?: number) {
     super(code);
     this.name = 'ReportAssetAccessError';
   }
@@ -38,12 +35,12 @@ const extensionByMimeType: Record<string, string> = {
   'text/plain': 'txt',
 };
 
-const getCachePath = (asset: IReportAsset): string => {
+const getCachePath = (reportId: string, asset: IReportAsset): string => {
   const environment = getActiveAppEnvironment().key;
   const mimeType = asset.verifiedMimeType ?? asset.declaredMimeType;
   const extension = extensionByMimeType[mimeType] ?? 'bin';
 
-  return `${RNFS.CachesDirectoryPath}/${CACHE_PREFIX}${environment}-${asset.id}.${extension}`;
+  return `${RNFS.CachesDirectoryPath}/${CACHE_PREFIX}${environment}-${reportId}-${asset.id}.${extension}`;
 };
 
 const removePartialDownload = async (path: string): Promise<void> => {
@@ -82,7 +79,7 @@ export const removeReportAssetCache = async (assetId: string): Promise<void> => 
 };
 
 export const ensureReportAssetFile = (reportId: string, asset: IReportAsset): Promise<string> => {
-  const path = getCachePath(asset);
+  const path = getCachePath(reportId, asset);
   const existing = inFlightDownloads.get(path);
 
   if (existing) {

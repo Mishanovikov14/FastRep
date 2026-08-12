@@ -6,17 +6,14 @@ import type { Asset } from 'react-native-image-picker';
 import { reportAssetLimits, supportedAssetMimeTypes } from '@/entities/report/config/reportAssetLimits';
 import { ReportAttachmentError } from '@/entities/report/model/ReportAttachmentError';
 import { sanitizeAssetFileName } from '@/entities/report/model/reportAssetValidation';
-import {
-  getUriScheme,
-  logAttachmentStage,
-} from '@/entities/report/services/reportAttachmentDiagnostics';
+import { getUriScheme, logAttachmentStage } from '@/entities/report/services/reportAttachmentDiagnostics';
 import {
   cleanupOwnedLocalFile,
   getReadableLocalFileSize,
   normalizeLocalFilePath,
   ReportLocalFileError,
 } from '@/entities/report/services/reportLocalFileService';
-import type { IReportAssetCandidate } from '@/entities/report/types/reportAsset';
+import type { IReportAssetCandidate, IReportImageSelection } from '@/entities/report/types/reportAsset';
 import { logger } from '@/libs/logger/logger';
 
 const extensionByMimeType: Record<string, string> = {
@@ -78,7 +75,7 @@ const getImageSize = async (uri: string): Promise<number> => {
   }
 };
 
-const toImageCandidate = async (asset: Asset): Promise<IReportAssetCandidate> => {
+const toImageCandidate = async (asset: IReportImageSelection): Promise<IReportAssetCandidate> => {
   if (!asset.uri) {
     throw new ReportAttachmentError('IMAGE', 'IMAGE_URI_MISSING', 'PICKER_RETURNED');
   }
@@ -89,7 +86,7 @@ const toImageCandidate = async (asset: Asset): Promise<IReportAssetCandidate> =>
   });
   assertReadableImageUri(asset.uri);
 
-  const declaredMimeType = asset.type?.toLowerCase();
+  const declaredMimeType = asset.mimeType?.toLowerCase();
   const mimeType = getMimeType(declaredMimeType, asset.fileName ?? asset.uri);
   const extension = getExtension(asset.fileName ?? asset.uri);
 
@@ -137,15 +134,29 @@ const imageOptions = {
   mediaType: 'photo' as const,
   quality: 0.9 as const,
   restrictMimeTypes: [...supportedAssetMimeTypes.IMAGE, 'image/heic', 'image/heif'],
-  selectionLimit: 1,
 };
+
+const toImageSelection = (asset: Asset): IReportImageSelection => ({
+  fileName: asset.fileName,
+  fileSize: asset.fileSize,
+  height: asset.height,
+  mimeType: asset.type,
+  uri: asset.uri,
+  width: asset.width,
+});
+
+export const normalizeReportImageSelection = (selection: IReportImageSelection): Promise<IReportAssetCandidate> =>
+  toImageCandidate(selection);
 
 export const pickReportImage = async (source: 'camera' | 'library'): Promise<IReportAssetCandidate | undefined> => {
   logAttachmentStage('IMAGE', 'PICKER_OPENING', { platform: Platform.OS, source });
   let response;
 
   try {
-    response = source === 'camera' ? await launchCamera(imageOptions) : await launchImageLibrary(imageOptions);
+    response =
+      source === 'camera'
+        ? await launchCamera(imageOptions)
+        : await launchImageLibrary({ ...imageOptions, selectionLimit: 1 });
   } catch {
     throw new ReportAttachmentError('IMAGE', 'IMAGE_PICKER_FAILED', 'PICKER_OPENING');
   }
@@ -176,7 +187,47 @@ export const pickReportImage = async (source: 'camera' | 'library'): Promise<IRe
     throw new ReportAttachmentError('IMAGE', 'IMAGE_URI_MISSING', 'PICKER_RETURNED');
   }
 
-  return toImageCandidate(asset);
+  return toImageCandidate(toImageSelection(asset));
+};
+
+export const pickReportImages = async (selectionLimit: number): Promise<IReportImageSelection[] | undefined> => {
+  logAttachmentStage('IMAGE', 'PICKER_OPENING', {
+    platform: Platform.OS,
+    source: 'library',
+  });
+  let response;
+
+  try {
+    response = await launchImageLibrary({
+      ...imageOptions,
+      selectionLimit: Math.max(1, selectionLimit),
+    });
+  } catch {
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_PICKER_FAILED', 'PICKER_OPENING');
+  }
+
+  if (response.didCancel) {
+    logAttachmentStage('IMAGE', 'PICKER_RETURNED', {
+      platform: Platform.OS,
+      source: 'library',
+      status: 'cancelled',
+    });
+    return undefined;
+  }
+  if (response.errorCode) {
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_PICKER_FAILED', 'PICKER_RETURNED');
+  }
+
+  const selections = (response.assets ?? []).map(toImageSelection);
+  if (selections.length === 0) {
+    throw new ReportAttachmentError('IMAGE', 'IMAGE_URI_MISSING', 'PICKER_RETURNED');
+  }
+  logger.info('report.multi_photo_batch_selected', {
+    assetCount: selections.length,
+    assetType: 'IMAGE',
+    platform: Platform.OS,
+  });
+  return selections;
 };
 
 const cleanupCopiedDocument = async (uri: string): Promise<void> => {

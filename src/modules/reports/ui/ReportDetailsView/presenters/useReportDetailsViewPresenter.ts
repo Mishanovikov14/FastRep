@@ -14,6 +14,7 @@ import type { AppStackParamList } from '@/navigation/types';
 import {
   removeReportDetailsCache,
   useDeleteReportMutation,
+  useDuplicateReportMutation,
   useReportDetailsQuery,
 } from '@/modules/reports/presenters/reportQueries';
 import { getReportErrorMessage } from '@/modules/reports/presenters/reportErrors';
@@ -39,6 +40,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
   const attachmentsOffsetRef = useRef(0);
   const query = useReportDetailsQuery(reportId);
   const deleteMutation = useDeleteReportMutation(reportId);
+  const duplicateMutation = useDuplicateReportMutation(reportId);
   const {
     isVisible: isDeleteConfirmationVisible,
     onHide: onHideDeleteAlert,
@@ -56,6 +58,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
   const attachments = useReportAttachmentsPresenter({ canEdit: canEditSources, reportId, t });
   const attachmentAccess = useReportAttachmentAccessPresenter({
     assets: attachments.assets,
+    canEdit: canEditSources,
     onDeleteAsset: attachments.onRemoveServerAsset,
     reportId,
     t,
@@ -80,8 +83,39 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
   }, [navigation]);
 
   const onEdit = useCallback(() => {
+    if (!canEditSources) {
+      return;
+    }
     navigation.navigate('EditReport', { reportId });
-  }, [navigation, reportId]);
+  }, [canEditSources, navigation, reportId]);
+
+  const onDuplicate = useCallback(async () => {
+    if (duplicateMutation.isPending || query.data?.status !== 'READY') {
+      return;
+    }
+
+    logger.info('report.duplicate_started', { reportStatus: query.data.status });
+    try {
+      const response = await duplicateMutation.mutateAsync();
+      if (response.isError || !response.data) {
+        logger.warn('report.duplicate_failed', {
+          errorCode: response.code ?? response.type ?? 'request_failed',
+          httpStatus: response.status,
+          reportStatus: query.data.status,
+        });
+        toastService.showError(String(t('reports.duplicate.failed')), getReportErrorMessage(response, t));
+        return;
+      }
+
+      navigation.push('ReportDetails', { reportId: response.data.id });
+    } catch {
+      logger.error('report.duplicate_failed', {
+        errorCode: 'local_exception',
+        reportStatus: query.data.status,
+      });
+      toastService.showError(String(t('reports.duplicate.failed')), String(t('common.somethingWentWrong')));
+    }
+  }, [duplicateMutation, navigation, query.data?.status, t]);
 
   const onRefresh = useCallback(async () => {
     await query.refetch();
@@ -163,6 +197,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     deleteActions,
     isDeleteConfirmationVisible,
     isDeleting: deleteMutation.isPending,
+    isDuplicating: duplicateMutation.isPending,
     isError: query.isError && !isNotFound,
     isLoading: query.isPending,
     isNotFound,
@@ -170,6 +205,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     onBack,
     onDelete,
     onEdit,
+    onDuplicate,
     onHideDeleteConfirmation,
     onRefresh,
     onAttachmentsLayout,

@@ -3,6 +3,7 @@ import { View } from 'react-native';
 
 import { PdfIcon } from '@/assets/icons/PdfIcon';
 import type { IReportGeneration } from '@/entities/report/types/reportGeneration';
+import type { ReportStatus } from '@/entities/report/types/report';
 import { Button } from '@/UIKit/Button';
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
@@ -16,14 +17,17 @@ interface IProps {
   generation?: IReportGeneration | null;
   hasOutput: boolean;
   isCancelling: boolean;
+  isDuplicating: boolean;
   isGenerating: boolean;
   isOpeningOutput: boolean;
   isSharingOutput: boolean;
   lockRemainingSeconds: number;
   onCancelGeneration(): void;
+  onDuplicate(): void;
   onOpenOutput(): void;
   onShareOutput(): void;
   onStartGeneration(): void;
+  reportStatus: ReportStatus;
   stageKey: string;
 }
 
@@ -34,14 +38,17 @@ export const GenerationSection = ({
   generation,
   hasOutput,
   isCancelling,
+  isDuplicating,
   isGenerating,
   isOpeningOutput,
   isSharingOutput,
   lockRemainingSeconds,
   onCancelGeneration,
+  onDuplicate,
   onOpenOutput,
   onShareOutput,
   onStartGeneration,
+  reportStatus,
   stageKey,
 }: IProps) => {
   const { colors, radius, spacing, t } = useUIContext();
@@ -78,7 +85,9 @@ export const GenerationSection = ({
               <View style={styles.progressTrack}>
                 <View style={[styles.progressFill, { width: `${progress}%` }]} />
               </View>
-              <Typography color={colors.textSecondary} variant="caption">{progress}%</Typography>
+              <Typography color={colors.textSecondary} variant="caption">
+                {progress}%
+              </Typography>
             </>
           ) : null}
         </View>
@@ -115,6 +124,15 @@ export const GenerationSection = ({
               title={String(t('reports.output.share'))}
               variant="secondary"
             />
+            {reportStatus === 'READY' ? (
+              <Button
+                loading={isDuplicating}
+                onPress={onDuplicate}
+                style={styles.outputAction}
+                title={String(t('reports.duplicate.action'))}
+                variant="secondary"
+              />
+            ) : null}
           </View>
         </View>
       ) : !isGenerating && generation?.status !== 'FAILED' ? (
@@ -129,21 +147,13 @@ export const GenerationSection = ({
           variant="secondary"
         />
       ) : null}
-      {!isGenerating ? (
+      {!isGenerating && reportStatus !== 'READY' ? (
         <Button
           disabled={!canGenerate}
           fullWidth
           onPress={onStartGeneration}
-          title={String(
-            t(
-              generation?.status === 'FAILED'
-                ? 'reports.generation.retry'
-                : hasOutput
-                  ? 'reports.generation.regenerate'
-                  : 'reports.generation.generate',
-            ),
-          )}
-          variant={hasOutput ? 'secondary' : 'primary'}
+          title={String(t(reportStatus === 'FAILED' ? 'reports.generation.retry' : 'reports.generation.generate'))}
+          variant="primary"
         />
       ) : null}
     </View>

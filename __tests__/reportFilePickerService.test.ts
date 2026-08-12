@@ -3,6 +3,7 @@ import RNFS from 'react-native-fs';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 import {
+  pickReportImages,
   pickReportDocument,
   pickReportImage,
 } from '@/entities/report/services/reportFilePickerService';
@@ -43,6 +44,23 @@ describe('report file picker service', () => {
     );
   });
 
+  it('returns multiple gallery selections using the requested dynamic limit', async () => {
+    mockLaunchImageLibrary.mockResolvedValue({
+      assets: [
+        { fileName: 'one.jpg', fileSize: 1024, type: 'image/jpeg', uri: 'file:///cache/one.jpg' },
+        { fileName: 'two.jpg', fileSize: 1024, type: 'image/jpeg', uri: 'file:///cache/two.jpg' },
+        { fileName: 'three.jpg', fileSize: 1024, type: 'image/jpeg', uri: 'file:///cache/three.jpg' },
+      ],
+    });
+
+    await expect(pickReportImages(13)).resolves.toHaveLength(3);
+    expect(mockLaunchImageLibrary).toHaveBeenCalledWith(expect.objectContaining({ selectionLimit: 13 }));
+    expect(logger.info).toHaveBeenCalledWith(
+      'report.multi_photo_batch_selected',
+      expect.objectContaining({ assetCount: 3, assetType: 'IMAGE' }),
+    );
+  });
+
   it('generates a safe image filename and resolves MIME from the URI when metadata is missing', async () => {
     mockLaunchImageLibrary.mockResolvedValue({
       assets: [{ fileSize: 1024, uri: 'file:///cache/selected-image.png' }],
@@ -57,7 +75,9 @@ describe('report file picker service', () => {
   });
 
   it('returns silently when image selection is cancelled and surfaces picker errors', async () => {
-    mockLaunchCamera.mockResolvedValueOnce({ didCancel: true }).mockResolvedValueOnce({ errorCode: 'camera_unavailable' });
+    mockLaunchCamera
+      .mockResolvedValueOnce({ didCancel: true })
+      .mockResolvedValueOnce({ errorCode: 'camera_unavailable' });
 
     await expect(pickReportImage('camera')).resolves.toBeUndefined();
     expect(logger.error).not.toHaveBeenCalled();

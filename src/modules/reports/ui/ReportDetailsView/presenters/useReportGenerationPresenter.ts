@@ -157,7 +157,8 @@ export const useReportGenerationPresenter = ({
     });
 
     const wasActive = previous.status === 'QUEUED' || previous.status === 'PROCESSING';
-    const isTerminal = generation.status === 'COMPLETED' || generation.status === 'FAILED' || generation.status === 'CANCELLED';
+    const isTerminal =
+      generation.status === 'COMPLETED' || generation.status === 'FAILED' || generation.status === 'CANCELLED';
 
     if (!wasActive || !isTerminal) {
       return;
@@ -181,6 +182,14 @@ export const useReportGenerationPresenter = ({
   }, [latestQuery.data, report.id, t]);
 
   const onStartGeneration = useCallback(async () => {
+    if (report.status !== 'DRAFT' && report.status !== 'FAILED') {
+      logger.warn('report.generation_start_blocked', {
+        errorCode: report.status === 'READY' ? 'REPORT_NOT_EDITABLE' : 'REPORT_GENERATION_ACTIVE',
+        reportStatus: report.status,
+      });
+      return;
+    }
+
     if (hasRejectedAssets) {
       logger.warn('report.generation_start_blocked', { errorCode: 'rejected_assets' });
       toastService.showWarning(
@@ -254,9 +263,12 @@ export const useReportGenerationPresenter = ({
       logger.error('report.generation_start_failed', {
         errorCode: isUncertainResult ? 'uncertain_request_result' : 'local_exception',
       });
-      toastService.showError(String(t('reports.generation.startFailed')), String(t('reports.generation.errors.generic')));
+      toastService.showError(
+        String(t('reports.generation.startFailed')),
+        String(t('reports.generation.errors.generic')),
+      );
     }
-  }, [hasRejectedAssets, lockedUntil, onRejectedAssetsBlocked, startMutation, t]);
+  }, [hasRejectedAssets, lockedUntil, onRejectedAssetsBlocked, report.status, startMutation, t]);
 
   const onCancelGeneration = useCallback(async () => {
     const generation = latestQuery.data;
@@ -321,7 +333,8 @@ export const useReportGenerationPresenter = ({
   }, [isSharingOutput, outputQuery.data, report.id, report.title, t]);
 
   const generation = latestQuery.data;
-  const isActive = generation?.status === 'QUEUED' || generation?.status === 'PROCESSING';
+  const isReportActive = report.status === 'QUEUED' || report.status === 'PROCESSING';
+  const isActive = isReportActive || generation?.status === 'QUEUED' || generation?.status === 'PROCESSING';
   const canGenerateSource = Boolean(report.notes?.trim()) || hasReadyAssets || hasRejectedAssets;
   const lockRemainingSeconds = lockedUntil
     ? Math.max(0, Math.ceil((new Date(lockedUntil).getTime() - now) / 1_000))
@@ -355,6 +368,7 @@ export const useReportGenerationPresenter = ({
     canCancel: generation?.status === 'QUEUED',
     canGenerate:
       canGenerateSource &&
+      (report.status === 'DRAFT' || report.status === 'FAILED') &&
       !hasUnresolvedAssets &&
       !isActive &&
       lockRemainingSeconds === 0 &&

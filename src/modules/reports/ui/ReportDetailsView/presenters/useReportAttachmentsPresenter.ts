@@ -26,17 +26,12 @@ import {
   logAttachmentFailure,
   logAttachmentStage,
 } from '@/entities/report/services/reportAttachmentDiagnostics';
-import {
-  removeReportAssetCache,
-} from '@/entities/report/services/reportAssetAccessService';
+import { removeReportAssetCache } from '@/entities/report/services/reportAssetAccessService';
 import {
   ReportStorageUploadError,
   uploadReportAssetToStorage,
 } from '@/entities/report/services/reportAssetUploadService';
-import {
-  pickReportDocument,
-  pickReportImage,
-} from '@/entities/report/services/reportFilePickerService';
+import { pickReportDocument, pickReportImage } from '@/entities/report/services/reportFilePickerService';
 import { cleanupOwnedLocalFile } from '@/entities/report/services/reportLocalFileService';
 import type {
   ILocalReportAsset,
@@ -50,6 +45,8 @@ import { logger } from '@/libs/logger/logger';
 import { queryClient } from '@/libs/query/QueryClient';
 import { toastService } from '@/libs/toast/toastService';
 import { useDeleteReportAssetMutation, useReportAssetsQuery } from '@/modules/reports/presenters/reportAssetQueries';
+
+import { useReportMultiPhotoPresenter } from './useReportMultiPhotoPresenter';
 
 interface IInput {
   canEdit: boolean;
@@ -86,7 +83,10 @@ const errorCodesByType: Record<
   },
 };
 
-const getDevelopmentErrorDescription = (errorCode: ReportAttachmentErrorCode, friendly?: string): string | undefined => {
+const getDevelopmentErrorDescription = (
+  errorCode: ReportAttachmentErrorCode,
+  friendly?: string,
+): string | undefined => {
   if (!__DEV__) {
     return friendly;
   }
@@ -100,7 +100,9 @@ const isConnected = async (): Promise<boolean> => {
   return state.isConnected !== false && state.isInternetReachable !== false;
 };
 
-const cleanupTemporaryAsset = async (asset: Pick<IReportAssetCandidate, 'ownership' | 'type' | 'uri'>): Promise<void> => {
+const cleanupTemporaryAsset = async (
+  asset: Pick<IReportAssetCandidate, 'ownership' | 'type' | 'uri'>,
+): Promise<void> => {
   if (await cleanupOwnedLocalFile(asset.uri, asset.ownership)) {
     logger.debug('report.temporary_asset_removed', {
       assetType: asset.type,
@@ -109,10 +111,7 @@ const cleanupTemporaryAsset = async (asset: Pick<IReportAssetCandidate, 'ownersh
   }
 };
 
-const getUploadFailure = (
-  assetType: ReportAssetType,
-  stage: ReportAttachmentStage,
-): ReportAttachmentErrorCode => {
+const getUploadFailure = (assetType: ReportAssetType, stage: ReportAttachmentStage): ReportAttachmentErrorCode => {
   if (stage === 'CONFIRM_STARTED' || stage === 'CONFIRM_SUCCEEDED') {
     return errorCodesByType[assetType].confirm;
   }
@@ -160,6 +159,20 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
     }
   }, []);
 
+  const logMultiPhotoFailure = useCallback(
+    (asset: Pick<ILocalReportAsset, 'isMultiPhotoBatch'>, errorCode: string, stage: string) => {
+      if (asset.isMultiPhotoBatch) {
+        logger.warn('report.multi_photo_item_upload_failed', {
+          assetType: 'IMAGE',
+          errorCode,
+          platform: Platform.OS,
+          stage,
+        });
+      }
+    },
+    [],
+  );
+
   const showUploadFailure = useCallback(
     (errorCode: ReportAttachmentErrorCode, friendlyDescription?: string) => {
       toastService.showError(
@@ -172,6 +185,11 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
 
   const deleteServerAsset = useCallback(
     async (assetId: string): Promise<boolean> => {
+      if (!canEdit) {
+        logger.warn('report.attachment_delete_blocked', { errorCode: 'REPORT_NOT_EDITABLE' });
+        return false;
+      }
+
       if (activeDeleteIdsRef.current.has(assetId)) {
         return false;
       }
@@ -197,12 +215,20 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
         activeDeleteIdsRef.current.delete(assetId);
       }
     },
-    [deleteMutation, t],
+    [canEdit, deleteMutation, t],
   );
 
   const onUpload = useCallback(
     async (asset: ILocalReportAsset) => {
       if (activeUploadIdsRef.current.has(asset.id)) {
+        return;
+      }
+
+      if (!canEdit) {
+        logger.warn('report.attachment_upload_blocked', {
+          assetType: asset.type,
+          errorCode: 'REPORT_NOT_EDITABLE',
+        });
         return;
       }
 
@@ -216,6 +242,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
           const errorCode = errorCodesByType[asset.type].uploadRequest;
           logAttachmentFailure(asset.type, stage, errorCode, { platform: Platform.OS, status: 'offline' });
           updateLocalAsset(asset.id, { errorCode, status: 'FAILED' });
+          logMultiPhotoFailure(asset, errorCode, stage);
           showUploadFailure(errorCode, String(t('reports.errors.network')));
           return;
         }
@@ -261,6 +288,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
               status: response.type,
             });
             updateLocalAsset(asset.id, { errorCode, status: 'FAILED' });
+            logMultiPhotoFailure(asset, errorCode, stage);
             showUploadFailure(errorCode);
             return;
           }
@@ -296,6 +324,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
               status: error instanceof ReportStorageUploadError ? error.failureType : 'local_exception',
             });
             updateLocalAsset(asset.id, { errorCode, status: 'FAILED', uploadRequest });
+            logMultiPhotoFailure(asset, errorCode, stage);
             showUploadFailure(errorCode);
             return;
           }
@@ -319,9 +348,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
           const shouldRestartUpload = confirmResponse.status === 404 || confirmResponse.status === 410;
           const isDeterministicRejection =
             confirmResponse.data?.status === 'REJECTED' ||
-            ((confirmResponse.status ?? 0) >= 400 &&
-              (confirmResponse.status ?? 0) < 500 &&
-              !shouldRestartUpload);
+            ((confirmResponse.status ?? 0) >= 400 && (confirmResponse.status ?? 0) < 500 && !shouldRestartUpload);
 
           if (isDeterministicRejection) {
             setLocalAssets((current) => current.filter((item) => item.id !== asset.id));
@@ -334,6 +361,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
               uploadRequest: shouldRestartUpload ? undefined : uploadRequest,
             });
           }
+          logMultiPhotoFailure(asset, errorCode, stage);
           toastService.showError(
             String(t('reports.attachments.confirmFailed')),
             getDevelopmentErrorDescription(errorCode, String(t('reports.attachments.tryAgain'))),
@@ -367,12 +395,13 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
             : new ReportAttachmentError(asset.type, getUploadFailure(asset.type, stage), stage);
         logAttachmentFailure(asset.type, attachmentError.stage, attachmentError.code, { platform: Platform.OS });
         updateLocalAsset(asset.id, { errorCode: attachmentError.code, status: 'FAILED', uploadRequest });
+        logMultiPhotoFailure(asset, attachmentError.code, attachmentError.stage);
         showUploadFailure(attachmentError.code);
       } finally {
         activeUploadIdsRef.current.delete(asset.id);
       }
     },
-    [reportId, showUploadFailure, t, updateLocalAsset],
+    [canEdit, logMultiPhotoFailure, reportId, showUploadFailure, t, updateLocalAsset],
   );
 
   const onAddCandidate = useCallback(
@@ -381,11 +410,20 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
         return false;
       }
 
+      if (!canEdit) {
+        logger.warn('report.attachment_add_blocked', {
+          assetType: candidate.type,
+          errorCode: 'REPORT_NOT_EDITABLE',
+        });
+        return false;
+      }
+
       logAttachmentStage(candidate.type, 'VALIDATING', { platform: Platform.OS });
       const pendingCandidates: IReportAssetCandidate[] = localAssets
         .filter((asset) => asset.status !== 'READY')
         .map((asset) => ({ ...asset }));
-      const validationError = validateReportAssetCandidate(candidate, assetsQuery.data ?? [], pendingCandidates);
+      const editableServerAssets = (assetsQuery.data ?? []).filter((asset) => asset.status !== 'REJECTED');
+      const validationError = validateReportAssetCandidate(candidate, editableServerAssets, pendingCandidates);
 
       if (validationError) {
         const errorCode = errorCodesByType[candidate.type].validation;
@@ -431,7 +469,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
       setLocalAssets((current) => [...current, localAsset]);
       onUpload(localAsset).catch(() => undefined);
     },
-    [assetsQuery.data, localAssets, onUpload, t],
+    [assetsQuery.data, canEdit, localAssets, onUpload, t],
   );
 
   const showPickerFailure = useCallback(
@@ -459,15 +497,22 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
     [t],
   );
 
-  const onAddPhoto = useCallback(async () => {
-    try {
-      onAddCandidate(await pickReportImage('library'));
-    } catch (error) {
-      showPickerFailure(error, 'IMAGE');
-    }
-  }, [onAddCandidate, showPickerFailure]);
+  const { onAddPhoto } = useReportMultiPhotoPresenter({
+    assets: assetsQuery.data ?? [],
+    canEdit,
+    localAssets,
+    onUpload,
+    setLocalAssets,
+    showPickerFailure,
+    t,
+    updateLocalAsset,
+  });
 
   const onTakePhoto = useCallback(async () => {
+    if (!canEdit) {
+      return;
+    }
+
     logAttachmentStage('IMAGE', 'PERMISSION_REQUEST', { platform: Platform.OS, source: 'camera' });
 
     try {
@@ -488,17 +533,25 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
     } catch (error) {
       showPickerFailure(error, 'IMAGE');
     }
-  }, [onAddCandidate, showPickerFailure, t]);
+  }, [canEdit, onAddCandidate, showPickerFailure, t]);
 
   const onAddDocument = useCallback(async () => {
+    if (!canEdit) {
+      return;
+    }
+
     try {
       onAddCandidate(await pickReportDocument());
     } catch (error) {
       showPickerFailure(error, 'DOCUMENT');
     }
-  }, [onAddCandidate, showPickerFailure]);
+  }, [canEdit, onAddCandidate, showPickerFailure]);
 
   const onStartRecording = useCallback(async (): Promise<boolean> => {
+    if (!canEdit) {
+      return false;
+    }
+
     try {
       if (!(await requestMicrophonePermission())) {
         const error = new ReportAttachmentError('AUDIO', 'AUDIO_PERMISSION_DENIED', 'PERMISSION_REQUEST');
@@ -538,7 +591,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
       );
       return false;
     }
-  }, [t]);
+  }, [canEdit, t]);
 
   const onStopRecording = useCallback(async () => {
     if (isStoppingRecordingRef.current) {
@@ -611,30 +664,82 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
   }, [t]);
 
   const onRetryUpload = useCallback(
-    (id: string) => {
-      const asset = localAssets.find((item) => item.id === id);
-      if (asset) {
-        onUpload(asset).catch(() => undefined);
+    async (id: string) => {
+      if (!canEdit) {
+        return;
       }
+
+      const asset = localAssets.find((item) => item.id === id);
+      if (!asset) {
+        return;
+      }
+
+      if (asset.retryKind === 'REPICK') {
+        try {
+          const candidate = await pickReportImage('library');
+          if (!candidate) {
+            return;
+          }
+
+          const pendingCandidates: IReportAssetCandidate[] = localAssets
+            .filter((item) => item.id !== id && item.status !== 'READY')
+            .map((item) => ({ ...item }));
+          const validationError = validateReportAssetCandidate(
+            candidate,
+            (assetsQuery.data ?? []).filter((item) => item.status !== 'REJECTED'),
+            pendingCandidates,
+          );
+          if (validationError) {
+            await cleanupTemporaryAsset(candidate);
+            updateLocalAsset(id, { errorCode: validationError, status: 'FAILED' });
+            return;
+          }
+
+          const replacement: ILocalReportAsset = {
+            ...asset,
+            ...candidate,
+            errorCode: undefined,
+            progress: 0,
+            retryKind: undefined,
+            status: 'LOCAL',
+            uploadRequest: undefined,
+          };
+          cleanupTemporaryAsset(asset).catch(() => undefined);
+          updateLocalAsset(id, replacement);
+          onUpload(replacement).catch(() => undefined);
+        } catch (error) {
+          showPickerFailure(error, 'IMAGE');
+        }
+        return;
+      }
+
+      onUpload(asset).catch(() => undefined);
     },
-    [localAssets, onUpload],
+    [assetsQuery.data, canEdit, localAssets, onUpload, showPickerFailure, updateLocalAsset],
   );
 
-  const onRemoveLocalAsset = useCallback((id: string) => {
-    setLocalAssets((current) => {
-      const asset = current.find((item) => item.id === id);
-      if (asset) {
-        cleanupTemporaryAsset(asset).catch(() => {
-          logger.warn('report.temporary_asset_cleanup_failed', {
-            assetType: asset.type,
-            errorCode: 'local_exception',
-            uriScheme: getUriScheme(asset.uri),
-          });
-        });
+  const onRemoveLocalAsset = useCallback(
+    (id: string) => {
+      if (!canEdit) {
+        return;
       }
-      return current.filter((item) => item.id !== id);
-    });
-  }, []);
+
+      setLocalAssets((current) => {
+        const asset = current.find((item) => item.id === id);
+        if (asset) {
+          cleanupTemporaryAsset(asset).catch(() => {
+            logger.warn('report.temporary_asset_cleanup_failed', {
+              assetType: asset.type,
+              errorCode: 'local_exception',
+              uriScheme: getUriScheme(asset.uri),
+            });
+          });
+        }
+        return current.filter((item) => item.id !== id);
+      });
+    },
+    [canEdit],
+  );
 
   const onRemoveServerAsset = useCallback(
     (assetId: string): Promise<boolean> => deleteServerAsset(assetId),
@@ -643,7 +748,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
 
   const onRetryRejectedAsset = useCallback(
     async (assetId: string) => {
-      if (retryingRejectedAssetId) {
+      if (!canEdit || retryingRejectedAssetId) {
         return;
       }
 
@@ -687,6 +792,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
     },
     [
       assetsQuery.data,
+      canEdit,
       onAddCandidate,
       deleteServerAsset,
       onStartRecording,
@@ -704,8 +810,7 @@ export const useReportAttachmentsPresenter = ({ canEdit, reportId, t }: IInput) 
       (assetsQuery.data?.some((asset) => asset.status === 'READY') ?? false) ||
       localAssets.some((asset) => asset.status === 'READY'),
     hasUnresolvedAssets:
-      unresolvedAssets.length > 0 ||
-      (assetsQuery.data?.some((asset) => asset.status === 'PENDING_UPLOAD') ?? false),
+      unresolvedAssets.length > 0 || (assetsQuery.data?.some((asset) => asset.status === 'PENDING_UPLOAD') ?? false),
     hasRejectedAssets: assetsQuery.data?.some((asset) => asset.status === 'REJECTED') ?? false,
     isLoadingAssets: assetsQuery.isPending,
     isRecording,
