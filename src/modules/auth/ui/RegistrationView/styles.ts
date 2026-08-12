@@ -3,14 +3,14 @@ import { StyleSheet } from 'react-native';
 import type { Colors, Spacing } from '@/UIProvider/theme/types';
 import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
-export const getStyles = (colors: Colors, spacing: Spacing) => {
+export const getStyles = (colors: Colors, spacing: Spacing, topInset: number) => {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.white,
+      backgroundColor: colors.background,
       gap: scaleVertical(spacing.lg),
       paddingHorizontal: scaleHorizontal(spacing.xl),
-      paddingTop: scaleVertical(46),
+      paddingTop: scaleVertical(46) + topInset,
     },
     fields: {
       gap: scaleVertical(spacing.lg),

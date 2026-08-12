@@ -4,8 +4,8 @@ import { i18n, initializeLocalization } from '@/localization/i18n';
 import { DEFAULT_LANGUAGE } from '@/localization/languages';
 import { persistLanguage } from '@/localization/storage';
 import type { SupportedLanguage } from '@/localization/types';
-import { radius } from '@/theme/radius';
-import { spacing } from '@/theme/spacing';
+import { radius } from '@/UIProvider/theme/radius';
+import { spacing } from '@/UIProvider/theme/spacing';
 
 import { languages } from './config';
 import { colors } from './theme/Colors';

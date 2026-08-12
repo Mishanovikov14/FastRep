@@ -15,7 +15,7 @@ export const SplashView = () => {
   const { errorMessage, hasTemporaryError, isLoading, onRetry } = useSplashViewPresenter({ t });
 
   return (
-    <ScreenContainer backgroundColor={colors.white} containerStyle={styles.content}>
+    <ScreenContainer backgroundColor={colors.background} containerStyle={styles.content}>
       <Image
         accessibilityLabel="FastRep"
         resizeMode="contain"

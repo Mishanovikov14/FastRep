@@ -16,7 +16,7 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       height: 4,
     },
     audioProgressTrack: {
-      backgroundColor: colors.primaryLight,
+      backgroundColor: colors.background,
       borderRadius: 2,
       height: 4,
       overflow: 'hidden',
@@ -25,7 +25,7 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       alignItems: 'center',
       borderColor: colors.border,
       borderRadius: scaleHorizontal(radius.md),
-      borderWidth: StyleSheet.hairlineWidth,
+      borderWidth: 1,
       flexDirection: 'row',
       gap: scaleHorizontal(spacing.sm),
       minHeight: scaleVertical(68),
@@ -59,8 +59,8 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
     },
     typeIcon: {
       alignItems: 'center',
-      backgroundColor: colors.primaryLight,
-      borderRadius: scaleHorizontal(radius.sm),
+      backgroundColor: colors.background,
+      borderRadius: scaleHorizontal(radius.md),
       height: scaleHorizontal(52),
       justifyContent: 'center',
       width: scaleHorizontal(52),

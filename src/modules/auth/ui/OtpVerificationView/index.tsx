@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Image, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { VerificationCodeInput } from '@/modules/auth/ui/components/VerificationCodeInput';
 import { Button } from '@/UIKit/Button';
@@ -12,7 +13,8 @@ import { getStyles } from './styles';
 
 export const OtpVerificationView = () => {
   const { colors, spacing, t } = useUIContext();
-  const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
+  const { top } = useSafeAreaInsets();
+  const styles = useMemo(() => getStyles(colors, spacing, top), [colors, spacing, top]);
   const {
     code,
     codeError,
@@ -27,7 +29,7 @@ export const OtpVerificationView = () => {
   } = useOtpVerificationViewPresenter({ t });
 
   return (
-    <ScreenContainer backgroundColor={colors.white} edges={['top', 'bottom']} isKeyboardAvoiding scrollEnabled>
+    <ScreenContainer backgroundColor={colors.white} edges={['bottom']} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"

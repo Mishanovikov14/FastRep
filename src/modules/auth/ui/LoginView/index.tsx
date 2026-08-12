@@ -9,10 +9,12 @@ import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { useLoginViewPresenter } from './presenters/useLoginViewPresenter';
 import { getStyles } from './styles';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const LoginView = () => {
   const { colors, spacing, t } = useUIContext();
-  const styles = useMemo(() => getStyles(colors, spacing), [colors, spacing]);
+  const { top } = useSafeAreaInsets();
+  const styles = useMemo(() => getStyles(colors, spacing, top), [colors, spacing, top]);
   const {
     email,
     emailError,
@@ -27,7 +29,7 @@ export const LoginView = () => {
   } = useLoginViewPresenter({ t });
 
   return (
-    <ScreenContainer backgroundColor={colors.white} edges={['top', 'bottom']} isKeyboardAvoiding scrollEnabled>
+    <ScreenContainer backgroundColor={colors.white} edges={['bottom']} isKeyboardAvoiding scrollEnabled>
       <View style={styles.container}>
         <Image
           accessibilityLabel="FastRep"
