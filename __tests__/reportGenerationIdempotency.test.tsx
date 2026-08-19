@@ -26,6 +26,7 @@ jest.mock('@/modules/reports/presenters/reportGenerationQueries', () => ({
   useStartReportGenerationMutation: jest.fn(),
 }));
 jest.mock('@/entities/report/services/reportOutputService', () => ({
+  ...jest.requireActual('@/entities/report/services/reportOutputService'),
   openReportOutput: jest.fn(),
   shareReportOutput: jest.fn(),
 }));

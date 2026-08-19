@@ -160,6 +160,72 @@ describe('report file picker service', () => {
     });
   });
 
+  it('preserves the original user-facing document name and MIME type', async () => {
+    mockPick.mockResolvedValue([
+      {
+        error: null,
+        hasRequestedType: true,
+        name: 'Invoice August 2026.xlsx',
+        size: 4096,
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        uri: 'content://provider/invoice',
+      },
+    ]);
+    mockKeepLocalCopy.mockResolvedValue([
+      {
+        localUri: 'file:///cache/Invoice-August-2026.xlsx',
+        sourceUri: 'content://provider/invoice',
+        status: 'success',
+      },
+    ]);
+
+    await expect(pickReportDocument()).resolves.toMatchObject({
+      displayName: 'Invoice August 2026.xlsx',
+      fileName: 'Invoice-August-2026.xlsx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      uri: 'file:///cache/Invoice-August-2026.xlsx',
+    });
+  });
+
+  it('exports an Android virtual document to a supported local file type', async () => {
+    mockPick.mockResolvedValue([
+      {
+        convertibleToMimeTypes: [
+          { extension: 'xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+        ],
+        error: null,
+        hasRequestedType: true,
+        isVirtual: true,
+        name: 'Inspection sheet',
+        type: 'application/vnd.google-apps.spreadsheet',
+        uri: 'content://provider/virtual-sheet',
+      },
+    ]);
+    mockKeepLocalCopy.mockResolvedValue([
+      {
+        localUri: 'file:///cache/Inspection-sheet.xlsx',
+        sourceUri: 'content://provider/virtual-sheet',
+        status: 'success',
+      },
+    ]);
+
+    await expect(pickReportDocument()).resolves.toMatchObject({
+      displayName: 'Inspection sheet',
+      fileName: 'Inspection-sheet.xlsx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    });
+    expect(mockKeepLocalCopy).toHaveBeenCalledWith({
+      destination: 'cachesDirectory',
+      files: [
+        {
+          convertVirtualFileToType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          fileName: 'Inspection-sheet.xlsx',
+          uri: 'content://provider/virtual-sheet',
+        },
+      ],
+    });
+  });
+
   it('resolves an exact supported document MIME when a provider returns octet-stream', async () => {
     mockPick.mockResolvedValue([
       {

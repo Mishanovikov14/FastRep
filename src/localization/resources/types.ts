@@ -196,6 +196,7 @@ export interface TranslationResources {
       tryAgain: string;
       types: Record<'AUDIO' | 'DOCUMENT' | 'IMAGE', string>;
       uploadFailed: string;
+      viewerUnavailable: string;
       validation: Record<
         | 'audioDurationTooLong'
         | 'fileTooLarge'
@@ -306,6 +307,7 @@ export interface TranslationResources {
       share: string;
       shareFailed: string;
       tryAgain: string;
+      viewerUnavailable: string;
     };
     status: {
       draft: string;

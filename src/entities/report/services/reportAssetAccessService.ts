@@ -1,14 +1,21 @@
-import FileViewer from 'react-native-file-viewer';
+import { Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 
 import { getActiveAppEnvironment } from '@/entities/environment/services/appEnvironmentService';
 import { createReportAssetDownloadUrl } from '@/entities/report/API/reportAssetsApi';
+import {
+  openLocalReportDocument,
+  ReportDocumentViewerError,
+} from '@/entities/report/services/reportDocumentViewerService';
 import type { IReportAsset } from '@/entities/report/types/reportAsset';
+import { logger } from '@/libs/logger/logger';
 
 export type ReportAssetAccessErrorCode =
   | 'ASSET_DOWNLOAD_REQUEST_FAILED'
   | 'ASSET_DOWNLOAD_FAILED'
-  | 'ASSET_VIEWER_UNAVAILABLE';
+  | 'ASSET_LOCAL_FILE_INVALID'
+  | 'ASSET_VIEWER_UNAVAILABLE'
+  | 'ASSET_VIEW_FAILED';
 
 export class ReportAssetAccessError extends Error {
   constructor(public readonly code: ReportAssetAccessErrorCode, public readonly httpStatus?: number) {
@@ -37,7 +44,7 @@ const extensionByMimeType: Record<string, string> = {
 
 const getCachePath = (reportId: string, asset: IReportAsset): string => {
   const environment = getActiveAppEnvironment().key;
-  const mimeType = asset.verifiedMimeType ?? asset.declaredMimeType;
+  const mimeType = (asset.verifiedMimeType ?? asset.declaredMimeType).toLowerCase();
   const extension = extensionByMimeType[mimeType] ?? 'bin';
 
   return `${RNFS.CachesDirectoryPath}/${CACHE_PREFIX}${environment}-${reportId}-${asset.id}.${extension}`;
@@ -49,17 +56,69 @@ const removePartialDownload = async (path: string): Promise<void> => {
   }
 };
 
+const assertDownloadedFileIsReadable = async (path: string, assetType: IReportAsset['type']): Promise<void> => {
+  let size: number;
+
+  try {
+    size = Number((await RNFS.stat(path)).size);
+  } catch {
+    logger.warn('report.attachment_local_file_validation_failed', {
+      assetType,
+      errorCode: 'ASSET_DOWNLOAD_FAILED',
+      platform: Platform.OS,
+      stage: 'LOCAL_FILE_VALIDATION',
+    });
+    throw new ReportAssetAccessError('ASSET_DOWNLOAD_FAILED');
+  }
+
+  if (!Number.isFinite(size) || size <= 0) {
+    logger.warn('report.attachment_local_file_validation_failed', {
+      assetType,
+      errorCode: 'ASSET_DOWNLOAD_FAILED',
+      platform: Platform.OS,
+      stage: 'LOCAL_FILE_VALIDATION',
+    });
+    throw new ReportAssetAccessError('ASSET_DOWNLOAD_FAILED');
+  }
+};
+
 const downloadFreshAsset = async (reportId: string, asset: IReportAsset, path: string): Promise<void> => {
+  logger.debug('report.attachment_download_url_request_started', {
+    assetType: asset.type,
+    platform: Platform.OS,
+    stage: 'DOWNLOAD_URL_REQUEST',
+  });
   const response = await createReportAssetDownloadUrl(reportId, asset.id);
 
   if (response.isError || !response.data) {
+    logger.warn('report.attachment_download_url_request_failed', {
+      assetType: asset.type,
+      errorCode: 'ASSET_DOWNLOAD_REQUEST_FAILED',
+      httpStatus: response.status,
+      platform: Platform.OS,
+      stage: 'DOWNLOAD_URL_REQUEST',
+    });
     throw new ReportAssetAccessError('ASSET_DOWNLOAD_REQUEST_FAILED', response.status);
   }
 
+  logger.debug('report.attachment_download_started', {
+    assetType: asset.type,
+    platform: Platform.OS,
+    stage: 'DOWNLOAD',
+  });
   const result = await RNFS.downloadFile({ fromUrl: response.data.url, toFile: path }).promise;
   if (result.statusCode < 200 || result.statusCode >= 300) {
+    logger.warn('report.attachment_download_failed', {
+      assetType: asset.type,
+      errorCode: 'ASSET_DOWNLOAD_FAILED',
+      httpStatus: result.statusCode,
+      platform: Platform.OS,
+      stage: 'DOWNLOAD',
+    });
     throw new ReportAssetAccessError('ASSET_DOWNLOAD_FAILED', result.statusCode);
   }
+
+  await assertDownloadedFileIsReadable(path, asset.type);
 };
 
 export const cleanupReportAssetCache = async (): Promise<void> => {
@@ -88,7 +147,12 @@ export const ensureReportAssetFile = (reportId: string, asset: IReportAsset): Pr
 
   const operation = (async () => {
     if (await RNFS.exists(path)) {
-      return path;
+      try {
+        await assertDownloadedFileIsReadable(path, asset.type);
+        return path;
+      } catch {
+        await removePartialDownload(path);
+      }
     }
 
     let lastError: unknown;
@@ -117,10 +181,23 @@ export const ensureReportAssetFile = (reportId: string, asset: IReportAsset): Pr
 
 export const openReportDocumentAsset = async (reportId: string, asset: IReportAsset): Promise<void> => {
   const path = await ensureReportAssetFile(reportId, asset);
+  const mimeType = (asset.verifiedMimeType ?? asset.declaredMimeType).toLowerCase();
 
   try {
-    await FileViewer.open(path, { showOpenWithDialog: true });
-  } catch {
-    throw new ReportAssetAccessError('ASSET_VIEWER_UNAVAILABLE');
+    await openLocalReportDocument({ headerTitle: asset.originalFileName, mimeType, path });
+  } catch (error) {
+    if (error instanceof ReportDocumentViewerError) {
+      if (error.code === 'VIEWER_UNAVAILABLE') {
+        throw new ReportAssetAccessError('ASSET_VIEWER_UNAVAILABLE');
+      }
+
+      if (error.code === 'VIEW_FAILED') {
+        throw new ReportAssetAccessError('ASSET_VIEW_FAILED');
+      }
+
+      throw new ReportAssetAccessError('ASSET_LOCAL_FILE_INVALID');
+    }
+
+    throw new ReportAssetAccessError('ASSET_VIEW_FAILED');
   }
 };

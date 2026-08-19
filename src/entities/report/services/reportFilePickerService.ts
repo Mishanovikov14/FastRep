@@ -49,6 +49,18 @@ const getMimeType = (mimeType?: string | null, fileName?: string): string | unde
     : extensionMimeType;
 };
 
+const getDocumentCopyFileName = (fileName: string, extension: string): string => {
+  const sanitized = sanitizeAssetFileName(fileName, extension);
+  const currentExtension = getExtension(sanitized);
+
+  if (currentExtension === extension) {
+    return sanitized;
+  }
+
+  const baseName = currentExtension ? sanitized.replace(/\.[^.]+$/u, '') : sanitized;
+  return `${baseName}.${extension}`;
+};
+
 const assertReadableImageUri = (uri: string): void => {
   try {
     normalizeLocalFilePath(uri);
@@ -284,21 +296,26 @@ export const pickReportDocument = async (): Promise<IReportAssetCandidate | unde
     platform: Platform.OS,
     uriScheme: getUriScheme(document.uri),
   });
-  const mimeType = getMimeType(document.type, document.name ?? undefined);
+  const virtualFileMimeType = document.isVirtual
+    ? document.convertibleToMimeTypes?.find(({ mimeType: candidateMimeType }) =>
+        (supportedAssetMimeTypes.DOCUMENT as readonly string[]).includes(candidateMimeType),
+      )?.mimeType
+    : undefined;
+  const mimeType = getMimeType(virtualFileMimeType ?? document.type, document.name ?? undefined);
 
   if (!mimeType) {
     throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_MIME_MISSING', 'METADATA_NORMALIZING');
   }
 
   if (
-    document.hasRequestedType === false ||
+    (document.hasRequestedType === false && !virtualFileMimeType) ||
     !(supportedAssetMimeTypes.DOCUMENT as readonly string[]).includes(mimeType)
   ) {
     throw new ReportAttachmentError('DOCUMENT', 'DOCUMENT_UNSUPPORTED_TYPE', 'METADATA_NORMALIZING');
   }
 
   const extension = extensionByMimeType[mimeType] ?? 'bin';
-  const fileName = sanitizeAssetFileName(document.name ?? `document-${Date.now()}.${extension}`, extension);
+  const fileName = getDocumentCopyFileName(document.name ?? `document-${Date.now()}.${extension}`, extension);
   logAttachmentStage('DOCUMENT', 'FILE_NORMALIZATION', {
     platform: Platform.OS,
     uriScheme: getUriScheme(document.uri),
@@ -308,7 +325,13 @@ export const pickReportDocument = async (): Promise<IReportAssetCandidate | unde
   try {
     const [copy] = await keepLocalCopy({
       destination: 'cachesDirectory',
-      files: [{ fileName, uri: document.uri }],
+      files: [
+        {
+          ...(virtualFileMimeType ? { convertVirtualFileToType: virtualFileMimeType } : {}),
+          fileName,
+          uri: document.uri,
+        },
+      ],
     });
 
     if (copy.status !== 'success' || !copy.localUri) {

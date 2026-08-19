@@ -36,6 +36,11 @@ jest.mock('@react-native-documents/picker', () => ({
   keepLocalCopy: jest.fn(),
   pick: jest.fn(),
 }));
+jest.mock('@react-native-documents/viewer', () => ({
+  errorCodes: { NULL_PRESENTER: 'NULL_PRESENTER', UNABLE_TO_OPEN_FILE_TYPE: 'UNABLE_TO_OPEN_FILE_TYPE' },
+  isErrorWithCode: (error) => typeof error === 'object' && error !== null && 'code' in error,
+  viewDocument: jest.fn(),
+}));
 jest.mock('react-native-image-picker', () => ({ launchCamera: jest.fn(), launchImageLibrary: jest.fn() }));
 jest.mock('react-native-nitro-sound', () => ({
   __esModule: true,
@@ -83,7 +88,6 @@ jest.mock('react-native-fs', () => ({
     write: jest.fn(async () => undefined),
   },
 }));
-jest.mock('react-native-file-viewer', () => ({ __esModule: true, default: { open: jest.fn() } }));
 jest.mock('react-native-share', () => ({ __esModule: true, default: { open: jest.fn() } }));
 jest.mock('uuid', () => ({ v4: jest.fn(() => '00000000-0000-4000-8000-000000000001') }));
 jest.mock('react-native-localize', () => ({

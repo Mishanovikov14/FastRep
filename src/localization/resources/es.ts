@@ -204,6 +204,7 @@ export const es: TranslationResources = {
       tryAgain: 'Inténtalo de nuevo.',
       types: { AUDIO: 'Audio', DOCUMENT: 'Archivo', IMAGE: 'Foto' },
       uploadFailed: 'Error al cargar el archivo adjunto',
+      viewerUnavailable: 'Ninguna aplicación de este dispositivo puede abrir este tipo de archivo',
       validation: {
         audioDurationTooLong: 'Las grabaciones de audio pueden durar hasta 20 minutos.',
         fileTooLarge: 'Este archivo es demasiado grande.',
@@ -320,6 +321,7 @@ export const es: TranslationResources = {
       share: 'Compartir informe',
       shareFailed: 'No se pudo compartir el informe',
       tryAgain: 'Descarga el PDF de nuevo y vuelve a intentarlo.',
+      viewerUnavailable: 'Ninguna aplicación de este dispositivo puede abrir archivos PDF',
     },
     status: {
       draft: 'Borrador',

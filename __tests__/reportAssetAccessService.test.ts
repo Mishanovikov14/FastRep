@@ -1,4 +1,4 @@
-import FileViewer from 'react-native-file-viewer';
+import { viewDocument } from '@react-native-documents/viewer';
 import RNFS from 'react-native-fs';
 
 import { createReportAssetDownloadUrl } from '@/entities/report/API/reportAssetsApi';
@@ -30,8 +30,9 @@ const asset: IReportAsset = {
 describe('report asset access service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.mocked(RNFS.exists).mockResolvedValue(false);
+    jest.mocked(RNFS.exists).mockResolvedValue(true).mockResolvedValueOnce(false);
     jest.mocked(RNFS.readDir).mockResolvedValue([]);
+    jest.mocked(RNFS.stat).mockResolvedValue({ size: 2048 } as never);
     jest.mocked(RNFS.unlink).mockResolvedValue();
     jest.mocked(createReportAssetDownloadUrl).mockResolvedValue({
       data: { expiresAt: '2026-08-11T10:05:00.000Z', url: 'https://signed.example/one' },
@@ -79,8 +80,11 @@ describe('report asset access service', () => {
   it('opens the downloaded local document', async () => {
     await openReportDocumentAsset('report-1', { ...asset, id: 'document-2' });
 
-    expect(FileViewer.open).toHaveBeenCalledWith(expect.stringContaining('document-2.pdf'), {
-      showOpenWithDialog: true,
+    expect(viewDocument).toHaveBeenCalledWith({
+      grantPermissions: 'read',
+      headerTitle: 'inspection.pdf',
+      mimeType: 'application/pdf',
+      uri: expect.stringContaining('file:///cache/FastRep-asset-development-report-1-document-2.pdf'),
     });
   });
 
@@ -107,16 +111,59 @@ describe('report asset access service', () => {
         ),
       }),
     );
-    expect(FileViewer.open).toHaveBeenCalledWith(expect.stringContaining(`document-${extension}.${extension}`), {
-      showOpenWithDialog: true,
-    });
+    expect(viewDocument).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mimeType,
+        uri: expect.stringContaining(`document-${extension}.${extension}`),
+      }),
+    );
   });
 
   it('returns a stable friendly error when the OS has no viewer', async () => {
-    jest.mocked(FileViewer.open).mockRejectedValueOnce(new Error('unsupported'));
+    jest.mocked(viewDocument).mockRejectedValueOnce(
+      Object.assign(new Error('unsupported'), { code: 'UNABLE_TO_OPEN_FILE_TYPE' }),
+    );
 
     await expect(openReportDocumentAsset('report-1', { ...asset, id: 'document-3' })).rejects.toEqual(
       expect.objectContaining<Partial<ReportAssetAccessError>>({ code: 'ASSET_VIEWER_UNAVAILABLE' }),
     );
+  });
+
+  it('uses verified MIME type instead of declared MIME type for the cache extension and viewer', async () => {
+    await openReportDocumentAsset('report-verified', {
+      ...asset,
+      declaredMimeType: 'application/octet-stream',
+      id: 'document-verified',
+      verifiedMimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    });
+
+    expect(viewDocument).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        uri: expect.stringContaining('document-verified.docx'),
+      }),
+    );
+  });
+
+  it('does not invoke the viewer when both download attempts produce an empty file', async () => {
+    jest.mocked(RNFS.stat).mockResolvedValue({ size: 0 } as never);
+
+    await expect(openReportDocumentAsset('report-empty', { ...asset, id: 'document-empty' })).rejects.toEqual(
+      expect.objectContaining<Partial<ReportAssetAccessError>>({ code: 'ASSET_DOWNLOAD_FAILED' }),
+    );
+    expect(RNFS.downloadFile).toHaveBeenCalledTimes(2);
+    expect(viewDocument).not.toHaveBeenCalled();
+  });
+
+  it('classifies a failed download as a download error before viewer invocation', async () => {
+    jest.mocked(RNFS.downloadFile).mockReturnValue({
+      jobId: 1,
+      promise: Promise.resolve({ bytesWritten: 0, jobId: 1, statusCode: 500 }),
+    });
+
+    await expect(openReportDocumentAsset('report-failed', { ...asset, id: 'document-failed' })).rejects.toEqual(
+      expect.objectContaining<Partial<ReportAssetAccessError>>({ code: 'ASSET_DOWNLOAD_FAILED', httpStatus: 500 }),
+    );
+    expect(viewDocument).not.toHaveBeenCalled();
   });
 });

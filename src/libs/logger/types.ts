@@ -6,6 +6,7 @@ export interface ISafeLogMetadata {
   declaredMimeType?: string;
   durationSeconds?: number;
   errorCode?: string;
+  extension?: string;
   generationStatus?: string;
   hasFileName?: boolean;
   hasFileSize?: boolean;

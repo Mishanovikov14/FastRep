@@ -5,7 +5,11 @@ import { AppState } from 'react-native';
 import { v4 as uuidv4 } from 'uuid';
 
 import { getReportDisplayTitle } from '@/entities/report/model/reportDisplayNames';
-import { openReportOutput, shareReportOutput } from '@/entities/report/services/reportOutputService';
+import {
+  openReportOutput,
+  ReportOutputAccessError,
+  shareReportOutput,
+} from '@/entities/report/services/reportOutputService';
 import type { IReport } from '@/entities/report/types/report';
 import type { IReportGeneration } from '@/entities/report/types/reportGeneration';
 import { logger } from '@/libs/logger/logger';
@@ -302,9 +306,19 @@ export const useReportGenerationPresenter = ({
     try {
       await openReportOutput(report.id, output.generationId);
       logger.info('report.output_opened', { operation: 'open_pdf' });
-    } catch {
-      logger.error('report.output_open_failed', { operation: 'open_pdf' });
-      toastService.showError(String(t('reports.output.openFailed')), String(t('reports.output.tryAgain')));
+    } catch (error) {
+      const errorCode = error instanceof ReportOutputAccessError ? error.code : 'local_exception';
+      logger.error('report.output_open_failed', { assetType: 'DOCUMENT', errorCode, operation: 'open_pdf' });
+      toastService.showError(
+        String(
+          t(
+            error instanceof ReportOutputAccessError && error.code === 'OUTPUT_VIEWER_UNAVAILABLE'
+              ? 'reports.output.viewerUnavailable'
+              : 'reports.output.openFailed',
+          ),
+        ),
+        String(t('reports.output.tryAgain')),
+      );
     } finally {
       setIsOpeningOutput(false);
     }

@@ -6,20 +6,17 @@ import ReactTestRenderer from 'react-test-renderer';
 import {
   ensureReportAssetFile,
   openReportDocumentAsset,
+  ReportAssetAccessError,
 } from '@/entities/report/services/reportAssetAccessService';
 import type { IReportAsset } from '@/entities/report/types/reportAsset';
 import { toastService } from '@/libs/toast/toastService';
 import { useReportAttachmentAccessPresenter } from '@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentAccessPresenter';
 
-jest.mock('@/entities/report/services/reportAssetAccessService', () => {
-  class ReportAssetAccessError extends Error {}
-
-  return {
-    ensureReportAssetFile: jest.fn(),
-    openReportDocumentAsset: jest.fn(),
-    ReportAssetAccessError,
-  };
-});
+jest.mock('@/entities/report/services/reportAssetAccessService', () => ({
+  ...jest.requireActual('@/entities/report/services/reportAssetAccessService'),
+  ensureReportAssetFile: jest.fn(),
+  openReportDocumentAsset: jest.fn(),
+}));
 jest.mock('@/libs/logger/logger', () => ({
   logger: { debug: jest.fn(), error: jest.fn(), info: jest.fn(), warn: jest.fn() },
 }));
@@ -134,6 +131,22 @@ describe('report attachment access presenter', () => {
     expect(Sound.removePlaybackEndListener).toHaveBeenCalled();
     errorSpy.mockRestore();
     renderer = undefined;
+  });
+
+  it('shows a localized viewer-unavailable message instead of an internal error code', async () => {
+    const document = createAsset('document-unavailable', 'DOCUMENT');
+    assets = [document];
+    jest.mocked(openReportDocumentAsset).mockRejectedValueOnce(new ReportAssetAccessError('ASSET_VIEWER_UNAVAILABLE'));
+    const errorSpy = jest.spyOn(toastService, 'showError');
+    await render();
+
+    await ReactTestRenderer.act(async () => presenter?.onOpenAsset(document));
+
+    expect(errorSpy).toHaveBeenCalledWith(
+      'reports.attachments.viewerUnavailable',
+      'reports.attachments.tryAgain',
+    );
+    errorSpy.mockRestore();
   });
 
   it('requires confirmation and prevents duplicate persisted deletion', async () => {

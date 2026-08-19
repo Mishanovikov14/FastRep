@@ -204,6 +204,7 @@ export const uk: TranslationResources = {
       tryAgain: 'Спробуйте ще раз.',
       types: { AUDIO: 'Аудіо', DOCUMENT: 'Файл', IMAGE: 'Фото' },
       uploadFailed: 'Не вдалося завантажити вкладення',
+      viewerUnavailable: 'На пристрої немає застосунку, який підтримує цей тип файлу',
       validation: {
         audioDurationTooLong: 'Аудіозапис може тривати до 20 хвилин.',
         fileTooLarge: 'Цей файл завеликий.',
@@ -320,6 +321,7 @@ export const uk: TranslationResources = {
       share: 'Поділитися звітом',
       shareFailed: 'Не вдалося поділитися звітом',
       tryAgain: 'Завантажте PDF ще раз і повторіть.',
+      viewerUnavailable: 'На пристрої немає застосунку, який підтримує PDF-файли',
     },
     status: {
       draft: 'Чернетка',

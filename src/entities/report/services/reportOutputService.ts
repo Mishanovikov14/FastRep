@@ -1,9 +1,27 @@
-import FileViewer from 'react-native-file-viewer';
+import { Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
 
 import { getActiveAppEnvironment } from '@/entities/environment/services/appEnvironmentService';
 import { createReportOutputDownloadUrl } from '@/entities/report/API/reportGenerationsApi';
+import {
+  openLocalReportDocument,
+  ReportDocumentViewerError,
+} from '@/entities/report/services/reportDocumentViewerService';
+import { logger } from '@/libs/logger/logger';
+
+export type ReportOutputAccessErrorCode =
+  | 'OUTPUT_DOWNLOAD_FAILED'
+  | 'OUTPUT_LOCAL_FILE_INVALID'
+  | 'OUTPUT_VIEWER_UNAVAILABLE'
+  | 'OUTPUT_VIEW_FAILED';
+
+export class ReportOutputAccessError extends Error {
+  constructor(public readonly code: ReportOutputAccessErrorCode) {
+    super(code);
+    this.name = 'ReportOutputAccessError';
+  }
+}
 
 const CACHE_PREFIX = 'FastRep-output-';
 const MAX_CACHED_OUTPUTS = 10;
@@ -11,14 +29,72 @@ const INVALID_FILENAME_CHARACTERS = new Set(['<', '>', ':', '"', '/', '\\', '|',
 const inFlightDownloads = new Map<string, Promise<string>>();
 
 const downloadOutput = async (reportId: string, cachePath: string): Promise<boolean> => {
+  logger.debug('report.output_download_url_request_started', {
+    assetType: 'DOCUMENT',
+    platform: Platform.OS,
+    stage: 'DOWNLOAD_URL_REQUEST',
+  });
   const response = await createReportOutputDownloadUrl(reportId);
 
   if (response.isError || !response.data) {
+    logger.warn('report.output_download_url_request_failed', {
+      assetType: 'DOCUMENT',
+      errorCode: 'OUTPUT_DOWNLOAD_FAILED',
+      httpStatus: response.status,
+      platform: Platform.OS,
+      stage: 'DOWNLOAD_URL_REQUEST',
+    });
     return false;
   }
 
+  logger.debug('report.output_download_started', {
+    assetType: 'DOCUMENT',
+    mimeType: 'application/pdf',
+    platform: Platform.OS,
+    stage: 'DOWNLOAD',
+  });
   const download = await RNFS.downloadFile({ fromUrl: response.data.url, toFile: cachePath }).promise;
+  if (download.statusCode < 200 || download.statusCode >= 300) {
+    logger.warn('report.output_download_failed', {
+      assetType: 'DOCUMENT',
+      errorCode: 'OUTPUT_DOWNLOAD_FAILED',
+      httpStatus: download.statusCode,
+      mimeType: 'application/pdf',
+      platform: Platform.OS,
+      stage: 'DOWNLOAD',
+    });
+  }
   return download.statusCode >= 200 && download.statusCode < 300;
+};
+
+const isReadableOutputFile = async (path: string): Promise<boolean> => {
+  try {
+    const size = Number((await RNFS.stat(path)).size);
+
+    const isReadable = Number.isFinite(size) && size > 0;
+    if (!isReadable) {
+      logger.warn('report.output_local_file_validation_failed', {
+        assetType: 'DOCUMENT',
+        errorCode: 'OUTPUT_LOCAL_FILE_INVALID',
+        extension: 'pdf',
+        mimeType: 'application/pdf',
+        platform: Platform.OS,
+        stage: 'LOCAL_FILE_VALIDATION',
+      });
+    }
+
+    return isReadable;
+  } catch {
+    logger.warn('report.output_local_file_validation_failed', {
+      assetType: 'DOCUMENT',
+      errorCode: 'OUTPUT_LOCAL_FILE_INVALID',
+      extension: 'pdf',
+      mimeType: 'application/pdf',
+      platform: Platform.OS,
+      stage: 'LOCAL_FILE_VALIDATION',
+    });
+    return false;
+  }
 };
 
 const getCachePath = (reportId: string, generationId: string): string => {
@@ -45,10 +121,18 @@ export const ensureReportOutputFile = (reportId: string, generationId: string): 
 
   const operation = (async () => {
     if (await RNFS.exists(cachePath)) {
-      return cachePath;
+      if (await isReadableOutputFile(cachePath)) {
+        return cachePath;
+      }
+
+      await RNFS.unlink(cachePath);
     }
 
     let didDownload = await downloadOutput(reportId, cachePath);
+
+    if (didDownload && !(await isReadableOutputFile(cachePath))) {
+      didDownload = false;
+    }
 
     if (!didDownload) {
       if (await RNFS.exists(cachePath)) {
@@ -57,11 +141,15 @@ export const ensureReportOutputFile = (reportId: string, generationId: string): 
       didDownload = await downloadOutput(reportId, cachePath);
     }
 
+    if (didDownload && !(await isReadableOutputFile(cachePath))) {
+      didDownload = false;
+    }
+
     if (!didDownload) {
       if (await RNFS.exists(cachePath)) {
         await RNFS.unlink(cachePath);
       }
-      throw new Error('pdf_download_failed');
+      throw new ReportOutputAccessError('OUTPUT_DOWNLOAD_FAILED');
     }
 
     await cleanupReportOutputCache();
@@ -74,7 +162,24 @@ export const ensureReportOutputFile = (reportId: string, generationId: string): 
 
 export const openReportOutput = async (reportId: string, generationId: string): Promise<void> => {
   const path = await ensureReportOutputFile(reportId, generationId);
-  await FileViewer.open(path, { showOpenWithDialog: true });
+
+  try {
+    await openLocalReportDocument({ mimeType: 'application/pdf', path });
+  } catch (error) {
+    if (error instanceof ReportDocumentViewerError) {
+      if (error.code === 'VIEWER_UNAVAILABLE') {
+        throw new ReportOutputAccessError('OUTPUT_VIEWER_UNAVAILABLE');
+      }
+
+      if (error.code === 'VIEW_FAILED') {
+        throw new ReportOutputAccessError('OUTPUT_VIEW_FAILED');
+      }
+
+      throw new ReportOutputAccessError('OUTPUT_LOCAL_FILE_INVALID');
+    }
+
+    throw new ReportOutputAccessError('OUTPUT_VIEW_FAILED');
+  }
 };
 
 export const getReportOutputShareFileName = (title: string): string => {

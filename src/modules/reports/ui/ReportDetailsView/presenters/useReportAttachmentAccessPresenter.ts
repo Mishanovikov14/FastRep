@@ -115,14 +115,27 @@ export const useReportAttachmentAccessPresenter = ({ assets, canEdit, onDeleteAs
   }, [assets, imageUris, reportId]);
 
   const showAccessFailure = useCallback(
-    (operation: 'open_document' | 'open_image' | 'play_audio', error: unknown) => {
+    (assetType: IReportAsset['type'], operation: 'open_document' | 'open_image' | 'play_audio', error: unknown) => {
       logger.error(operation === 'play_audio' ? 'report.audio_play_failed' : 'report.attachment_open_failed', {
+        assetType,
         errorCode: error instanceof ReportAssetAccessError ? error.code : 'local_exception',
         httpStatus: error instanceof ReportAssetAccessError ? error.httpStatus : undefined,
         operation,
       });
+      const isViewerUnavailable =
+        operation === 'open_document' &&
+        error instanceof ReportAssetAccessError &&
+        error.code === 'ASSET_VIEWER_UNAVAILABLE';
       toastService.showError(
-        String(t(operation === 'play_audio' ? 'reports.attachments.playFailed' : 'reports.attachments.accessFailed')),
+        String(
+          t(
+            operation === 'play_audio'
+              ? 'reports.attachments.playFailed'
+              : isViewerUnavailable
+                ? 'reports.attachments.viewerUnavailable'
+                : 'reports.attachments.accessFailed',
+          ),
+        ),
         String(t('reports.attachments.tryAgain')),
       );
     },
@@ -157,7 +170,7 @@ export const useReportAttachmentAccessPresenter = ({ assets, canEdit, onDeleteAs
           logger.info('report.attachment_opened', { assetType: 'DOCUMENT', operation: 'viewer' });
         }
       } catch (error) {
-        showAccessFailure(asset.type === 'IMAGE' ? 'open_image' : 'open_document', error);
+        showAccessFailure(asset.type, asset.type === 'IMAGE' ? 'open_image' : 'open_document', error);
       } finally {
         if (mountedRef.current) {
           setAccessingAssetId(undefined);
@@ -205,7 +218,7 @@ export const useReportAttachmentAccessPresenter = ({ assets, canEdit, onDeleteAs
         logger.info('report.audio_play_started', { assetType: 'AUDIO' });
       } catch (error) {
         setPlayback(initialPlayback);
-        showAccessFailure('play_audio', error);
+        showAccessFailure('AUDIO', 'play_audio', error);
       } finally {
         if (mountedRef.current) {
           setAccessingAssetId(undefined);

@@ -204,6 +204,7 @@ export const fr: TranslationResources = {
       tryAgain: 'Réessayez.',
       types: { AUDIO: 'Audio', DOCUMENT: 'Fichier', IMAGE: 'Photo' },
       uploadFailed: 'Échec du transfert de la pièce jointe',
+      viewerUnavailable: 'Aucune application sur cet appareil ne peut ouvrir ce type de fichier',
       validation: {
         audioDurationTooLong: 'Les enregistrements audio sont limités à 20 minutes.',
         fileTooLarge: 'Ce fichier est trop volumineux.',
@@ -320,6 +321,7 @@ export const fr: TranslationResources = {
       share: 'Partager le rapport',
       shareFailed: 'Impossible de partager le rapport',
       tryAgain: 'Téléchargez à nouveau le PDF puis réessayez.',
+      viewerUnavailable: 'Aucune application sur cet appareil ne peut ouvrir les fichiers PDF',
     },
     status: {
       draft: 'Brouillon',

@@ -204,6 +204,7 @@ export const en: TranslationResources = {
       tryAgain: 'Try again.',
       types: { AUDIO: 'Audio', DOCUMENT: 'File', IMAGE: 'Photo' },
       uploadFailed: 'Attachment upload failed',
+      viewerUnavailable: 'No app on this device can open this file type',
       validation: {
         audioDurationTooLong: 'Audio recordings can be up to 20 minutes.',
         fileTooLarge: 'This file is too large.',
@@ -320,6 +321,7 @@ export const en: TranslationResources = {
       share: 'Share report',
       shareFailed: 'Could not share report',
       tryAgain: 'Download the PDF again and retry.',
+      viewerUnavailable: 'No app on this device can open PDF files',
     },
     status: {
       draft: 'Draft',
