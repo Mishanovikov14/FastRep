@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 
 import { PdfIcon } from '@/assets/icons/PdfIcon';
+import { isReportGenerationActive } from '@/entities/report/model/reportGenerationState';
 import type { IReportGeneration } from '@/entities/report/types/reportGeneration';
 import type { ReportStatus } from '@/entities/report/types/report';
 import { Button } from '@/UIKit/Button';
@@ -54,7 +55,7 @@ export const GenerationSection = ({
   const { colors, radius, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const progress = Math.max(0, Math.min(100, generation?.progress ?? 0));
-  const isActive = generation?.status === 'QUEUED' || generation?.status === 'PROCESSING';
+  const isActive = isReportGenerationActive(generation);
 
   return (
     <View style={styles.section}>
@@ -124,7 +125,7 @@ export const GenerationSection = ({
               title={String(t('reports.output.share'))}
               variant="secondary"
             />
-            {reportStatus === 'READY' ? (
+            {reportStatus === 'READY' && !isActive ? (
               <Button
                 loading={isDuplicating}
                 onPress={onDuplicate}

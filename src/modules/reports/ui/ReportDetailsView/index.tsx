@@ -27,6 +27,7 @@ export const ReportDetailsView = () => {
   const {
     attachments,
     attachmentAccess,
+    canEditSources,
     createdAtLabel,
     deleteActions,
     isDeleteConfirmationVisible,
@@ -45,6 +46,7 @@ export const ReportDetailsView = () => {
     onRetry,
     onShowDeleteConfirmation,
     report,
+    reportStatus,
     reportTitle,
     scrollRef,
     updatedAtLabel,
@@ -93,7 +95,7 @@ export const ReportDetailsView = () => {
                 <Typography selectable style={styles.reportTitle} variant="heading">
                   {reportTitle}
                 </Typography>
-                <ReportStatusBadge status={report.status} />
+                <ReportStatusBadge status={reportStatus ?? report.status} />
               </View>
               <View style={styles.notesCard}>
                 <Typography color={colors.textSecondary} variant="caption">
@@ -118,7 +120,7 @@ export const ReportDetailsView = () => {
                 </View>
               </View>
               <View style={styles.actions}>
-                {report.status === 'DRAFT' || report.status === 'FAILED' ? (
+                {canEditSources ? (
                   <Button
                     onPress={onEdit}
                     style={styles.action}
@@ -179,7 +181,7 @@ export const ReportDetailsView = () => {
                 onOpenOutput={generation.onOpenOutput}
                 onShareOutput={generation.onShareOutput}
                 onStartGeneration={generation.onStartGeneration}
-                reportStatus={report.status}
+                reportStatus={reportStatus ?? report.status}
                 stageKey={generation.stageKey}
               />
             </View>

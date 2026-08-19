@@ -14,9 +14,11 @@ import {
   useDuplicateReportMutation,
   useUpdateReportMutation,
 } from '@/modules/reports/presenters/reportQueries';
+import { useLatestReportGenerationQuery } from '@/modules/reports/presenters/reportGenerationQueries';
 import { useCreateReportViewPresenter } from '@/modules/reports/ui/CreateReportView/presenters/useCreateReportViewPresenter';
 import { useEditReportViewPresenter } from '@/modules/reports/ui/EditReportView/presenters/useEditReportViewPresenter';
 import { useReportDetailsViewPresenter } from '@/modules/reports/ui/ReportDetailsView/presenters/useReportDetailsViewPresenter';
+import { useReportAttachmentsPresenter } from '@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentsPresenter';
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
@@ -28,6 +30,9 @@ jest.mock('@/modules/reports/presenters/reportQueries', () => ({
   useReportDetailsQuery: jest.fn(),
   useDuplicateReportMutation: jest.fn(),
   useUpdateReportMutation: jest.fn(),
+}));
+jest.mock('@/modules/reports/presenters/reportGenerationQueries', () => ({
+  useLatestReportGenerationQuery: jest.fn(),
 }));
 jest.mock('@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentsPresenter', () => ({
   useReportAttachmentsPresenter: jest.fn(() => ({
@@ -106,6 +111,7 @@ describe('report mutation presenters', () => {
       isRefetching: false,
       refetch,
     } as never);
+    jest.mocked(useLatestReportGenerationQuery).mockReturnValue({ data: null } as never);
   });
 
   afterEach(() => {
@@ -311,5 +317,99 @@ describe('report mutation presenters', () => {
     expect(duplicateMutate).toHaveBeenCalledTimes(1);
     expect(navigation.push).toHaveBeenCalledWith('ReportDetails', { reportId: 'report-copy' });
     expect(toastService.showSuccess).not.toHaveBeenCalled();
+  });
+
+  it.each(['QUEUED', 'PROCESSING'] as const)(
+    'restores %s as non-editable from the latest generation query on mount',
+    async (status) => {
+      let presenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
+      jest.mocked(useReportDetailsQuery).mockReturnValue({
+        data: { ...report, status: 'DRAFT' },
+        error: null,
+        isError: false,
+        isPending: false,
+        isRefetching: false,
+        refetch,
+      } as never);
+      jest.mocked(useLatestReportGenerationQuery).mockReturnValue({
+        data: {
+          createdAt: '2026-08-19T10:00:00.000Z',
+          id: 'generation-active',
+          progress: 25,
+          reportId: report.id,
+          status,
+          updatedAt: '2026-08-19T10:00:00.000Z',
+        },
+      } as never);
+
+      const Harness = () => {
+        presenter = useReportDetailsViewPresenter({ language: 'en', reportId: report.id, t });
+        return null;
+      };
+
+      await ReactTestRenderer.act(async () => {
+        renderer = ReactTestRenderer.create(<Harness />);
+      });
+
+      expect(presenter?.canEditSources).toBe(false);
+      expect(presenter?.reportStatus).toBe(status);
+      expect(useReportAttachmentsPresenter).toHaveBeenCalledWith(
+        expect.objectContaining({ canEdit: false, reportId: report.id }),
+      );
+      ReactTestRenderer.act(() => presenter?.onEdit());
+      expect(navigation.navigate).not.toHaveBeenCalled();
+    },
+  );
+
+  it('blocks duplicate, title, and notes mutations while the latest generation is active', async () => {
+    let detailsPresenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
+    let editPresenter: ReturnType<typeof useEditReportViewPresenter> | undefined;
+    jest.mocked(useReportDetailsQuery).mockReturnValue({
+      data: { ...report, status: 'DRAFT' },
+      error: null,
+      isError: false,
+      isPending: false,
+      isRefetching: false,
+      refetch,
+    } as never);
+    jest.mocked(useLatestReportGenerationQuery).mockReturnValue({
+      data: {
+        createdAt: '2026-08-19T10:00:00.000Z',
+        id: 'generation-processing',
+        progress: 50,
+        reportId: report.id,
+        status: 'PROCESSING',
+        updatedAt: '2026-08-19T10:00:00.000Z',
+      },
+      refetch,
+    } as never);
+
+    const DetailsHarness = () => {
+      detailsPresenter = useReportDetailsViewPresenter({ language: 'en', reportId: report.id, t });
+      return null;
+    };
+    const EditHarness = () => {
+      editPresenter = useEditReportViewPresenter({ reportId: report.id, t });
+      return null;
+    };
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<DetailsHarness />);
+    });
+    await ReactTestRenderer.act(async () => {
+      await detailsPresenter?.onDuplicate();
+      renderer?.update(<EditHarness />);
+    });
+    ReactTestRenderer.act(() => {
+      editPresenter?.onChangeTitle('Blocked title');
+      editPresenter?.onChangeNotes('Blocked notes');
+    });
+    await ReactTestRenderer.act(async () => editPresenter?.onSubmit());
+
+    expect(duplicateMutate).not.toHaveBeenCalled();
+    expect(updateMutate).not.toHaveBeenCalled();
+    expect(editPresenter?.isEditable).toBe(false);
+    expect(editPresenter?.title).not.toBe('Blocked title');
+    expect(editPresenter?.notes).not.toBe('Blocked notes');
   });
 });

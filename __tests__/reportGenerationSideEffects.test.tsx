@@ -11,7 +11,6 @@ import {
   refreshGenerationResources,
   useCancelReportGenerationMutation,
   useEntitlementsQuery,
-  useLatestReportGenerationQuery,
   useReportOutputQuery,
   useStartReportGenerationMutation,
 } from '@/modules/reports/presenters/reportGenerationQueries';
@@ -21,7 +20,6 @@ jest.mock('@/modules/reports/presenters/reportGenerationQueries', () => ({
   refreshGenerationResources: jest.fn(),
   useCancelReportGenerationMutation: jest.fn(),
   useEntitlementsQuery: jest.fn(),
-  useLatestReportGenerationQuery: jest.fn(),
   useReportOutputQuery: jest.fn(),
   useStartReportGenerationMutation: jest.fn(),
 }));
@@ -64,8 +62,11 @@ describe('report generation side effects', () => {
 
   const Harness = () => {
     presenter = useReportGenerationPresenter({
+      generation: currentGeneration,
       hasReadyAssets: true,
       hasUnresolvedAssets: false,
+      isGenerationStateReady: true,
+      onRefetchLatestGeneration: jest.fn(async () => undefined),
       report: currentReport,
       t,
     });
@@ -92,9 +93,6 @@ describe('report generation side effects', () => {
     jest
       .mocked(useEntitlementsQuery)
       .mockReturnValue({ data: { canGenerate: true, generationCredits: { available: 3 } } } as never);
-    jest
-      .mocked(useLatestReportGenerationQuery)
-      .mockImplementation(() => ({ data: currentGeneration, refetch: jest.fn() } as never));
     jest.mocked(useReportOutputQuery).mockReturnValue({ data: null } as never);
     jest
       .mocked(useCancelReportGenerationMutation)
@@ -123,20 +121,20 @@ describe('report generation side effects', () => {
     appStateSpy.mockRestore();
   });
 
-  it('does not show success or refresh terminal resources for an initially loaded completed generation', async () => {
+  it('refreshes terminal resources without showing success for an initially loaded completed generation', async () => {
     currentGeneration = createGeneration('COMPLETED');
     await render();
 
     expect(successSpy).not.toHaveBeenCalled();
-    expect(refreshGenerationResources).not.toHaveBeenCalled();
+    expect(refreshGenerationResources).toHaveBeenCalledTimes(1);
   });
 
-  it('does not emit a failure toast for an initially loaded failed generation', async () => {
+  it('refreshes terminal resources without emitting a failure toast for an initially loaded failed generation', async () => {
     currentGeneration = createGeneration('FAILED');
     await render();
 
     expect(errorSpy).not.toHaveBeenCalled();
-    expect(refreshGenerationResources).not.toHaveBeenCalled();
+    expect(refreshGenerationResources).toHaveBeenCalledTimes(1);
   });
 
   it('keeps an existing processing generation quiet when it later completes', async () => {
@@ -152,12 +150,13 @@ describe('report generation side effects', () => {
 
   it('shows success once for an active queued/processing to completed transition', async () => {
     currentReport = { ...report, status: 'DRAFT' };
-    currentGeneration = createGeneration('QUEUED');
     await render();
     ReactTestRenderer.act(() => appStateListener?.('active'));
     await ReactTestRenderer.act(async () => {
       await presenter?.onStartGeneration();
     });
+    currentGeneration = createGeneration('QUEUED');
+    await rerender();
     currentReport = report;
     currentGeneration = createGeneration('PROCESSING');
     await rerender();
@@ -168,6 +167,7 @@ describe('report generation side effects', () => {
     expect(successSpy).toHaveBeenCalledTimes(1);
     expect(successSpy).toHaveBeenCalledWith('reports.generation.generated');
     expect(refreshGenerationResources).toHaveBeenCalledTimes(1);
+    expect(presenter?.isGenerating).toBe(false);
     expect(appLogger.info).toHaveBeenCalledWith(
       'report.generation_status_changed',
       expect.objectContaining({ generationStatus: 'COMPLETED' }),
@@ -201,12 +201,13 @@ describe('report generation side effects', () => {
 
   it('shows one failure toast for an actively observed transition to failed', async () => {
     currentReport = { ...report, status: 'DRAFT' };
-    currentGeneration = createGeneration('QUEUED');
     await render();
     ReactTestRenderer.act(() => appStateListener?.('active'));
     await ReactTestRenderer.act(async () => {
       await presenter?.onStartGeneration();
     });
+    currentGeneration = createGeneration('QUEUED');
+    await rerender();
     currentReport = report;
     currentGeneration = createGeneration('PROCESSING');
     await rerender();
@@ -217,5 +218,7 @@ describe('report generation side effects', () => {
     expect(errorSpy).toHaveBeenCalledTimes(1);
     expect(errorSpy).toHaveBeenCalledWith('reports.generation.startFailed', 'reports.generation.failedDescription');
     expect(refreshGenerationResources).toHaveBeenCalledTimes(1);
+    expect(presenter?.isGenerating).toBe(false);
+    expect(presenter?.canGenerate).toBe(true);
   });
 });
