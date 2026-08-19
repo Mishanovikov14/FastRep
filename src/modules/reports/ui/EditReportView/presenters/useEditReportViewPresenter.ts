@@ -5,11 +5,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { normalizeUpdateReportRequest, validateReportForm } from '@/entities/report/model/reportValidation';
 import type { ReportFormErrors } from '@/entities/report/model/reportValidation';
+import { isReportSourceEditable } from '@/entities/report/model/reportGenerationState';
 import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
 import { getReportErrorMessage, getReportFieldErrors } from '@/modules/reports/presenters/reportErrors';
 import { useReportDetailsQuery, useUpdateReportMutation } from '@/modules/reports/presenters/reportQueries';
+import { useLatestReportGenerationQuery } from '@/modules/reports/presenters/reportGenerationQueries';
 
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'EditReport'>;
 
@@ -21,13 +23,18 @@ interface IInput {
 export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
   const navigation = useNavigation<Navigation>();
   const reportQuery = useReportDetailsQuery(reportId);
+  const latestGenerationQuery = useLatestReportGenerationQuery(reportId);
   const mutation = useUpdateReportMutation(reportId);
   const initializedReportIdRef = useRef<string | undefined>(undefined);
   const isSubmittingRef = useRef(false);
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<ReportFormErrors>({});
-  const isEditable = reportQuery.data?.status === 'DRAFT' || reportQuery.data?.status === 'FAILED';
+  const isEditable = reportQuery.data
+    ? !latestGenerationQuery.isPending &&
+      !latestGenerationQuery.isError &&
+      isReportSourceEditable(reportQuery.data.status, latestGenerationQuery.data)
+    : false;
 
   useEffect(() => {
     if (reportQuery.data && initializedReportIdRef.current !== reportQuery.data.id) {

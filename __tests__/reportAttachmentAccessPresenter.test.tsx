@@ -47,9 +47,10 @@ describe('report attachment access presenter', () => {
   let onDeleteAsset: jest.MockedFunction<(assetId: string) => Promise<boolean>>;
   let presenter: ReturnType<typeof useReportAttachmentAccessPresenter> | undefined;
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
+  let canEdit: boolean;
 
   const Harness = () => {
-    presenter = useReportAttachmentAccessPresenter({ assets, canEdit: true, onDeleteAsset, reportId: 'report-1', t });
+    presenter = useReportAttachmentAccessPresenter({ assets, canEdit, onDeleteAsset, reportId: 'report-1', t });
     return null;
   };
 
@@ -62,6 +63,7 @@ describe('report attachment access presenter', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    canEdit = true;
     assets = [];
     onDeleteAsset = jest.fn(async (_assetId: string) => true);
     jest.mocked(ensureReportAssetFile).mockImplementation(async (_reportId, asset) => `/cache/${asset.id}`);
@@ -174,5 +176,19 @@ describe('report attachment access presenter', () => {
       await flushPromises();
     });
     expect(presenter?.isDeleteConfirmationVisible).toBe(false);
+  });
+
+  it('does not open or execute attachment deletion when source editing is blocked', async () => {
+    const asset = createAsset('document-locked', 'DOCUMENT');
+    assets = [asset];
+    canEdit = false;
+    await render();
+
+    ReactTestRenderer.act(() => presenter?.onRequestDelete(asset));
+    const deleteAction = presenter?.deleteActions.find((action) => action.key === 'delete');
+    await ReactTestRenderer.act(async () => deleteAction?.onPress());
+
+    expect(presenter?.isDeleteConfirmationVisible).toBe(false);
+    expect(onDeleteAsset).not.toHaveBeenCalled();
   });
 });

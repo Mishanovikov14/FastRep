@@ -6,6 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { getReportDisplayTitle } from '@/entities/report/model/reportDisplayNames';
 import {
+  getEffectiveReportStatus,
+  isReportGenerationActive,
+  isReportSourceEditable,
+} from '@/entities/report/model/reportGenerationState';
+import {
   openReportOutput,
   ReportOutputAccessError,
   shareReportOutput,
@@ -19,15 +24,18 @@ import {
   refreshGenerationResources,
   useCancelReportGenerationMutation,
   useEntitlementsQuery,
-  useLatestReportGenerationQuery,
   useReportOutputQuery,
   useStartReportGenerationMutation,
 } from '@/modules/reports/presenters/reportGenerationQueries';
+import { setReportStatusInLists } from '@/modules/reports/presenters/reportQueries';
 
 interface IInput {
+  generation?: IReportGeneration | null;
   hasReadyAssets: boolean;
   hasRejectedAssets?: boolean;
   hasUnresolvedAssets: boolean;
+  isGenerationStateReady: boolean;
+  onRefetchLatestGeneration(): Promise<void>;
   onRejectedAssetsBlocked?(): void;
   report: IReport;
   t: TFunction;
@@ -85,14 +93,16 @@ const isUncertainGenerationError = (error: unknown): boolean => {
 };
 
 export const useReportGenerationPresenter = ({
+  generation: latestGeneration,
   hasReadyAssets,
   hasRejectedAssets = false,
   hasUnresolvedAssets,
+  isGenerationStateReady,
+  onRefetchLatestGeneration,
   onRejectedAssetsBlocked,
   report,
   t,
 }: IInput) => {
-  const latestQuery = useLatestReportGenerationQuery(report.id);
   const entitlementsQuery = useEntitlementsQuery();
   const startMutation = useStartReportGenerationMutation(report.id);
   const cancelMutation = useCancelReportGenerationMutation(report.id);
@@ -101,6 +111,7 @@ export const useReportGenerationPresenter = ({
   const activeGenerationIdRef = useRef<string | undefined>(undefined);
   const isAppActiveRef = useRef(AppState.currentState === 'active');
   const previousGenerationRef = useRef<Pick<IReportGeneration, 'id' | 'status'> | undefined>(undefined);
+  const refreshedTerminalGenerationRef = useRef<string | undefined>(undefined);
   const [lockedUntil, setLockedUntil] = useState<string | undefined>(undefined);
   const [now, setNow] = useState(Date.now());
   const [isOpeningOutput, setIsOpeningOutput] = useState(false);
@@ -133,7 +144,7 @@ export const useReportGenerationPresenter = ({
   }, []);
 
   useEffect(() => {
-    const generation = latestQuery.data;
+    const generation = latestGeneration;
 
     if (!generation) {
       previousGenerationRef.current = undefined;
@@ -143,12 +154,27 @@ export const useReportGenerationPresenter = ({
     const previous = previousGenerationRef.current;
     previousGenerationRef.current = { id: generation.id, status: generation.status };
 
+    if (generation.status !== 'CANCELLED') {
+      setReportStatusInLists(report.id, getEffectiveReportStatus(report.status, generation));
+    }
+
     if (
       (generation.status === 'QUEUED' || generation.status === 'PROCESSING') &&
       pendingIdempotencyKeyRef.current &&
       isAppActiveRef.current
     ) {
       activeGenerationIdRef.current = generation.id;
+    }
+
+    const isTerminal =
+      generation.status === 'COMPLETED' || generation.status === 'FAILED' || generation.status === 'CANCELLED';
+    const terminalKey = isTerminal ? `${generation.id}:${generation.status}` : undefined;
+
+    if (terminalKey && refreshedTerminalGenerationRef.current !== terminalKey) {
+      refreshedTerminalGenerationRef.current = terminalKey;
+      refreshGenerationResources(report.id).catch(() => {
+        logger.warn('report.generation_resources_refresh_failed', { generationStatus: generation.status });
+      });
     }
 
     if (previous?.id !== generation.id || previous.status === generation.status) {
@@ -160,17 +186,11 @@ export const useReportGenerationPresenter = ({
       stage: generation.stage ?? undefined,
     });
 
-    const wasActive = previous.status === 'QUEUED' || previous.status === 'PROCESSING';
-    const isTerminal =
-      generation.status === 'COMPLETED' || generation.status === 'FAILED' || generation.status === 'CANCELLED';
+    const wasActive = isReportGenerationActive(previous);
 
     if (!wasActive || !isTerminal) {
       return;
     }
-
-    refreshGenerationResources(report.id).catch(() => {
-      logger.warn('report.generation_resources_refresh_failed', { generationStatus: generation.status });
-    });
 
     const ownsActiveGeneration = isAppActiveRef.current && activeGenerationIdRef.current === generation.id;
     if (generation.status === 'COMPLETED' && ownsActiveGeneration) {
@@ -183,12 +203,19 @@ export const useReportGenerationPresenter = ({
     }
 
     activeGenerationIdRef.current = undefined;
-  }, [latestQuery.data, report.id, t]);
+  }, [latestGeneration, report.id, report.status, t]);
 
   const onStartGeneration = useCallback(async () => {
-    if (report.status !== 'DRAFT' && report.status !== 'FAILED') {
+    if (
+      !isGenerationStateReady ||
+      !isReportSourceEditable(report.status, latestGeneration) ||
+      startMutation.isPending
+    ) {
       logger.warn('report.generation_start_blocked', {
-        errorCode: report.status === 'READY' ? 'REPORT_NOT_EDITABLE' : 'REPORT_GENERATION_ACTIVE',
+        errorCode:
+          report.status === 'READY' || latestGeneration?.status === 'COMPLETED'
+            ? 'REPORT_NOT_EDITABLE'
+            : 'REPORT_GENERATION_ACTIVE',
         reportStatus: report.status,
       });
       return;
@@ -272,10 +299,19 @@ export const useReportGenerationPresenter = ({
         String(t('reports.generation.errors.generic')),
       );
     }
-  }, [hasRejectedAssets, lockedUntil, onRejectedAssetsBlocked, report.status, startMutation, t]);
+  }, [
+    hasRejectedAssets,
+    isGenerationStateReady,
+    latestGeneration,
+    lockedUntil,
+    onRejectedAssetsBlocked,
+    report.status,
+    startMutation,
+    t,
+  ]);
 
   const onCancelGeneration = useCallback(async () => {
-    const generation = latestQuery.data;
+    const generation = latestGeneration;
     if (!generation || generation.status !== 'QUEUED') {
       return;
     }
@@ -289,12 +325,12 @@ export const useReportGenerationPresenter = ({
       }
 
       logger.info('report.generation_cancelled', { generationStatus: response.data?.status ?? 'CANCELLED' });
-      await Promise.all([latestQuery.refetch(), refreshGenerationResources(report.id)]);
+      await Promise.all([onRefetchLatestGeneration(), refreshGenerationResources(report.id)]);
     } catch {
       logger.error('report.generation_cancel_failed', { errorCode: 'local_exception' });
       toastService.showError(String(t('reports.generation.cancelFailed')));
     }
-  }, [cancelMutation, latestQuery, report.id, t]);
+  }, [cancelMutation, latestGeneration, onRefetchLatestGeneration, report.id, t]);
 
   const onOpenOutput = useCallback(async () => {
     const output = outputQuery.data;
@@ -346,9 +382,9 @@ export const useReportGenerationPresenter = ({
     }
   }, [isSharingOutput, outputQuery.data, report.id, report.title, t]);
 
-  const generation = latestQuery.data;
+  const generation = latestGeneration;
   const isReportActive = report.status === 'QUEUED' || report.status === 'PROCESSING';
-  const isActive = isReportActive || generation?.status === 'QUEUED' || generation?.status === 'PROCESSING';
+  const isActive = isReportGenerationActive(generation) || (!generation && isReportActive);
   const canGenerateSource = Boolean(report.notes?.trim()) || hasReadyAssets || hasRejectedAssets;
   const lockRemainingSeconds = lockedUntil
     ? Math.max(0, Math.ceil((new Date(lockedUntil).getTime() - now) / 1_000))
@@ -382,7 +418,8 @@ export const useReportGenerationPresenter = ({
     canCancel: generation?.status === 'QUEUED',
     canGenerate:
       canGenerateSource &&
-      (report.status === 'DRAFT' || report.status === 'FAILED') &&
+      isGenerationStateReady &&
+      isReportSourceEditable(report.status, generation) &&
       !hasUnresolvedAssets &&
       !isActive &&
       lockRemainingSeconds === 0 &&
@@ -390,6 +427,7 @@ export const useReportGenerationPresenter = ({
     creditsAvailable: entitlementsQuery.data?.generationCredits.available,
     generation,
     hasOutput: Boolean(outputQuery.data),
+    isGenerationActive: isReportGenerationActive(generation),
     isCancelling: cancelMutation.isPending,
     isGenerating: startMutation.isPending || isActive,
     isOpeningOutput,
