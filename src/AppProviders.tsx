@@ -1,6 +1,6 @@
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AppLifecycle } from '@/AppLifecycle';
 import { ReactQueryProvider } from '@/libs/query/ReactQueryProvider';
@@ -23,7 +23,7 @@ export const AppProviders = ({ children }: IProps) => {
   return (
     <GestureHandlerRootView>
       <KeyboardProvider>
-        <SafeAreaProvider>
+        <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <UIProvider>
             <ReactQueryProvider>
               <AppContent>{children}</AppContent>

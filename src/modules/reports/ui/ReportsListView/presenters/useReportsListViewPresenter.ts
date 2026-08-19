@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { IReport } from '@/entities/report/types/report';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList, AppTabsParamList } from '@/navigation/types';
 import { refreshReportsFirstPage, useReportsListQuery } from '@/modules/reports/presenters/reportQueries';
@@ -53,8 +54,8 @@ export const useReportsListViewPresenter = ({ t }: IInput) => {
       if (response.isError) {
         toastService.showError(String(t('common.error')), getReportErrorMessage(response, t));
       }
-    } catch (error: unknown) {
-      console.error('Unexpected reports refresh failure', error);
+    } catch {
+      logger.error('report.list_refresh_failed');
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isRefreshingRef.current = false;

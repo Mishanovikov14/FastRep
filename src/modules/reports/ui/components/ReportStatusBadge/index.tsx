@@ -15,6 +15,7 @@ const statusTranslationKeys: Record<ReportStatus, string> = {
   DRAFT: 'reports.status.draft',
   FAILED: 'reports.status.failed',
   PROCESSING: 'reports.status.processing',
+  QUEUED: 'reports.status.queued',
   READY: 'reports.status.ready',
 };
 
@@ -25,12 +26,14 @@ export const ReportStatusBadge = ({ status }: IProps) => {
     DRAFT: styles.draft,
     FAILED: styles.failed,
     PROCESSING: styles.processing,
+    QUEUED: styles.processing,
     READY: styles.ready,
   };
   const colorByStatus = {
     DRAFT: colors.textSecondary,
     FAILED: colors.error,
     PROCESSING: colors.info,
+    QUEUED: colors.info,
     READY: colors.success,
   };
 

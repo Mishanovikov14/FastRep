@@ -5,6 +5,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import { normalizeCreateReportRequest, validateReportForm } from '@/entities/report/model/reportValidation';
 import type { ReportFormErrors } from '@/entities/report/model/reportValidation';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
 import { getReportErrorMessage, getReportFieldErrors } from '@/modules/reports/presenters/reportErrors';
@@ -64,8 +65,8 @@ export const useCreateReportViewPresenter = ({ t }: IInput) => {
 
       toastService.showSuccess(String(t('reports.create.success')));
       navigation.replace('ReportDetails', { reportId: response.data.id });
-    } catch (error: unknown) {
-      console.error('Unexpected report creation failure', error);
+    } catch {
+      logger.error('report.creation_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;

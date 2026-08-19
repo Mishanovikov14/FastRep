@@ -148,6 +148,67 @@ export interface TranslationResources {
     title: string;
   };
   reports: {
+    attachments: {
+      accessFailed: string;
+      attentionRequired: string;
+      audio: string;
+      audioRecordingName: string;
+      camera: string;
+      cameraPermission: string;
+      confirmFailed: string;
+      delete: string;
+      deleteAccessibility: string;
+      deleteConfirmation: string;
+      deleteTitle: string;
+      documentFailed: string;
+      empty: string;
+      file: string;
+      fileName: string;
+      invalid: string;
+      microphonePermission: string;
+      pauseAccessibility: string;
+      permissionTitle: string;
+      photo: string;
+      photoName: string;
+      playFailed: string;
+      playAccessibility: string;
+      photoConversionFailed: string;
+      photoFailed: string;
+      recording: string;
+      recordingFailed: string;
+      rejectionReasons: Record<
+        | 'expired'
+        | 'invalidContent'
+        | 'limitExceeded'
+        | 'processingFailed'
+        | 'storageUnavailable'
+        | 'tooLarge'
+        | 'unsupportedType',
+        string
+      >;
+      remove: string;
+      removeFailed: string;
+      removed: string;
+      retryAccessibility: string;
+      states: Record<'CONFIRMING' | 'FAILED' | 'LOCAL' | 'READY' | 'REQUESTING_UPLOAD' | 'UPLOADING', string>;
+      stop: string;
+      title: string;
+      tryAgain: string;
+      types: Record<'AUDIO' | 'DOCUMENT' | 'IMAGE', string>;
+      uploadFailed: string;
+      viewerUnavailable: string;
+      validation: Record<
+        | 'audioDurationTooLong'
+        | 'fileTooLarge'
+        | 'imageDimensionsTooLarge'
+        | 'missingFileMetadata'
+        | 'reportTotalTooLarge'
+        | 'tooManyFiles'
+        | 'unsupportedType',
+        string
+      >;
+    };
+    fallbackTitle: string;
     card: {
       created: string;
       updated: string;
@@ -174,8 +235,14 @@ export interface TranslationResources {
       title: string;
       updatedAt: string;
     };
+    duplicate: {
+      action: string;
+      failed: string;
+    };
     edit: {
       action: string;
+      notEditableDescription: string;
+      notEditableTitle: string;
       success: string;
       title: string;
     };
@@ -192,6 +259,41 @@ export interface TranslationResources {
       title: string;
       titlePlaceholder: string;
     };
+    generation: {
+      cancel: string;
+      cancelFailed: string;
+      credits: string;
+      description: string;
+      errors: Record<
+        | 'GENERATION_ALREADY_ACTIVE'
+        | 'GENERATION_CREDITS_EXHAUSTED'
+        | 'GENERATION_CREDIT_RESERVATION_FAILED'
+        | 'GENERATION_DAILY_LIMIT_REACHED'
+        | 'GENERATION_DISABLED'
+        | 'GENERATION_QUEUE_UNAVAILABLE'
+        | 'GENERATION_RATE_LIMITED'
+        | 'REPORT_HAS_NO_CONTENT'
+        | 'REPORT_HAS_PENDING_UPLOADS'
+        | 'REPORT_HAS_REJECTED_ASSETS'
+        | 'REPORT_NOT_EDITABLE'
+        | 'REPORT_TEMPORARILY_LOCKED'
+        | 'generic',
+        string
+      >;
+      failedDescription: string;
+      generate: string;
+      generated: string;
+      lock: { message: string; title: string };
+      outputReady: string;
+      rejectedAttachments: string;
+      retry: string;
+      stages: Record<
+        'analyzing' | 'completed' | 'creatingPdf' | 'finalizing' | 'generating' | 'preparing' | 'transcribing',
+        string
+      >;
+      startFailed: string;
+      title: string;
+    };
     list: {
       emptyDescription: string;
       emptyTitle: string;
@@ -199,10 +301,19 @@ export interface TranslationResources {
       errorTitle: string;
       title: string;
     };
+    output: {
+      open: string;
+      openFailed: string;
+      share: string;
+      shareFailed: string;
+      tryAgain: string;
+      viewerUnavailable: string;
+    };
     status: {
       draft: string;
       failed: string;
       processing: string;
+      queued: string;
       ready: string;
     };
     validation: {

@@ -1,4 +1,10 @@
-import { createReport, deleteReport, getReports, updateReport } from '@/entities/report/API/reportsApi';
+import {
+  createReport,
+  deleteReport,
+  duplicateReport,
+  getReports,
+  updateReport,
+} from '@/entities/report/API/reportsApi';
 import { requester } from '@/libs/requester/requester';
 
 jest.mock('@/libs/requester/requester', () => ({
@@ -61,6 +67,15 @@ describe('reports API', () => {
     expect(requester.request).toHaveBeenCalledWith({
       method: 'DELETE',
       url: '/reports/report-1',
+    });
+  });
+
+  it('duplicates through the dedicated report endpoint', async () => {
+    await duplicateReport('report-1');
+
+    expect(requester.request).toHaveBeenCalledWith({
+      method: 'POST',
+      url: '/reports/report-1/duplicate',
     });
   });
 });

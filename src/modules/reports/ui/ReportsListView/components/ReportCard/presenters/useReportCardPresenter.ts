@@ -3,6 +3,7 @@ import { useCallback, useMemo } from 'react';
 import type { PressableStateCallbackType, StyleProp, ViewStyle } from 'react-native';
 
 import type { IReport } from '@/entities/report/types/report';
+import { getReportDisplayTitle } from '@/entities/report/model/reportDisplayNames';
 import type { SupportedLanguage } from '@/localization/types';
 import { formatLocalizedDate } from '@/utils/formatLocalizedDate';
 
@@ -17,6 +18,7 @@ interface IInput {
 
 export const useReportCardPresenter = ({ cardPressedStyle, cardStyle, language, onPress, report, t }: IInput) => {
   const isUpdated = report.updatedAt !== report.createdAt;
+  const displayTitle = getReportDisplayTitle(report.title, String(t('reports.fallbackTitle')));
   const dateLabel = useMemo(
     () =>
       String(
@@ -38,6 +40,7 @@ export const useReportCardPresenter = ({ cardPressedStyle, cardStyle, language, 
 
   return {
     dateLabel,
+    displayTitle,
     getCardStyle,
     onPressCard,
   };

@@ -25,7 +25,7 @@ export const getStyles = (colors: Colors, spacing: Spacing, topInset: number) =>
       paddingHorizontal: scaleHorizontal(spacing.sm),
     },
     header: {
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       borderBottomColor: colors.border,
       borderBottomWidth: StyleSheet.hairlineWidth,
       paddingTop: topInset,

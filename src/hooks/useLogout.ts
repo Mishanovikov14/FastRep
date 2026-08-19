@@ -5,6 +5,7 @@ import { useCallback, useRef, useState } from 'react';
 import { logout } from '@/entities/user/API/userApi';
 import { clearUserSession } from '@/entities/user/services/userStateService';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 
 export const useLogout = (t: TFunction) => {
@@ -31,14 +32,14 @@ export const useLogout = (t: TFunction) => {
 
         hasRemoteError = response.isError;
       }
-    } catch (error: unknown) {
-      console.error('Unexpected logout failure', error);
+    } catch {
+      logger.error('auth.logout_request_failed');
       hasRemoteError = true;
     } finally {
       try {
         await clearUserSession();
-      } catch (error: unknown) {
-        console.error('Unable to clear the local authentication session', error);
+      } catch {
+        logger.error('auth.local_session_clear_failed');
         hasRemoteError = true;
       }
 

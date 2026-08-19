@@ -1,11 +1,18 @@
 import { useMemo } from 'react';
-import { TextInput, View } from 'react-native';
+import { TextInput, TextInputProps, View } from 'react-native';
 
 import { Typography } from '@/UIKit/Typography';
 import { useUIContext } from '@/UIProvider/useUIContext';
 
 import { getStyles } from './styles';
-import type { IProps } from './types';
+
+interface IProps extends Omit<TextInputProps, 'editable' | 'onChangeText' | 'value'> {
+  disabled?: boolean;
+  error?: string;
+  label: string;
+  onChangeText(value: string): void;
+  value: string;
+}
 
 export const Input = ({
   accessibilityLabel,

@@ -1,21 +1,30 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { TFunction } from 'i18next';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
+import type { LayoutChangeEvent } from 'react-native';
+import type { KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 
 import { ReportRequestError } from '@/entities/report/model/ReportRequestError';
+import { getReportDisplayTitle } from '@/entities/report/model/reportDisplayNames';
+import { logger } from '@/libs/logger/logger';
 import type { SupportedLanguage } from '@/localization/types';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
 import {
   removeReportDetailsCache,
   useDeleteReportMutation,
+  useDuplicateReportMutation,
   useReportDetailsQuery,
 } from '@/modules/reports/presenters/reportQueries';
 import { getReportErrorMessage } from '@/modules/reports/presenters/reportErrors';
 import { useCustomAlert } from '@/UIKit/CustomAlert/presenters/useCustomAlert';
 import type { ICustomAlertAction } from '@/UIKit/CustomAlert/types';
 import { formatLocalizedDate } from '@/utils/formatLocalizedDate';
+
+import { useReportAttachmentsPresenter } from './useReportAttachmentsPresenter';
+import { useReportAttachmentAccessPresenter } from './useReportAttachmentAccessPresenter';
+import { useReportGenerationPresenter } from './useReportGenerationPresenter';
 
 type Navigation = NativeStackNavigationProp<AppStackParamList, 'ReportDetails'>;
 
@@ -27,21 +36,86 @@ interface IInput {
 
 export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput) => {
   const navigation = useNavigation<Navigation>();
+  const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
+  const attachmentsOffsetRef = useRef(0);
   const query = useReportDetailsQuery(reportId);
   const deleteMutation = useDeleteReportMutation(reportId);
+  const duplicateMutation = useDuplicateReportMutation(reportId);
   const {
     isVisible: isDeleteConfirmationVisible,
     onHide: onHideDeleteAlert,
     onShow: onShowDeleteAlert,
   } = useCustomAlert();
+  const reportForGeneration = query.data ?? {
+    createdAt: '',
+    id: reportId,
+    notes: '',
+    status: 'DRAFT' as const,
+    title: '',
+    updatedAt: '',
+  };
+  const canEditSources = query.data?.status === 'DRAFT' || query.data?.status === 'FAILED';
+  const attachments = useReportAttachmentsPresenter({ canEdit: canEditSources, reportId, t });
+  const attachmentAccess = useReportAttachmentAccessPresenter({
+    assets: attachments.assets,
+    canEdit: canEditSources,
+    onDeleteAsset: attachments.onRemoveServerAsset,
+    reportId,
+    t,
+  });
+  const onAttachmentsLayout = useCallback((event: LayoutChangeEvent) => {
+    attachmentsOffsetRef.current = event.nativeEvent.layout.y;
+  }, []);
+  const onRejectedAssetsBlocked = useCallback(() => {
+    scrollRef.current?.scrollTo({ animated: true, y: Math.max(0, attachmentsOffsetRef.current - 16) });
+  }, []);
+  const generation = useReportGenerationPresenter({
+    hasReadyAssets: attachments.hasReadyAssets,
+    hasRejectedAssets: attachments.hasRejectedAssets,
+    hasUnresolvedAssets: attachments.hasUnresolvedAssets,
+    onRejectedAssetsBlocked,
+    report: reportForGeneration,
+    t,
+  });
 
   const onBack = useCallback(() => {
     navigation.goBack();
   }, [navigation]);
 
   const onEdit = useCallback(() => {
+    if (!canEditSources) {
+      return;
+    }
     navigation.navigate('EditReport', { reportId });
-  }, [navigation, reportId]);
+  }, [canEditSources, navigation, reportId]);
+
+  const onDuplicate = useCallback(async () => {
+    if (duplicateMutation.isPending || query.data?.status !== 'READY') {
+      return;
+    }
+
+    logger.info('report.duplicate_started', { reportStatus: query.data.status });
+    try {
+      const response = await duplicateMutation.mutateAsync();
+      if (response.isError || !response.data) {
+        logger.warn('report.duplicate_failed', {
+          errorCode: response.code ?? response.type ?? 'request_failed',
+          httpStatus: response.status,
+          reportStatus: query.data.status,
+        });
+        toastService.showError(String(t('reports.duplicate.failed')), getReportErrorMessage(response, t));
+        return;
+      }
+
+      navigation.push('ReportDetails', { reportId: response.data.id });
+    } catch {
+      logger.error('report.duplicate_failed', {
+        errorCode: 'local_exception',
+        reportStatus: query.data.status,
+      });
+      toastService.showError(String(t('reports.duplicate.failed')), String(t('common.somethingWentWrong')));
+    }
+  }, [duplicateMutation, navigation, query.data?.status, t]);
 
   const onRefresh = useCallback(async () => {
     await query.refetch();
@@ -80,8 +154,8 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
       );
       navigation.popTo('Tabs', { screen: 'Reports' });
       removeReportDetailsCache(reportId);
-    } catch (error: unknown) {
-      console.error('Unexpected report deletion failure', error);
+    } catch {
+      logger.error('report.deletion_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     }
   }, [deleteMutation, navigation, onHideDeleteAlert, reportId, t]);
@@ -114,12 +188,16 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     () => (query.data ? formatLocalizedDate(query.data.updatedAt, language) : undefined),
     [language, query.data],
   );
+  const reportTitle = getReportDisplayTitle(query.data?.title ?? '', String(t('reports.fallbackTitle')));
 
   return {
+    attachments,
+    attachmentAccess,
     createdAtLabel,
     deleteActions,
     isDeleteConfirmationVisible,
     isDeleting: deleteMutation.isPending,
+    isDuplicating: duplicateMutation.isPending,
     isError: query.isError && !isNotFound,
     isLoading: query.isPending,
     isNotFound,
@@ -127,11 +205,16 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     onBack,
     onDelete,
     onEdit,
+    onDuplicate,
     onHideDeleteConfirmation,
     onRefresh,
+    onAttachmentsLayout,
     onRetry,
     onShowDeleteConfirmation,
     report: query.data,
+    reportTitle,
+    scrollRef,
+    generation,
     updatedAtLabel,
   };
 };

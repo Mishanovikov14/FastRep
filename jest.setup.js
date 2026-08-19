@@ -24,6 +24,72 @@ jest.mock('react-native-config', () => ({
   API_URL: 'https://api.fastrep.app',
 }));
 jest.mock('react-native-device-info', () => require('react-native-device-info/jest/react-native-device-info-mock'));
+jest.mock('@react-native-community/netinfo', () => ({
+  __esModule: true,
+  default: {
+    fetch: jest.fn(async () => ({ isConnected: true, isInternetReachable: true })),
+  },
+}));
+jest.mock('@react-native-documents/picker', () => ({
+  errorCodes: { OPERATION_CANCELED: 'OPERATION_CANCELED' },
+  isErrorWithCode: (error) => typeof error === 'object' && error !== null && 'code' in error,
+  keepLocalCopy: jest.fn(),
+  pick: jest.fn(),
+}));
+jest.mock('@react-native-documents/viewer', () => ({
+  errorCodes: { NULL_PRESENTER: 'NULL_PRESENTER', UNABLE_TO_OPEN_FILE_TYPE: 'UNABLE_TO_OPEN_FILE_TYPE' },
+  isErrorWithCode: (error) => typeof error === 'object' && error !== null && 'code' in error,
+  viewDocument: jest.fn(),
+}));
+jest.mock('react-native-image-picker', () => ({ launchCamera: jest.fn(), launchImageLibrary: jest.fn() }));
+jest.mock('react-native-nitro-sound', () => ({
+  __esModule: true,
+  AudioEncoderAndroidType: { AAC: 3 },
+  AudioSourceAndroidType: { MIC: 1 },
+  AVEncoderAudioQualityIOSType: { high: 96 },
+  OutputFormatAndroidType: { MPEG_4: 2 },
+  default: {
+    addPlayBackListener: jest.fn(),
+    addPlaybackEndListener: jest.fn(),
+    addRecordBackListener: jest.fn(),
+    pausePlayer: jest.fn(async () => 'paused'),
+    removePlayBackListener: jest.fn(),
+    removePlaybackEndListener: jest.fn(),
+    removeRecordBackListener: jest.fn(),
+    resumePlayer: jest.fn(async () => 'resumed'),
+    setSubscriptionDuration: jest.fn(),
+    startPlayer: jest.fn(async () => 'started'),
+    startRecorder: jest.fn(),
+    stopPlayer: jest.fn(async () => 'stopped'),
+    stopRecorder: jest.fn(),
+  },
+}));
+jest.mock('react-native-permissions', () => ({
+  PERMISSIONS: { ANDROID: { CAMERA: 'camera', RECORD_AUDIO: 'record_audio' }, IOS: { CAMERA: 'camera', MICROPHONE: 'microphone' } },
+  request: jest.fn(async () => 'granted'),
+  RESULTS: { GRANTED: 'granted', LIMITED: 'limited' },
+}));
+jest.mock('react-native-fs', () => ({
+  __esModule: true,
+  default: {
+    CachesDirectoryPath: '/cache',
+    downloadFile: jest.fn(() => ({ promise: Promise.resolve({ statusCode: 200 }) })),
+    exists: jest.fn(async () => false),
+    readDir: jest.fn(async () => []),
+    read: jest.fn(async (_path, length, position) => {
+      if (length === 8 && position === 4) {
+        return 'ftypmp42';
+      }
+
+      return 'M4A ';
+    }),
+    stat: jest.fn(async () => ({ size: 1 })),
+    unlink: jest.fn(async () => undefined),
+    write: jest.fn(async () => undefined),
+  },
+}));
+jest.mock('react-native-share', () => ({ __esModule: true, default: { open: jest.fn() } }));
+jest.mock('uuid', () => ({ v4: jest.fn(() => '00000000-0000-4000-8000-000000000001') }));
 jest.mock('react-native-localize', () => ({
   getLocales: () => [
     {

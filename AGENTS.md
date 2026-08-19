@@ -16,6 +16,7 @@ Read the linked document only when the task touches that area:
 - Reanimated or gestures: `docs/Animations.md`
 - Naming, files, imports, exports, formatting: `docs/CodingStyle.md`
 - Project layers and module boundaries: `docs/Architecture.md`
+- Application diagnostics or logging: `docs/Logging.md`
 
 Do not read unrelated documents unless the task requires them.
 
@@ -429,6 +430,10 @@ Do not update success state before checking the request result.
 - Styles should preferably stay under 200 lines.
 - Split files when responsibilities diverge, not only to satisfy a line count.
 - Remove dead code, unused exports, commented-out code, debug code, and accidental `console.log`.
+
+Application code must use the shared typed logger instead of `console.*`.
+Never log secrets, tokens, presigned upload data, user content, file names,
+full paths or URLs, or raw request/error objects. Follow `docs/Logging.md`.
 
 ---
 

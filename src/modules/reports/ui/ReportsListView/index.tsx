@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
 import type { ListRenderItemInfo } from 'react-native';
 import { FlatList, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { IReport } from '@/entities/report/types/report';
 import { ReportsIcon } from '@/assets/icons/ReportsIcon';
+import { useAppSafeAreaInsets } from '@/hooks/useAppSafeAreaInsets';
 import { Button } from '@/UIKit/Button';
 import { EmptyState } from '@/UIKit/EmptyState';
 import { Header } from '@/UIKit/Header';
@@ -21,7 +21,7 @@ const keyExtractor = (report: IReport) => report.id;
 
 export const ReportsListView = () => {
   const { colors, spacing, t } = useUIContext();
-  const { bottom } = useSafeAreaInsets();
+  const { bottom } = useAppSafeAreaInsets();
   const styles = useMemo(() => getStyles(colors, spacing, bottom), [bottom, colors, spacing]);
   const {
     errorMessage,

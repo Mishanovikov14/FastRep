@@ -1,4 +1,4 @@
-export type ReportStatus = 'DRAFT' | 'FAILED' | 'PROCESSING' | 'READY';
+export type ReportStatus = 'DRAFT' | 'FAILED' | 'PROCESSING' | 'QUEUED' | 'READY';
 
 export interface IReport {
   createdAt: string;

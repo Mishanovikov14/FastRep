@@ -1,15 +1,30 @@
-import { useMemo } from 'react';
-import { Keyboard, Pressable, ScrollView, View } from 'react-native';
-import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardStickyView } from 'react-native-keyboard-controller';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ReactElement, ReactNode, RefObject, useMemo } from 'react';
+import { Keyboard, Pressable, RefreshControlProps, ScrollView, StyleProp, View, ViewStyle } from 'react-native';
+import { KeyboardAvoidingView, KeyboardAwareScrollView, KeyboardAwareScrollViewRef, KeyboardStickyView } from 'react-native-keyboard-controller';
 
+import { useAppSafeAreaInsets } from '@/hooks/useAppSafeAreaInsets';
 import { Gradient } from '@/UIKit/Gradient';
 import { useUIContext } from '@/UIProvider/useUIContext';
 import { scaleVertical } from '@/utils/scaling';
 
 import { useKeyboardStickyLayout } from './presenters/useKeyboardStickyLayout';
 import { getStyles } from './styles';
-import type { IProps } from './types';
+import { Edge } from 'react-native-safe-area-context';
+
+interface IProps {
+  backgroundColor?: string;
+  children?: ReactNode;
+  containerStyle?: StyleProp<ViewStyle>;
+  contentContainerStyle?: StyleProp<ViewStyle>;
+  edges?: Edge[];
+  footerComponent?: ReactNode;
+  headerComponent?: ReactNode;
+  isKeyboardAvoiding?: boolean;
+  refreshControl?: ReactElement<RefreshControlProps>;
+  scrollEnabled?: boolean;
+  scrollRef?: RefObject<KeyboardAwareScrollViewRef | null>;
+  withGradient?: boolean;
+}
 
 export const ScreenContainer = ({
   backgroundColor,
@@ -27,7 +42,7 @@ export const ScreenContainer = ({
 }: IProps) => {
   const { colors, spacing } = useUIContext();
   const styles = useMemo(() => getStyles(colors, backgroundColor), [backgroundColor, colors]);
-  const safeAreaInsets = useSafeAreaInsets();
+  const safeAreaInsets = useAppSafeAreaInsets();
   const bottomOffset = scaleVertical(spacing.xl);
   const { extraKeyboardSpace, onStickyLayout, scrollBottomOffset, stickyOpenedOffset } = useKeyboardStickyLayout();
   const keyboardBottomOffset = footerComponent ? scrollBottomOffset : bottomOffset;

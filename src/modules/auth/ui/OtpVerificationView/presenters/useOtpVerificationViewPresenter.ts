@@ -3,6 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { forgotPassword } from '@/entities/user/API/userApi';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import { getForgotPasswordErrorMessage } from '@/modules/auth/presenters/passwordRecoveryErrors';
 import type { GuestStackParamList } from '@/navigation/types';
@@ -93,7 +94,7 @@ export const useOtpVerificationViewPresenter = ({ t }: IPresenterInput) => {
       setResendSeconds(RESEND_COOLDOWN_SECONDS);
       toastService.showSuccess(String(t('auth.otp.codeResent')));
     } catch {
-      console.error('Unexpected password-code resend failure');
+      logger.error('auth.password_code_resend_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isResendingRef.current = false;

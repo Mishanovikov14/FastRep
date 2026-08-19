@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { ProfileIcon } from '@/assets/icons/ProfileIcon';
 import { ReportsIcon } from '@/assets/icons/ReportsIcon';
 import { useUserStore } from '@/entities/user/model/userStore';
+import { useAppSafeAreaInsets } from '@/hooks/useAppSafeAreaInsets';
 import { ForgotPasswordView } from '@/modules/auth/ui/ForgotPasswordView';
 import { LoginView } from '@/modules/auth/ui/LoginView';
 import { OtpVerificationView } from '@/modules/auth/ui/OtpVerificationView';
@@ -44,7 +45,8 @@ const ProfileTabIcon = ({ color, size }: ITabBarIconProps) => {
 
 const AppTabsNavigation = () => {
   const { colors, fonts, spacing, t } = useUIContext();
-  const styles = useMemo(() => getStyles(colors, fonts, spacing), [colors, fonts, spacing]);
+  const { bottom } = useAppSafeAreaInsets();
+  const styles = useMemo(() => getStyles(colors, fonts, spacing, bottom), [bottom, colors, fonts, spacing]);
 
   return (
     <AppTabs.Navigator

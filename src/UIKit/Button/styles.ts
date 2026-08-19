@@ -24,9 +24,24 @@ export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
     fullWidth: {
       alignSelf: 'stretch',
     },
+    buttonText: {
+      textAlign: 'center'
+    },
     large: {
       minHeight: scaleVertical(spacing.xxl + spacing.lg),
       paddingHorizontal: scaleHorizontal(spacing.xl),
+    },
+    loaderOverlay: {
+      alignItems: 'center',
+      bottom: 0,
+      justifyContent: 'center',
+      left: 0,
+      position: 'absolute',
+      right: 0,
+      top: 0,
+    },
+    loadingContent: {
+      opacity: 0,
     },
     medium: {
       minHeight: scaleVertical(spacing.xxl + spacing.md),

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { normalizeUpdateReportRequest, validateReportForm } from '@/entities/report/model/reportValidation';
 import type { ReportFormErrors } from '@/entities/report/model/reportValidation';
+import { logger } from '@/libs/logger/logger';
 import { toastService } from '@/libs/toast/toastService';
 import type { AppStackParamList } from '@/navigation/types';
 import { getReportErrorMessage, getReportFieldErrors } from '@/modules/reports/presenters/reportErrors';
@@ -26,6 +27,7 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [errors, setErrors] = useState<ReportFormErrors>({});
+  const isEditable = reportQuery.data?.status === 'DRAFT' || reportQuery.data?.status === 'FAILED';
 
   useEffect(() => {
     if (reportQuery.data && initializedReportIdRef.current !== reportQuery.data.id) {
@@ -35,15 +37,31 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
     }
   }, [reportQuery.data]);
 
-  const onChangeTitle = useCallback((value: string) => {
-    setTitle(value);
-    setErrors((current) => ({ ...current, title: undefined }));
-  }, []);
+  const onChangeTitle = useCallback(
+    (value: string) => {
+      if (!isEditable) {
+        return;
+      }
+      setTitle(value);
+      setErrors((current) => ({ ...current, title: undefined }));
+    },
+    [isEditable],
+  );
 
-  const onChangeNotes = useCallback((value: string) => {
-    setNotes(value);
-    setErrors((current) => ({ ...current, notes: undefined }));
-  }, []);
+  const onChangeNotes = useCallback(
+    (value: string) => {
+      if (!isEditable) {
+        return;
+      }
+      setNotes(value);
+      setErrors((current) => ({ ...current, notes: undefined }));
+    },
+    [isEditable],
+  );
+
+  const onBack = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
 
   const onRetry = useCallback(async () => {
     await reportQuery.refetch();
@@ -51,6 +69,13 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
 
   const onSubmit = useCallback(async () => {
     if (isSubmittingRef.current) {
+      return;
+    }
+    if (!isEditable) {
+      logger.warn('report.update_blocked', {
+        errorCode: 'REPORT_NOT_EDITABLE',
+        reportStatus: reportQuery.data?.status,
+      });
       return;
     }
 
@@ -79,22 +104,24 @@ export const useEditReportViewPresenter = ({ reportId, t }: IInput) => {
 
       toastService.showSuccess(String(t('reports.edit.success')));
       navigation.goBack();
-    } catch (error: unknown) {
-      console.error('Unexpected report update failure', error);
+    } catch {
+      logger.error('report.update_failed', { errorCode: 'unexpected_error' });
       toastService.showError(String(t('common.error')), String(t('common.somethingWentWrong')));
     } finally {
       isSubmittingRef.current = false;
     }
-  }, [mutation, navigation, notes, t, title]);
+  }, [isEditable, mutation, navigation, notes, reportQuery.data?.status, t, title]);
 
   return {
     errors,
     isError: reportQuery.isError,
+    isEditable,
     isLoading: reportQuery.isPending,
     isSubmitting: mutation.isPending,
     notes,
     onChangeNotes,
     onChangeTitle,
+    onBack,
     onRetry,
     onSubmit,
     title,

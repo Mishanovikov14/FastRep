@@ -4,6 +4,7 @@ import type { ITokenPair } from '@/entities/user/types/auth';
 import type { ITokenSnapshot } from '@/entities/user/types/session';
 import type { IRequesterAuthState } from '@/libs/requester/IRequester';
 import type { IResponse } from '@/libs/requester/IResponse';
+import { logger } from '@/libs/logger/logger';
 import { configureRequesterAuth } from '@/libs/requester/requester';
 import { toastService } from '@/libs/toast/toastService';
 import { i18n } from '@/localization/i18n';
@@ -226,8 +227,8 @@ export const createTokenRefreshService = ({
                 shouldClear = true;
                 shouldNotify = true;
               }
-            } catch (snapshotError: unknown) {
-              console.error('Unable to verify the failed authentication session', snapshotError);
+            } catch {
+              logger.error('auth.failed_session_verification_failed');
             }
 
             if (shouldClear && cleanupSnapshot) {
@@ -235,8 +236,8 @@ export const createTokenRefreshService = ({
 
               try {
                 wasCleared = await clearSession(cleanupSnapshot);
-              } catch (clearError: unknown) {
-                console.error('Unable to clear the expired authentication session', clearError);
+              } catch {
+                logger.error('auth.expired_session_clear_failed');
 
                 if (shouldNotify && shouldNotifySessionExpired) {
                   onSessionExpired?.();

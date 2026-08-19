@@ -53,3 +53,10 @@ export const deleteReport = (id: string): Promise<IResponse<void>> => {
     url: `/reports/${id}`,
   });
 };
+
+export const duplicateReport = (id: string): Promise<IResponse<IReport>> => {
+  return requester.request<IReport>({
+    method: 'POST',
+    url: `/reports/${id}/duplicate`,
+  });
+};

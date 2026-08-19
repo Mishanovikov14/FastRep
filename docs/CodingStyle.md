@@ -43,6 +43,12 @@ Use `on`, not `handle`. Avoid inline handlers in JSX.
 Use `@` alias, named exports, `import type`, and avoid circular dependencies.
 Import order is not enforced.
 
+## Logging
+
+Use the shared typed `logger` for diagnostics. Do not call `console.*` outside
+the logger adapter, and do not pass raw errors, request objects, secrets, user
+content, file names, full paths, or URLs. See `docs/Logging.md`.
+
 ## Types
 
 Declare component-local props in `index.tsx` and name the interface `IProps`,
