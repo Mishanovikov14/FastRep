@@ -6,6 +6,7 @@ import { refreshTokenPair } from '@/entities/user/services/tokenRefreshService';
 import { applyAuthenticationResponse, restoreUserSession } from '@/entities/user/services/userSessionService';
 import { clearUserSession } from '@/entities/user/services/userStateService';
 import { userTokenStorage } from '@/entities/user/services/userTokenStorage';
+import { synchronizeUserTimezone } from '@/entities/user/services/userTimezoneService';
 import type { ITokenPair } from '@/entities/user/types/auth';
 import type { IUser } from '@/entities/user/types/user';
 
@@ -42,6 +43,10 @@ jest.mock('@/entities/user/services/tokenRefreshService', () => ({
   refreshTokenPair: jest.fn(),
 }));
 
+jest.mock('@/entities/user/services/userTimezoneService', () => ({
+  synchronizeUserTimezone: jest.fn(),
+}));
+
 const tokens: ITokenPair = {
   accessToken: 'expired-access-token',
   refreshToken: 'current-refresh-token',
@@ -76,6 +81,7 @@ describe('applyAuthenticationResponse', () => {
     jest.mocked(userTokenStorage.saveTokens).mockResolvedValue();
     jest.mocked(enforceAppEnvironmentForAuthenticatedUser).mockReturnValue(true);
     jest.mocked(clearAuthenticatedResources).mockResolvedValue();
+    jest.mocked(synchronizeUserTimezone).mockImplementation(async (currentUser) => currentUser);
   });
 
   it('does not save Development tokens when a non-owner forces Production', async () => {
@@ -106,6 +112,7 @@ describe('applyAuthenticationResponse', () => {
       accessToken: 'access-token',
       refreshToken: 'refresh-token',
     });
+    expect(synchronizeUserTimezone).toHaveBeenCalledTimes(1);
     expect(useUserStore.getState()).toMatchObject({
       isAuthorized: true,
       user,
@@ -121,6 +128,7 @@ describe('restoreUserSession', () => {
     jest.mocked(clearUserSession).mockResolvedValue();
     jest.mocked(enforceAppEnvironmentForAuthenticatedUser).mockReturnValue(true);
     jest.mocked(clearAuthenticatedResources).mockResolvedValue();
+    jest.mocked(synchronizeUserTimezone).mockImplementation(async (currentUser) => currentUser);
   });
 
   it('forces Production and clears a restored non-owner Development session', async () => {
@@ -161,6 +169,7 @@ describe('restoreUserSession', () => {
       user,
     });
     expect(getMeWithoutRefresh).toHaveBeenCalledTimes(1);
+    expect(synchronizeUserTimezone).toHaveBeenCalledTimes(1);
     expect(refreshTokenPair).not.toHaveBeenCalled();
     expect(clearUserSession).not.toHaveBeenCalled();
   });

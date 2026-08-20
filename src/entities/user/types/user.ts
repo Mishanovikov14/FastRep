@@ -8,5 +8,10 @@ export interface IUser {
   isPremium: boolean;
   language: SupportedLanguage;
   photoUrl: string | null;
+  timezone?: string | null;
   updatedAt: string;
+}
+
+export interface IUpdateUserProfileRequest {
+  timezone?: string | null;
 }
