@@ -132,7 +132,7 @@ export const ReportDetailsView = () => {
                   onPress={onShowDeleteConfirmation}
                   style={styles.action}
                   title={String(t('reports.delete.action'))}
-                  variant="text"
+                  variant="danger"
                 />
               </View>
             </View>
