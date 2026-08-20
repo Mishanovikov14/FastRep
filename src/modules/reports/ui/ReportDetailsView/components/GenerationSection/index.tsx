@@ -111,29 +111,31 @@ export const GenerationSection = ({
               </Typography>
             </View>
           </View>
-          <View style={styles.outputActions}>
+          <View style={styles.outputActions} testID="report-output-actions">
             <Button
+              fullWidth
               loading={isOpeningOutput}
               onPress={onOpenOutput}
-              style={styles.outputAction}
               title={String(t('reports.output.open'))}
             />
-            <Button
-              loading={isSharingOutput}
-              onPress={onShareOutput}
-              style={styles.outputAction}
-              title={String(t('reports.output.share'))}
-              variant="secondary"
-            />
-            {reportStatus === 'READY' && !isActive ? (
+            <View style={styles.outputSecondaryActions} testID="report-output-secondary-actions">
               <Button
-                loading={isDuplicating}
-                onPress={onDuplicate}
+                loading={isSharingOutput}
+                onPress={onShareOutput}
                 style={styles.outputAction}
-                title={String(t('reports.duplicate.action'))}
+                title={String(t('reports.output.share'))}
                 variant="secondary"
               />
-            ) : null}
+              {reportStatus === 'READY' && !isActive ? (
+                <Button
+                  loading={isDuplicating}
+                  onPress={onDuplicate}
+                  style={styles.outputAction}
+                  title={String(t('reports.duplicate.action'))}
+                  variant="secondary"
+                />
+              ) : null}
+            </View>
           </View>
         </View>
       ) : !isGenerating && generation?.status !== 'FAILED' ? (

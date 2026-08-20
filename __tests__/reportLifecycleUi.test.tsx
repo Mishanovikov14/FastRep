@@ -6,6 +6,7 @@ import type { ILocalReportAsset, IReportAsset } from '@/entities/report/types/re
 import { AttachmentsSection } from '@/modules/reports/ui/ReportDetailsView/components/AttachmentsSection';
 import { GenerationSection } from '@/modules/reports/ui/ReportDetailsView/components/GenerationSection';
 import { Button } from '@/UIKit/Button';
+import { Typography } from '@/UIKit/Typography';
 
 jest.mock('@/UIKit/Button', () => {
   const ReactModule = require('react') as typeof React;
@@ -132,6 +133,69 @@ describe('report lifecycle UI', () => {
     expect(titles).toEqual(['reports.output.open', 'reports.output.share', 'reports.duplicate.action']);
     expect(titles).not.toContain('reports.generation.generate');
     expect(titles).not.toContain('reports.generation.retry');
+
+    const actions = renderer?.root.findByProps({ testID: 'report-output-actions' });
+    const secondaryActions = renderer?.root.findByProps({ testID: 'report-output-secondary-actions' });
+    const openButton = renderer?.root.findAllByType(Button).find((node) => node.props.title === 'reports.output.open');
+    expect(openButton?.props.fullWidth).toBe(true);
+    expect(actions?.findAllByType(Button).map((node) => node.props.title)).toEqual([
+      'reports.output.open',
+      'reports.output.share',
+      'reports.duplicate.action',
+    ]);
+    expect(secondaryActions?.findAllByType(Button).map((node) => node.props.title)).toEqual([
+      'reports.output.share',
+      'reports.duplicate.action',
+    ]);
+  });
+
+  it('updates visible generation progress without changing action layout', async () => {
+    let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
+    const generation = {
+      createdAt: '2026-08-12T10:00:00.000Z',
+      id: 'generation-1',
+      progress: 25,
+      reportId: 'report-1',
+      status: 'PROCESSING' as const,
+      updatedAt: '2026-08-12T10:00:00.000Z',
+    };
+    const renderSection = (progress: number) => (
+      <GenerationSection
+        canCancel={false}
+        canGenerate={false}
+        generation={{ ...generation, progress }}
+        hasOutput={false}
+        isCancelling={false}
+        isDuplicating={false}
+        isGenerating
+        isOpeningOutput={false}
+        isSharingOutput={false}
+        lockRemainingSeconds={0}
+        onCancelGeneration={noop}
+        onDuplicate={noop}
+        onOpenOutput={asyncNoop}
+        onShareOutput={asyncNoop}
+        onStartGeneration={asyncNoop}
+        reportStatus="PROCESSING"
+        stageKey="generating"
+      />
+    );
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(renderSection(25));
+    });
+    const rendered = renderer as ReactTestRenderer.ReactTestRenderer;
+    const visibleText = () =>
+      rendered.root
+        .findAllByType(Typography)
+        .map((node) => React.Children.toArray(node.props.children).join(''));
+
+    expect(visibleText()).toContain('25%');
+
+    await ReactTestRenderer.act(async () => {
+      rendered.update(renderSection(60));
+    });
+    expect(visibleText()).toContain('60%');
   });
 
   it('freezes READY attachment controls while keeping assets readable', async () => {

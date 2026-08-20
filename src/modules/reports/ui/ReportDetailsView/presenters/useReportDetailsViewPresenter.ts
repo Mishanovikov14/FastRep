@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { TFunction } from 'i18next';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import type { KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 
@@ -44,6 +44,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
   const navigation = useNavigation<Navigation>();
   const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
   const attachmentsOffsetRef = useRef(0);
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
   const query = useReportDetailsQuery(reportId);
   const latestGenerationQuery = useLatestReportGenerationQuery(reportId);
   const refetchReport = query.refetch;
@@ -137,7 +138,12 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
   }, [duplicateMutation, isGenerationActive, navigation, query.data?.status, t]);
 
   const onRefresh = useCallback(async () => {
-    await Promise.all([refetchReport(), refetchLatestGeneration()]);
+    setIsManualRefreshing(true);
+    try {
+      await Promise.all([refetchReport(), refetchLatestGeneration()]);
+    } finally {
+      setIsManualRefreshing(false);
+    }
   }, [refetchLatestGeneration, refetchReport]);
 
   const onRetry = useCallback(async () => {
@@ -224,7 +230,7 @@ export const useReportDetailsViewPresenter = ({ language, reportId, t }: IInput)
     isError: query.isError && !isNotFound,
     isLoading: query.isPending,
     isNotFound,
-    isRefreshing: query.isRefetching || latestGenerationQuery.isRefetching,
+    isRefreshing: isManualRefreshing,
     onBack,
     onDelete,
     onEdit,

@@ -4,7 +4,7 @@ import type { Colors, Radius, Spacing } from '@/UIProvider/theme/types';
 import { scaleHorizontal, scaleVertical } from '@/utils/scaling';
 
 export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
-  return StyleSheet.create({
+  const styles = StyleSheet.create({
     failureCard: {
       backgroundColor: colors.background,
       borderColor: colors.error,
@@ -20,7 +20,7 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       padding: scaleHorizontal(spacing.md),
     },
     outputAction: { flex: 1 },
-    outputActions: { flexDirection: 'row', gap: scaleHorizontal(spacing.sm) },
+    outputActions: { gap: scaleVertical(spacing.sm) },
     outputCard: {
       backgroundColor: colors.background,
       borderRadius: scaleHorizontal(radius.md),
@@ -37,6 +37,10 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
       width: scaleHorizontal(48),
     },
     outputText: { flex: 1, gap: scaleVertical(spacing.xs) },
+    outputSecondaryActions: {
+      flexDirection: 'row',
+      gap: scaleHorizontal(spacing.sm),
+    },
     processingDot: {
       backgroundColor: colors.primary,
       borderRadius: scaleHorizontal(4),
@@ -54,4 +58,6 @@ export const getStyles = (colors: Colors, radius: Radius, spacing: Spacing) => {
     },
     statusHeading: { alignItems: 'center', flexDirection: 'row', gap: scaleHorizontal(spacing.sm) },
   });
+
+  return styles;
 };
