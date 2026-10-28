@@ -2,36 +2,30 @@ This is a new [**React Native**](https://reactnative.dev) project, bootstrapped 
 
 # Environment
 
-FastRep uses one canonical `API_URL` variable through `react-native-config`. Normal Debug
-and Release builds both use the shared remote backend:
+API environments are selected at runtime through
+`src/entities/environment/config/appEnvironments.ts` and the environment service.
+Debug builds default to Development; Release builds default to Production. See
+[Requester](docs/Requester.md) and [Authentication](docs/Auth.md) for switching behavior.
 
-```sh
-API_URL=https://api.fastrep.app
-```
+Local `.env` and `.env.*` files are ignored by Git; only `.env.example` may be
+committed as a template without secrets. The native `react-native-config` integration
+remains available, but it does not select the active API environment. Never put
+private API keys, passwords, or signing credentials in native environment files:
+values embedded in a mobile application can be extracted from it.
 
-- iOS Debug and Release: `.env`
-- Android Debug and DebugOptimized: `.env.development`
-- Android Release: `.env.production`
+# Android release signing
 
-These environment files are tracked, so a clean checkout resolves the same backend without a
-developer-specific override. The iOS `react-native-config` CocoaPods target reads the root `.env`
-for both configurations; app-target `ENVFILE` build settings do not propagate to that pod target.
-Application code reads the backend URL only through
-`react-native-config`; requester and feature code must not contain platform-specific fallbacks.
+Release builds use a private keystore configured through these environment variables:
 
-To explicitly use a local backend later, create an ignored `.env.local`, choose the URL that is
-reachable from the target, and select that file only for the intended launch:
+- `FASTREP_RELEASE_STORE_FILE`: absolute path to the private `.keystore` or `.jks` file.
+- `FASTREP_RELEASE_STORE_PASSWORD`: keystore password.
+- `FASTREP_RELEASE_KEY_ALIAS`: signing key alias.
+- `FASTREP_RELEASE_KEY_PASSWORD`: signing key password.
 
-```sh
-API_URL=http://localhost:3000
-ENVFILE=.env.local npm run ios
-ENVFILE=.env.local npm run android
-```
-
-For the standard Android emulator, use `http://10.0.2.2:3000` in `.env.local`. For a physical
-device, use the development machine's reachable LAN address and ensure both devices share a
-network. Never commit `.env.local`. Environment values are embedded in native builds, so stop the
-running app and rebuild it after changing the selected file; Fast Refresh is not sufficient.
+Keep the keystore outside the repository and provide these variables through your
+local shell or CI secret settings before building a release. The signing task requires
+all four values; release builds never fall back to the public debug keystore. Debug
+builds continue to use the bundled `android/app/debug.keystore`.
 
 # Typography
 
