@@ -9,7 +9,6 @@ import {
   refreshGenerationResources,
   useCancelReportGenerationMutation,
   useEntitlementsQuery,
-  useLatestReportGenerationQuery,
   useReportOutputQuery,
   useStartReportGenerationMutation,
 } from '@/modules/reports/presenters/reportGenerationQueries';
@@ -21,7 +20,6 @@ jest.mock('@/modules/reports/presenters/reportGenerationQueries', () => ({
   refreshGenerationResources: jest.fn(),
   useCancelReportGenerationMutation: jest.fn(),
   useEntitlementsQuery: jest.fn(),
-  useLatestReportGenerationQuery: jest.fn(),
   useReportOutputQuery: jest.fn(),
   useStartReportGenerationMutation: jest.fn(),
 }));
@@ -68,15 +66,17 @@ describe('report generation idempotency', () => {
         subscription: null,
       },
     } as never);
-    jest.mocked(useLatestReportGenerationQuery).mockReturnValue({ data: null, refetch: jest.fn() } as never);
     jest.mocked(useReportOutputQuery).mockReturnValue({ data: null } as never);
     jest.mocked(useCancelReportGenerationMutation).mockReturnValue({ isPending: false, mutateAsync: jest.fn() } as never);
     jest.mocked(useStartReportGenerationMutation).mockReturnValue({ isPending: false, mutateAsync } as never);
 
     const Harness = () => {
       presenter = useReportGenerationPresenter({
+        generation: null,
         hasReadyAssets: false,
         hasUnresolvedAssets: false,
+        isGenerationStateReady: true,
+        onRefetchLatestGeneration: jest.fn(async () => undefined),
         report,
         t,
       });
@@ -180,9 +180,12 @@ describe('report generation idempotency', () => {
 
     const RejectedHarness = () => {
       presenter = useReportGenerationPresenter({
+        generation: null,
         hasReadyAssets: false,
         hasRejectedAssets: true,
         hasUnresolvedAssets: false,
+        isGenerationStateReady: true,
+        onRefetchLatestGeneration: jest.fn(async () => undefined),
         onRejectedAssetsBlocked,
         report,
         t,

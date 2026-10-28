@@ -16,6 +16,7 @@ import type {
   IPaginatedReports,
   IReport,
   IUpdateReportRequest,
+  ReportStatus,
 } from '@/entities/report/types/report';
 import { queryClient } from '@/libs/query/QueryClient';
 import type { IResponse } from '@/libs/requester/IResponse';
@@ -138,6 +139,22 @@ const setReportAcrossLists = (
   updater: (data: InfiniteData<IPaginatedReports> | undefined) => InfiniteData<IPaginatedReports> | undefined,
 ): void => {
   queryClient.setQueriesData<InfiniteData<IPaginatedReports>>({ queryKey: reportsQueryKeys.lists() }, updater);
+};
+
+export const setReportStatusInLists = (reportId: string, status: ReportStatus): void => {
+  setReportAcrossLists((data) => {
+    if (!data) {
+      return data;
+    }
+
+    return {
+      ...data,
+      pages: data.pages.map((page) => ({
+        ...page,
+        data: page.data.map((report) => (report.id === reportId ? { ...report, status } : report)),
+      })),
+    };
+  });
 };
 
 export const useReportsListQuery = () => {

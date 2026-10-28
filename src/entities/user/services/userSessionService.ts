@@ -9,6 +9,7 @@ import { clearAuthenticatedResources } from './authenticatedResourcesService';
 import { getTokenRefreshErrorDetails, isInvalidTokenRefreshError, refreshTokenPair } from './tokenRefreshService';
 import { clearUserSession } from './userStateService';
 import { userTokenStorage } from './userTokenStorage';
+import { synchronizeUserTimezone } from './userTimezoneService';
 
 const getTemporaryErrorResult = (message?: string, type?: string, statusCode?: number): SessionRestoreResult => {
   return {
@@ -48,7 +49,8 @@ export const applyAuthenticationResponse = async (
     accessToken: authentication.accessToken,
     refreshToken: authentication.refreshToken,
   });
-  useUserStore.getState().setUser(authentication.user);
+  const user = await synchronizeUserTimezone(authentication.user);
+  useUserStore.getState().setUser(user);
 
   return 'authenticated';
 };
@@ -68,9 +70,11 @@ export const restoreUserSession = async (): Promise<SessionRestoreResult> => {
         return { status: 'unauthorized' };
       }
 
+      const user = await synchronizeUserTimezone(response.data);
+
       return {
         status: 'authorized',
-        user: response.data,
+        user,
       };
     }
 
@@ -97,9 +101,11 @@ export const restoreUserSession = async (): Promise<SessionRestoreResult> => {
         return { status: 'unauthorized' };
       }
 
+      const user = await synchronizeUserTimezone(retryResponse.data);
+
       return {
         status: 'authorized',
-        user: retryResponse.data,
+        user,
       };
     }
 

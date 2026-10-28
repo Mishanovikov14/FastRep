@@ -14,9 +14,11 @@ import {
   useDuplicateReportMutation,
   useUpdateReportMutation,
 } from '@/modules/reports/presenters/reportQueries';
+import { useLatestReportGenerationQuery } from '@/modules/reports/presenters/reportGenerationQueries';
 import { useCreateReportViewPresenter } from '@/modules/reports/ui/CreateReportView/presenters/useCreateReportViewPresenter';
 import { useEditReportViewPresenter } from '@/modules/reports/ui/EditReportView/presenters/useEditReportViewPresenter';
 import { useReportDetailsViewPresenter } from '@/modules/reports/ui/ReportDetailsView/presenters/useReportDetailsViewPresenter';
+import { useReportAttachmentsPresenter } from '@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentsPresenter';
 
 jest.mock('@react-navigation/native', () => ({
   useNavigation: jest.fn(),
@@ -28,6 +30,9 @@ jest.mock('@/modules/reports/presenters/reportQueries', () => ({
   useReportDetailsQuery: jest.fn(),
   useDuplicateReportMutation: jest.fn(),
   useUpdateReportMutation: jest.fn(),
+}));
+jest.mock('@/modules/reports/presenters/reportGenerationQueries', () => ({
+  useLatestReportGenerationQuery: jest.fn(),
 }));
 jest.mock('@/modules/reports/ui/ReportDetailsView/presenters/useReportAttachmentsPresenter', () => ({
   useReportAttachmentsPresenter: jest.fn(() => ({
@@ -77,6 +82,7 @@ describe('report mutation presenters', () => {
   const deleteMutate = jest.fn();
   const duplicateMutate = jest.fn();
   const refetch = jest.fn();
+  const refetchLatestGeneration = jest.fn();
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
 
   beforeEach(() => {
@@ -105,6 +111,13 @@ describe('report mutation presenters', () => {
       isPending: false,
       isRefetching: false,
       refetch,
+    } as never);
+    jest.mocked(useLatestReportGenerationQuery).mockReturnValue({
+      data: null,
+      isError: false,
+      isPending: false,
+      isRefetching: false,
+      refetch: refetchLatestGeneration,
     } as never);
   });
 
@@ -246,6 +259,86 @@ describe('report mutation presenters', () => {
     });
     expect(removeReportDetailsCache).toHaveBeenCalledWith('report-1');
     expect(toastService.showSuccess).toHaveBeenCalledWith('reports.delete.success');
+    expect(presenter?.deleteActions.find((action) => action.key === 'delete')?.variant).toBe('danger');
+  });
+
+  it('does not expose background query refetching as manual refreshing', async () => {
+    let presenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
+    jest.mocked(useReportDetailsQuery).mockReturnValue({
+      data: report,
+      error: null,
+      isError: false,
+      isPending: false,
+      isRefetching: true,
+      refetch,
+    } as never);
+    jest.mocked(useLatestReportGenerationQuery).mockReturnValue({
+      data: {
+        createdAt: '2026-08-19T10:00:00.000Z',
+        id: 'generation-processing',
+        progress: 60,
+        reportId: report.id,
+        status: 'PROCESSING',
+        updatedAt: '2026-08-19T10:00:00.000Z',
+      },
+      isError: false,
+      isPending: false,
+      isRefetching: true,
+      refetch: refetchLatestGeneration,
+    } as never);
+
+    const Harness = () => {
+      presenter = useReportDetailsViewPresenter({ language: 'en', reportId: report.id, t });
+      return null;
+    };
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<Harness />);
+    });
+
+    expect(presenter?.isRefreshing).toBe(false);
+  });
+
+  it('shows manual refreshing only while both explicit refetches are pending', async () => {
+    let presenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
+    let resolveReport: (() => void) | undefined;
+    let resolveGeneration: (() => void) | undefined;
+    refetch.mockReturnValue(
+      new Promise((resolve) => {
+        resolveReport = () => resolve({});
+      }),
+    );
+    refetchLatestGeneration.mockReturnValue(
+      new Promise((resolve) => {
+        resolveGeneration = () => resolve({});
+      }),
+    );
+
+    const Harness = () => {
+      presenter = useReportDetailsViewPresenter({ language: 'en', reportId: report.id, t });
+      return null;
+    };
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<Harness />);
+    });
+
+    let refresh: Promise<void> | undefined;
+    ReactTestRenderer.act(() => {
+      refresh = presenter?.onRefresh();
+    });
+
+    expect(presenter?.isRefreshing).toBe(true);
+    expect(refetch).toHaveBeenCalledTimes(1);
+    expect(refetchLatestGeneration).toHaveBeenCalledTimes(1);
+
+    resolveReport?.();
+    resolveGeneration?.();
+    await ReactTestRenderer.act(async () => {
+      await refresh;
+    });
+
+    expect(presenter?.isRefreshing).toBe(false);
   });
 
   it('blocks edit outside editable states, retries details, and exposes a 404 not-found state', async () => {
@@ -311,5 +404,99 @@ describe('report mutation presenters', () => {
     expect(duplicateMutate).toHaveBeenCalledTimes(1);
     expect(navigation.push).toHaveBeenCalledWith('ReportDetails', { reportId: 'report-copy' });
     expect(toastService.showSuccess).not.toHaveBeenCalled();
+  });
+
+  it.each(['QUEUED', 'PROCESSING'] as const)(
+    'restores %s as non-editable from the latest generation query on mount',
+    async (status) => {
+      let presenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
+      jest.mocked(useReportDetailsQuery).mockReturnValue({
+        data: { ...report, status: 'DRAFT' },
+        error: null,
+        isError: false,
+        isPending: false,
+        isRefetching: false,
+        refetch,
+      } as never);
+      jest.mocked(useLatestReportGenerationQuery).mockReturnValue({
+        data: {
+          createdAt: '2026-08-19T10:00:00.000Z',
+          id: 'generation-active',
+          progress: 25,
+          reportId: report.id,
+          status,
+          updatedAt: '2026-08-19T10:00:00.000Z',
+        },
+      } as never);
+
+      const Harness = () => {
+        presenter = useReportDetailsViewPresenter({ language: 'en', reportId: report.id, t });
+        return null;
+      };
+
+      await ReactTestRenderer.act(async () => {
+        renderer = ReactTestRenderer.create(<Harness />);
+      });
+
+      expect(presenter?.canEditSources).toBe(false);
+      expect(presenter?.reportStatus).toBe(status);
+      expect(useReportAttachmentsPresenter).toHaveBeenCalledWith(
+        expect.objectContaining({ canEdit: false, reportId: report.id }),
+      );
+      ReactTestRenderer.act(() => presenter?.onEdit());
+      expect(navigation.navigate).not.toHaveBeenCalled();
+    },
+  );
+
+  it('blocks duplicate, title, and notes mutations while the latest generation is active', async () => {
+    let detailsPresenter: ReturnType<typeof useReportDetailsViewPresenter> | undefined;
+    let editPresenter: ReturnType<typeof useEditReportViewPresenter> | undefined;
+    jest.mocked(useReportDetailsQuery).mockReturnValue({
+      data: { ...report, status: 'DRAFT' },
+      error: null,
+      isError: false,
+      isPending: false,
+      isRefetching: false,
+      refetch,
+    } as never);
+    jest.mocked(useLatestReportGenerationQuery).mockReturnValue({
+      data: {
+        createdAt: '2026-08-19T10:00:00.000Z',
+        id: 'generation-processing',
+        progress: 50,
+        reportId: report.id,
+        status: 'PROCESSING',
+        updatedAt: '2026-08-19T10:00:00.000Z',
+      },
+      refetch,
+    } as never);
+
+    const DetailsHarness = () => {
+      detailsPresenter = useReportDetailsViewPresenter({ language: 'en', reportId: report.id, t });
+      return null;
+    };
+    const EditHarness = () => {
+      editPresenter = useEditReportViewPresenter({ reportId: report.id, t });
+      return null;
+    };
+
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<DetailsHarness />);
+    });
+    await ReactTestRenderer.act(async () => {
+      await detailsPresenter?.onDuplicate();
+      renderer?.update(<EditHarness />);
+    });
+    ReactTestRenderer.act(() => {
+      editPresenter?.onChangeTitle('Blocked title');
+      editPresenter?.onChangeNotes('Blocked notes');
+    });
+    await ReactTestRenderer.act(async () => editPresenter?.onSubmit());
+
+    expect(duplicateMutate).not.toHaveBeenCalled();
+    expect(updateMutate).not.toHaveBeenCalled();
+    expect(editPresenter?.isEditable).toBe(false);
+    expect(editPresenter?.title).not.toBe('Blocked title');
+    expect(editPresenter?.notes).not.toBe('Blocked notes');
   });
 });

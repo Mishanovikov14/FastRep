@@ -11,7 +11,7 @@ import type {
   ITokenPair,
   IVerifyRegistrationRequest,
 } from '@/entities/user/types/auth';
-import type { IUser } from '@/entities/user/types/user';
+import type { IUpdateUserProfileRequest, IUser } from '@/entities/user/types/user';
 import type { IResponse } from '@/libs/requester/IResponse';
 import { requester } from '@/libs/requester/requester';
 
@@ -43,9 +43,7 @@ export const verifyRegistration = (
   });
 };
 
-export const resendRegistrationCode = (
-  request: IResendRegistrationCodeRequest,
-): Promise<IResponse<void>> => {
+export const resendRegistrationCode = (request: IResendRegistrationCodeRequest): Promise<IResponse<void>> => {
   return requester.request<void>({
     data: request,
     method: 'POST',
@@ -101,6 +99,14 @@ export const getMe = (): Promise<IResponse<IUser>> => {
 
 export const getMeWithoutRefresh = (): Promise<IResponse<IUser>> => {
   return requestCurrentUser(true);
+};
+
+export const updateProfile = (request: IUpdateUserProfileRequest): Promise<IResponse<IUser>> => {
+  return requester.request<IUser>({
+    data: request,
+    method: 'PATCH',
+    url: '/auth/me',
+  });
 };
 
 export const logout = (refreshToken: string): Promise<IResponse<void>> => {

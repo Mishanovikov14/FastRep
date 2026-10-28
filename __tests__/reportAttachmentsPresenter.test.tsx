@@ -12,9 +12,14 @@ import { ReportAttachmentError } from '@/entities/report/model/ReportAttachmentE
 import { uploadReportAssetToStorage } from '@/entities/report/services/reportAssetUploadService';
 import {
   normalizeReportImageSelection,
+  pickReportDocument,
   pickReportImage,
   pickReportImages,
 } from '@/entities/report/services/reportFilePickerService';
+import {
+  requestMicrophonePermission,
+  startReportAudioRecording,
+} from '@/entities/report/services/reportAudioRecordingService';
 import type { IReportAsset } from '@/entities/report/types/reportAsset';
 import { logger } from '@/libs/logger/logger';
 import { queryClient } from '@/libs/query/QueryClient';
@@ -82,14 +87,16 @@ const flushPromises = async () => {
 describe('report attachments presenter upload state machine', () => {
   let presenter: ReturnType<typeof useReportAttachmentsPresenter> | undefined;
   let renderer: ReactTestRenderer.ReactTestRenderer | undefined;
+  let canEdit: boolean;
 
   const Harness = () => {
-    presenter = useReportAttachmentsPresenter({ canEdit: true, reportId: 'report-1', t });
+    presenter = useReportAttachmentsPresenter({ canEdit, reportId: 'report-1', t });
     return null;
   };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    canEdit = true;
     let uuidIndex = 0;
     uuidV4Mock.mockImplementation(() => `00000000-0000-4000-8000-${String(uuidIndex++).padStart(12, '0')}`);
     jest.mocked(useReportAssetsQuery).mockReset();
@@ -194,6 +201,27 @@ describe('report attachments presenter upload state machine', () => {
     ]);
     expect(presenter?.localAssets).toEqual([]);
     expect(queryClient.setQueryData).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not invoke add attachment handlers when source editing becomes blocked', async () => {
+    ReactTestRenderer.act(() => renderer?.unmount());
+    canEdit = false;
+    await ReactTestRenderer.act(async () => {
+      renderer = ReactTestRenderer.create(<Harness />);
+    });
+
+    await ReactTestRenderer.act(async () => {
+      await presenter?.onAddPhoto();
+      await presenter?.onTakePhoto();
+      await presenter?.onAddDocument();
+      await presenter?.onStartRecording();
+    });
+
+    expect(pickReportImages).not.toHaveBeenCalled();
+    expect(pickReportImage).not.toHaveBeenCalled();
+    expect(pickReportDocument).not.toHaveBeenCalled();
+    expect(requestMicrophonePermission).not.toHaveBeenCalled();
+    expect(startReportAudioRecording).not.toHaveBeenCalled();
   });
 
   it('cleans an expired pending slot before requesting a new upload contract', async () => {

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { View } from 'react-native';
 
 import { PdfIcon } from '@/assets/icons/PdfIcon';
+import { isReportGenerationActive } from '@/entities/report/model/reportGenerationState';
 import type { IReportGeneration } from '@/entities/report/types/reportGeneration';
 import type { ReportStatus } from '@/entities/report/types/report';
 import { Button } from '@/UIKit/Button';
@@ -54,7 +55,7 @@ export const GenerationSection = ({
   const { colors, radius, spacing, t } = useUIContext();
   const styles = useMemo(() => getStyles(colors, radius, spacing), [colors, radius, spacing]);
   const progress = Math.max(0, Math.min(100, generation?.progress ?? 0));
-  const isActive = generation?.status === 'QUEUED' || generation?.status === 'PROCESSING';
+  const isActive = isReportGenerationActive(generation);
 
   return (
     <View style={styles.section}>
@@ -110,29 +111,31 @@ export const GenerationSection = ({
               </Typography>
             </View>
           </View>
-          <View style={styles.outputActions}>
+          <View style={styles.outputActions} testID="report-output-actions">
             <Button
+              fullWidth
               loading={isOpeningOutput}
               onPress={onOpenOutput}
-              style={styles.outputAction}
               title={String(t('reports.output.open'))}
             />
-            <Button
-              loading={isSharingOutput}
-              onPress={onShareOutput}
-              style={styles.outputAction}
-              title={String(t('reports.output.share'))}
-              variant="secondary"
-            />
-            {reportStatus === 'READY' ? (
+            <View style={styles.outputSecondaryActions} testID="report-output-secondary-actions">
               <Button
-                loading={isDuplicating}
-                onPress={onDuplicate}
+                loading={isSharingOutput}
+                onPress={onShareOutput}
                 style={styles.outputAction}
-                title={String(t('reports.duplicate.action'))}
+                title={String(t('reports.output.share'))}
                 variant="secondary"
               />
-            ) : null}
+              {reportStatus === 'READY' && !isActive ? (
+                <Button
+                  loading={isDuplicating}
+                  onPress={onDuplicate}
+                  style={styles.outputAction}
+                  title={String(t('reports.duplicate.action'))}
+                  variant="secondary"
+                />
+              ) : null}
+            </View>
           </View>
         </View>
       ) : !isGenerating && generation?.status !== 'FAILED' ? (

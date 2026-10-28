@@ -16,7 +16,9 @@ export const getStyles = (colors: Colors, spacing: Spacing, radius: Radius) => {
       borderColor: colors.error,
     },
     dangerPressed: {
-      backgroundColor: colors.primaryPressed,
+      backgroundColor: colors.error,
+      borderColor: colors.error,
+      opacity: 0.85,
     },
     disabled: {
       opacity: 0.5,
